@@ -1,0 +1,18 @@
+# Build and intermediate output
+bin/
+obj/
+src/obj/
+src/bin/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Backups folder content (keep directory structure)
+backups/*.reg
+!backups/.gitkeep
+
+# Temporary / Scratch
+scratch/
+*.tmp
+*.log

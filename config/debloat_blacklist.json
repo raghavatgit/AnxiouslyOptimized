@@ -1,0 +1,137 @@
+[
+  {
+    "name": "Microsoft.549981C3F5F10",
+    "displayName": "Cortana App",
+    "description": "Old voice assistant app that is no longer supported."
+  },
+  {
+    "name": "Microsoft.GetHelp",
+    "displayName": "Get Help App",
+    "description": "Online help and support shortcut."
+  },
+  {
+    "name": "Microsoft.Getstarted",
+    "displayName": "Tips / Get Started",
+    "description": "Windows welcome tips and pop-up messages."
+  },
+  {
+    "name": "Microsoft.MicrosoftSolitaireCollection",
+    "displayName": "Solitaire Collection",
+    "description": "Card games with built-in advertising."
+  },
+  {
+    "name": "Microsoft.BingWeather",
+    "displayName": "MSN Weather",
+    "description": "Weather app running and updating in the background."
+  },
+  {
+    "name": "Microsoft.BingNews",
+    "displayName": "MSN News",
+    "description": "News feed widget and news pop-up alerts."
+  },
+  {
+    "name": "Microsoft.WindowsFeedbackHub",
+    "displayName": "Feedback Hub",
+    "description": "Windows feedback and survey tool."
+  },
+  {
+    "name": "Microsoft.WindowsMaps",
+    "displayName": "Windows Maps",
+    "description": "Built-in offline maps app."
+  },
+  {
+    "name": "Microsoft.People",
+    "displayName": "Windows People",
+    "description": "Old contact book app."
+  },
+  {
+    "name": "Microsoft.MixedReality.Portal",
+    "displayName": "Mixed Reality Portal",
+    "description": "Virtual reality headset setup tool."
+  },
+  {
+    "name": "Microsoft.Microsoft3DViewer",
+    "displayName": "3D Viewer",
+    "description": "Old 3D model viewer app."
+  },
+  {
+    "name": "Clipchamp.Clipchamp",
+    "displayName": "Clipchamp Video Editor",
+    "description": "Web-based video editor app."
+  },
+  {
+    "name": "Microsoft.Todos",
+    "displayName": "Microsoft To-Do",
+    "description": "To-do list and task reminder app."
+  },
+  {
+    "name": "Microsoft.PowerAutomateDesktop",
+    "displayName": "Power Automate Desktop",
+    "description": "Office automation tool that most home users do not need."
+  },
+  {
+    "name": "Microsoft.BingFinance",
+    "displayName": "MSN Money / Finance",
+    "description": "Stock and finance tracking widget running in background."
+  },
+  {
+    "name": "Microsoft.BingSports",
+    "displayName": "MSN Sports",
+    "description": "Sports scores feed and background news updater."
+  },
+  {
+    "name": "Microsoft.MicrosoftOfficeHub",
+    "displayName": "Microsoft 365 / Office Hub",
+    "description": "Pre-installed promotional hub pushing Office 365 subscriptions."
+  },
+  {
+    "name": "Microsoft.SkypeApp",
+    "displayName": "Skype",
+    "description": "Legacy Skype messaging app."
+  },
+  {
+    "name": "Microsoft.YourPhone",
+    "displayName": "Phone Link",
+    "description": "Mobile phone pairing app that runs continuously in background."
+  },
+  {
+    "name": "Microsoft.ZuneVideo",
+    "displayName": "Movies & TV",
+    "description": "Legacy default video player."
+  },
+  {
+    "name": "Microsoft.ZuneMusic",
+    "displayName": "Groove Music / Media Player",
+    "description": "Legacy audio player replaced by modern alternatives."
+  },
+  {
+    "name": "SpotifyAB.SpotifyMusic",
+    "displayName": "Spotify Pre-install",
+    "description": "Sponsored music app pre-installed by Microsoft."
+  },
+  {
+    "name": "Disney.37853FC22B2CE",
+    "displayName": "Disney+ Pre-install",
+    "description": "Sponsored streaming app pre-installed on Windows."
+  },
+  {
+    "name": "ByteDancePte.Ltd.TikTok",
+    "displayName": "TikTok Pre-install",
+    "description": "Sponsored social media app pre-installed on Windows."
+  },
+  {
+    "name": "Facebook.InstagramBeta",
+    "displayName": "Instagram Pre-install",
+    "description": "Sponsored social media app pre-installed on Windows."
+  },
+  {
+    "name": "Amazon.com.Amazon",
+    "displayName": "Amazon App Pre-install",
+    "description": "Sponsored shopping app pre-installed on Windows."
+  },
+  {
+    "name": "Microsoft.OutlookForWindows",
+    "displayName": "New Outlook Web App",
+    "description": "Web wrapper replacement for Windows Mail that runs background telemetry."
+  }
+]

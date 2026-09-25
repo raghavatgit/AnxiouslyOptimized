@@ -1,0 +1,68 @@
+{
+  "safe_baseline": {
+    "name": "1-Click Instant PC Boost (Recommended for Everyone)",
+    "description": "Essential speed, privacy, and declutter optimizations. Safe for 100% of computers (home, office, school). Never breaks updates, printers, or apps.",
+    "tweaks": [
+      "telemetry_services",
+      "telemetry_registry",
+      "advertising_id",
+      "bing_search_start",
+      "consumer_features",
+      "win11_classic_context_menu",
+      "win11_taskbar_clean",
+      "win11_explorer_clean",
+      "win10_news_interests",
+      "win10_cortana_clean",
+      "win10_timeline_clean",
+      "fast_ntfs_access",
+      "network_autotuning"
+    ]
+  },
+  "gaming_rig": {
+    "name": "High-FPS Gaming Boost",
+    "description": "Made for PC gamers. Stops game stutter, turns off background screen recording, smooths out mouse aiming, and unlocks maximum speed for your graphics card and processor.",
+    "tweaks": [
+      "telemetry_services",
+      "telemetry_registry",
+      "advertising_id",
+      "bing_search_start",
+      "consumer_features",
+      "win11_classic_context_menu",
+      "win11_taskbar_clean",
+      "win11_explorer_clean",
+      "win10_news_interests",
+      "win10_cortana_clean",
+      "win10_timeline_clean",
+      "fast_ntfs_access",
+      "network_autotuning",
+      "game_dvr",
+      "mouse_acceleration",
+      "ultimate_performance_plan",
+      "hags_scheduling"
+    ]
+  },
+  "emulator_pro": {
+    "name": "Free Fire & Android Emulators (BlueStacks 5 & MSI App Player)",
+    "description": "Made specifically for Free Fire on BlueStacks 5 and MSI App Player. Unlocks up to 240 FPS with fast ROG Phone mode, makes upward drag headshots easy, and gives top speed to your graphics card.",
+    "tweaks": [
+      "telemetry_services",
+      "telemetry_registry",
+      "advertising_id",
+      "bing_search_start",
+      "consumer_features",
+      "win11_classic_context_menu",
+      "win11_taskbar_clean",
+      "win11_explorer_clean",
+      "win10_news_interests",
+      "win10_cortana_clean",
+      "win10_timeline_clean",
+      "fast_ntfs_access",
+      "network_autotuning",
+      "game_dvr",
+      "mouse_acceleration",
+      "ultimate_performance_plan",
+      "hags_scheduling",
+      "emulator_bluestacks_fps"
+    ]
+  }
+}

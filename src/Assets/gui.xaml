@@ -1,0 +1,2093 @@
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        Title="AnxiouslyOptimized - Easy PC Speed &amp; Game Booster" 
+        Height="780" Width="1240" 
+        MinHeight="680" MinWidth="1020"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        Background="#000000" Foreground="#FFFFFF"
+        FontFamily="Inter, Segoe UI Variable Display, Segoe UI, Aptos, system-ui, -apple-system, sans-serif"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType"
+        RenderOptions.ClearTypeHint="Enabled"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True">
+
+    <!-- Native Windows Resizing and Aero Snap Integration -->
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="52" ResizeBorderThickness="6" CornerRadius="0" GlassFrameThickness="0" UseAeroCaptionButtons="False"/>
+    </shell:WindowChrome.WindowChrome>
+
+            <Window.Resources>
+        <!-- High-Performance Solid OLED Black Theme Tokens (Zero Gradients, Pure OLED Deep Black) -->
+        <SolidColorBrush x:Key="OverviewCardBg" Color="#0A0A0D"/>
+        <SolidColorBrush x:Key="OverviewCardBorder" Color="#1C1C22"/>
+        <SolidColorBrush x:Key="OverviewCardHoverBg" Color="#121216"/>
+        <SolidColorBrush x:Key="OverviewCardHoverBorder" Color="#2A2A35"/>
+
+        <SolidColorBrush x:Key="CardActionBtnBg" Color="#14141A"/>
+        <SolidColorBrush x:Key="CardActionBtnBorder" Color="#262632"/>
+        <SolidColorBrush x:Key="CardActionBtnHoverBg" Color="#1C1C24"/>
+        <SolidColorBrush x:Key="CardActionBtnHoverBorder" Color="#00F5D4"/>
+
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#A1A1AA"/>
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#71717A"/>
+        <SolidColorBrush x:Key="SidebarActiveBgBrush" Color="#14141A"/>
+        <SolidColorBrush x:Key="SidebarActiveFgBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="SidebarCardBgBrush" Color="#0A0A0D"/>
+        <SolidColorBrush x:Key="SidebarCardBorderBrush" Color="#1C1C22"/>
+        <SolidColorBrush x:Key="CircleNavBgBrush" Color="#14141A"/>
+        <SolidColorBrush x:Key="CircleNavBorderBrush" Color="#262632"/>
+        <SolidColorBrush x:Key="SidebarHoverBgBrush" Color="#0E0E12"/>
+
+        <!-- Universal Dynamic Section Banners &amp; Status Badges -->
+        <SolidColorBrush x:Key="SectionBannerBg" Color="#0A0A0D"/>
+        <SolidColorBrush x:Key="SectionBannerBorder" Color="#1C1C22"/>
+        <SolidColorBrush x:Key="SectionBannerTitleBrush" Color="#00F5D4"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#00F5D4"/>
+
+        <SolidColorBrush x:Key="TweakCardBg" Color="#09090C"/>
+        <SolidColorBrush x:Key="TweakCardBorder" Color="#18181E"/>
+        <SolidColorBrush x:Key="TweakCardHoverBg" Color="#111116"/>
+
+        <SolidColorBrush x:Key="BadgeOptimizedBg" Color="#061A14"/>
+        <SolidColorBrush x:Key="BadgeOptimizedBorder" Color="#0F5132"/>
+        <SolidColorBrush x:Key="BadgeOptimizedFg" Color="#10B981"/>
+
+        <SolidColorBrush x:Key="BadgeStandardBg" Color="#121216"/>
+        <SolidColorBrush x:Key="BadgeStandardBorder" Color="#22222A"/>
+        <SolidColorBrush x:Key="BadgeStandardFg" Color="#71717A"/>
+
+        <SolidColorBrush x:Key="WarningBannerBg" Color="#140C06"/>
+        <SolidColorBrush x:Key="WarningBannerBorder" Color="#3D2109"/>
+
+        <SolidColorBrush x:Key="DangerBannerBg" Color="#140809"/>
+        <SolidColorBrush x:Key="DangerBannerBorder" Color="#3E1417"/>
+
+        <SolidColorBrush x:Key="SuccessBannerBg" Color="#061710"/>
+        <SolidColorBrush x:Key="SuccessBannerBorder" Color="#0D422B"/>
+
+        <SolidColorBrush x:Key="InputSearchBg" Color="#0A0A0D"/>
+        <SolidColorBrush x:Key="InputSearchBorder" Color="#1C1C22"/>
+        <SolidColorBrush x:Key="InputSearchFg" Color="#FFFFFF"/>
+
+        <!-- Swift Tab Content Transition Animation -->
+        <Storyboard x:Key="TabEntranceAnim">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.18" DecelerationRatio="0.8"/>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" From="12" To="0" Duration="0:0:0.20">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <!-- World-Class Solid OLED Bento Card Style -->
+        <Style x:Key="OverviewCard" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource OverviewCardBg}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource OverviewCardBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="18,14"/>
+            <Setter Property="MinHeight" Value="216"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TransformGroup>
+                        <TranslateTransform Y="0"/>
+                        <ScaleTransform ScaleX="1.0" ScaleY="1.0"/>
+                    </TransformGroup>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="12" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.45"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource OverviewCardHoverBorder}"/>
+                    <Setter Property="Background" Value="{DynamicResource OverviewCardHoverBg}"/>
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(TranslateTransform.Y)" To="-2" Duration="0:0:0.15">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CubicEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <DoubleAnimation Storyboard.TargetProperty="Effect.BlurRadius" To="18" Duration="0:0:0.15"/>
+                                <DoubleAnimation Storyboard.TargetProperty="Effect.Opacity" To="0.65" Duration="0:0:0.15"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(TranslateTransform.Y)" To="0" Duration="0:0:0.18">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CubicEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <DoubleAnimation Storyboard.TargetProperty="Effect.BlurRadius" To="12" Duration="0:0:0.18"/>
+                                <DoubleAnimation Storyboard.TargetProperty="Effect.Opacity" To="0.45" Duration="0:0:0.18"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- General Solid OLED Card Style -->
+        <Style x:Key="CardBorder" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource OverviewCardBg}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource OverviewCardBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="16,14"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="12" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.45"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Window Control Button (Min / Max) -->
+        <Style x:Key="WinCtrlButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#94A3B8"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="52"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="BrdCtrl" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BrdCtrl" Property="Background" Value="#18181B"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="BrdCtrl" Property="Background" Value="#27272A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Window Close Button -->
+        <Style x:Key="WinCloseButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#94A3B8"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="52"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="BrdCtrl" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BrdCtrl" Property="Background" Value="#DC2626"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="BrdCtrl" Property="Background" Value="#B91C1C"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Primary Action Button Mint Cyan (Scan My PC CTA) -->
+        <Style x:Key="ButtonScanCTA" TargetType="Button">
+            <Setter Property="Background" Value="#00F5D4"/>
+            <Setter Property="BorderBrush" Value="#5EEAD4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#000000"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="13.5"/>
+            <Setter Property="Padding" Value="18,10"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1.0" ScaleY="1.0"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="12" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.35"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="BrdBtn" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="12" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="#2DD4BF"/>
+                                <Setter TargetName="BrdBtn" Property="BorderBrush" Value="#FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="#0D9488"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Overview Card Bottom Action Button -->
+        <Style x:Key="ButtonCardAction" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource CardActionBtnBg}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardActionBtnBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TransformGroup>
+                        <TranslateTransform Y="0"/>
+                        <ScaleTransform ScaleX="1.0" ScaleY="1.0"/>
+                    </TransformGroup>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="BrdBtn" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10" Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.35"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="{DynamicResource CardActionBtnHoverBg}"/>
+                                <Setter TargetName="BrdBtn" Property="BorderBrush" Value="{DynamicResource CardActionBtnHoverBorder}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="#0A0A0D"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Circular Action Navigation Button (Solid Disc) -->
+        <Style x:Key="ButtonCircleNav" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource CircleNavBgBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CircleNavBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#94A3B8"/>
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TransformGroup>
+                        <TranslateTransform X="0" Y="0"/>
+                        <ScaleTransform ScaleX="1.0" ScaleY="1.0"/>
+                    </TransformGroup>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="BrdCircle" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="14">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BrdCircle" Property="Background" Value="#1C1C24"/>
+                                <Setter TargetName="BrdCircle" Property="BorderBrush" Value="#00F5D4"/>
+                                <Setter Property="Foreground" Value="#00F5D4"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="BrdCircle" Property="Background" Value="#0E0E12"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Solid Action Profile Buttons (Primary, Blue, Purple, Flame, Danger, Secondary) -->
+        <Style x:Key="ButtonPrimary" TargetType="Button">
+            <Setter Property="Background" Value="#00F5D4"/>
+            <Setter Property="BorderBrush" Value="#5EEAD4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#000000"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="16,9"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="BrdBtn" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="8" ShadowDepth="1" Direction="270" Color="#000000" Opacity="0.35"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="#2DD4BF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="#0D9488"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ButtonBlue" TargetType="Button">
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="BorderBrush" Value="#3B82F6"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="16,9"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="BrdBtn" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="8" ShadowDepth="1" Direction="270" Color="#000000" Opacity="0.35"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="#1D4ED8"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="#1E40AF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ButtonPurple" TargetType="Button">
+            <Setter Property="Background" Value="#7C3AED"/>
+            <Setter Property="BorderBrush" Value="#8B5CF6"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="16,9"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="BrdBtn" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="8" ShadowDepth="1" Direction="270" Color="#000000" Opacity="0.35"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="#6D28D9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="#5B21B6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ButtonFlame" TargetType="Button">
+            <Setter Property="Background" Value="#EA580C"/>
+            <Setter Property="BorderBrush" Value="#F97316"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="16,9"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="BrdBtn" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="8" ShadowDepth="1" Direction="270" Color="#000000" Opacity="0.35"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="#C2410C"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="#9A3412"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ButtonDanger" TargetType="Button">
+            <Setter Property="Background" Value="#DC2626"/>
+            <Setter Property="BorderBrush" Value="#EF4444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="16,9"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="BrdBtn" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="8" ShadowDepth="1" Direction="270" Color="#000000" Opacity="0.35"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="#B91C1C"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="#991B1B"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ButtonSecondary" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource CardActionBtnBg}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardActionBtnBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1.0" ScaleY="1.0"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="BrdBtn" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="{DynamicResource CardActionBtnHoverBg}"/>
+                                <Setter TargetName="BrdBtn" Property="BorderBrush" Value="{DynamicResource CardActionBtnHoverBorder}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="BrdBtn" Property="Background" Value="#0A0A0D"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Sidebar Navigation Button Style -->
+        <Style x:Key="SidebarNavButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.0,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TranslateTransform X="0"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="BrdNav" Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BrdNav" Property="Background" Value="{DynamicResource SidebarHoverBgBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Dynamic Window Brushes -->
+        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#000000"/>
+        <SolidColorBrush x:Key="WindowBorderBrush" Color="#18181B"/>
+    </Window.Resources>
+
+    <!-- Outer Window Container with Specular Top Highlight and Fullscreen Margin Compensation -->
+    <Border Name="RootBorder" Background="{DynamicResource WindowBackgroundBrush}" BorderBrush="{DynamicResource WindowBorderBrush}">
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=WindowState}" Value="Maximized">
+                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="52"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- ========================================================== -->
+            <!-- 1. TOP HEADER & WINDOW CHROME BAR                          -->
+            <!-- ========================================================== -->
+            <Border Name="BrdTitleBar" Grid.Row="0" BorderThickness="0,0,0,1" Background="#050505" BorderBrush="#141418">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="280"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left: Brand Logo & Title (Official Microchip Arrow Brand Icon) -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                        <!-- Official Microchip Arrow Brand Icon -->
+                        <Image Name="ImgTitleLogo" Source="Assets/app_icon.png" Width="28" Height="28" Margin="0,0,10,0" VerticalAlignment="Center"
+                               RenderOptions.BitmapScalingMode="HighQuality" SnapsToDevicePixels="True"/>
+                        
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="ANXIOUSLY OPTIMIZED" FontSize="13.5" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            </StackPanel>
+                            <!-- Edition Pill Badge (Exact Blue Pill) -->
+                            <Border Name="BrdEditionBadge" CornerRadius="4" Padding="5,1" Margin="0,2,0,0" HorizontalAlignment="Left" Background="#111E32" BorderBrush="#1C3050" BorderThickness="1">
+                                <TextBlock Name="TxtEditionBadge" Text="Windows 10 Edition" FontSize="9.5" FontWeight="SemiBold" Foreground="#60A5FA"/>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Center Drag Area -->
+                    <Grid Grid.Column="1"/>
+
+                    <!-- Right: 4-Shade Animated Theme Slider + Search Pill Box + Window Control Buttons -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Search Tools Pill Input (1-to-1 with Reference Screenshot) -->
+                        <Border Name="BrdSearchBox" CornerRadius="16" Height="30" Width="165" Background="#0C0C0F" BorderBrush="#22222A" BorderThickness="1" Margin="0,0,14,0" shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                            <Grid Margin="10,0,8,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Path Grid.Column="0" Data="M 7 2 C 4.2 2 2 4.2 2 7 C 2 9.8 4.2 12 7 12 C 8.2 12 9.3 11.6 10.1 10.9 L 13.6 14.4 C 13.8 14.6 14.2 14.6 14.4 14.4 C 14.6 14.2 14.6 13.8 14.4 13.6 L 10.9 10.1 C 11.6 9.3 12 8.2 12 7 C 12 4.2 9.8 2 7 2 Z M 7 3.5 C 8.9 3.5 10.5 5.1 10.5 7 C 10.5 8.9 8.9 10.5 7 10.5 C 5.1 10.5 3.5 8.9 3.5 7 C 3.5 5.1 5.1 3.5 7 3.5 Z" Fill="#64748B" Width="12" Height="12" Stretch="Uniform" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBox Name="TxtGlobalSearch" Grid.Column="1" Text="Search tools..." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" CaretBrush="{DynamicResource TextPrimaryBrush}"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Minimize Button -->
+                        <Button Name="BtnMin" Style="{StaticResource WinCtrlButton}">
+                            <Rectangle Width="10" Height="1.6" Fill="#94A3B8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Button>
+                        
+                        <!-- Maximize/Restore Button -->
+                        <Button Name="BtnMax" Style="{StaticResource WinCtrlButton}">
+                            <TextBlock Text="&#x25A2;" FontSize="13"/>
+                        </Button>
+                        
+                        <!-- Close Button -->
+                        <Button Name="BtnClose" Style="{StaticResource WinCloseButton}">
+                            <TextBlock Text="&#x2715;" FontSize="12"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================== -->
+            <!-- 2. MAIN APPLICATION WORKSPACE (Sidebar + Content)          -->
+            <!-- ========================================================== -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="280"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left Sidebar Navigation Menu -->
+                <Border Name="BrdSidebar" Grid.Column="0" BorderThickness="0,0,1,0" Padding="12,14" Background="#070709" BorderBrush="#141418">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Primary Navigation Menu (Items 1 - 6 with 1-to-1 Vector Sublogos) -->
+                        <StackPanel Grid.Row="0">
+                            <!-- Nav 0: Overview (Home Outline Sublogo) -->
+                            <Button Name="NavBtnOverview" Style="{StaticResource SidebarNavButton}" Background="{DynamicResource SidebarActiveBgBrush}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Path Grid.Column="0" Data="M 3 10.5 L 12 3 L 21 10.5 V 20 C 21 20.6 20.6 21 20 21 H 15 V 14 H 9 V 21 H 4 C 3.4 21 3 20.6 3 20 Z" 
+                                          Stroke="#00F5D4" StrokeThickness="1.6" Fill="Transparent" Width="16" Height="16" Stretch="Uniform" Margin="2,0,10,0" VerticalAlignment="Center"/>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="Overview" FontSize="13.5" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                        <TextBlock Text="All tools at a glance" FontSize="10.5" Foreground="#64748B"/>
+                                    </StackPanel>
+                                    <Rectangle Name="NavIndicatorOverview" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Visible"/>
+                                </Grid>
+                            </Button>
+
+                            <!-- Nav 1: Quick Boost (Lightning Bolt Sublogo) -->
+                            <Button Name="NavBtnQuickBoost" Style="{StaticResource SidebarNavButton}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Path Grid.Column="0" Data="M 13 2 L 4 14 H 11 L 9 22 L 20 10 H 13 Z" 
+                                          Fill="#00F5D4" Width="15" Height="15" Stretch="Uniform" Margin="3,0,10,0" VerticalAlignment="Center"/>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="Quick Boost" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                        <TextBlock Text="1-click speed profiles" FontSize="10" Foreground="#64748B"/>
+                                    </StackPanel>
+                                    <Rectangle Name="NavIndicatorQuickBoost" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
+                                </Grid>
+                            </Button>
+
+                            <!-- Nav 2: System Tweaks (Horizontal Sliders Sublogo) -->
+                            <Button Name="NavBtnTweaks" Style="{StaticResource SidebarNavButton}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Canvas Grid.Column="0" Width="16" Height="16" Margin="3,0,10,0" VerticalAlignment="Center">
+                                        <Line X1="1" Y1="4" X2="15" Y2="4" Stroke="#38BDF8" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                        <Ellipse Canvas.Left="4" Canvas.Top="2" Width="4" Height="4" Fill="#060B12" Stroke="#38BDF8" StrokeThickness="1.5"/>
+                                        <Line X1="1" Y1="8" X2="15" Y2="8" Stroke="#38BDF8" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                        <Ellipse Canvas.Left="10" Canvas.Top="6" Width="4" Height="4" Fill="#060B12" Stroke="#38BDF8" StrokeThickness="1.5"/>
+                                        <Line X1="1" Y1="12" X2="15" Y2="12" Stroke="#38BDF8" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                        <Ellipse Canvas.Left="5" Canvas.Top="10" Width="4" Height="4" Fill="#060B12" Stroke="#38BDF8" StrokeThickness="1.5"/>
+                                    </Canvas>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="System Tweaks" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                        <TextBlock Text="Speed, privacy &amp; internet" FontSize="9" Foreground="#64748B"/>
+                                    </StackPanel>
+                                    <Rectangle Name="NavIndicatorTweaks" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
+                                </Grid>
+                            </Button>
+
+                            <!-- Nav 3: App Cleaner (Modern Trash Can Sublogo) -->
+                            <Button Name="NavBtnDebloat" Style="{StaticResource SidebarNavButton}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Path Grid.Column="0" Data="M 3 6 H 17 M 8 6 V 4 C 8 3.4 8.4 3 9 3 H 11 C 11.6 3 12 3.4 12 4 V 6 M 5 6 L 6 17 C 6 18.1 6.9 19 8 19 H 12 C 13.1 19 14 18.1 14 17 L 15 6 M 8 9 V 15 M 12 9 V 15" 
+                                          Stroke="#F87171" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent" Width="15" Height="15" Stretch="Uniform" Margin="3,0,10,0" VerticalAlignment="Center"/>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="App Cleaner" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                        <TextBlock Text="Remove unnecessary junk" FontSize="10" Foreground="#64748B"/>
+                                    </StackPanel>
+                                    <Rectangle Name="NavIndicatorDebloat" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
+                                </Grid>
+                            </Button>
+
+                            <!-- Nav 4: System Health (Heart Outline Sublogo) -->
+                            <Button Name="NavBtnHealth" Style="{StaticResource SidebarNavButton}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Path Grid.Column="0" Data="M 12 21 L 10.5 19.7 C 5.4 15 2 12 2 8.2 C 2 5.1 4.4 2.8 7.5 2.8 C 9.2 2.8 10.9 3.6 12 4.9 C 13.1 3.6 14.8 2.8 16.5 2.8 C 19.6 2.8 22 5.1 22 8.2 C 22 12 18.6 15 13.5 19.7 Z" 
+                                          Stroke="#38BDF8" StrokeThickness="1.6" StrokeLineJoin="Round" Fill="Transparent" Width="15" Height="15" Stretch="Uniform" Margin="3,0,10,0" VerticalAlignment="Center"/>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="System Health" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                        <TextBlock Text="RAM, disk &amp; repair" FontSize="9" Foreground="#64748B"/>
+                                    </StackPanel>
+                                    <Rectangle Name="NavIndicatorHealth" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
+                                </Grid>
+                            </Button>
+
+                            <!-- Nav 5: Free Fire & Emulators (Gamepad Sublogo) -->
+                            <Button Name="NavBtnEmulators" Style="{StaticResource SidebarNavButton}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Path Grid.Column="0" Data="M 6 6 H 18 C 20.2 6 22 7.8 22 10 V 14 C 22 16.2 20.4 18 18.3 18.4 L 16 16 H 8 L 5.7 18.4 C 3.6 18 2 16.2 2 14 V 10 C 2 7.8 3.8 6 6 6 Z M 6 11 H 9 M 7.5 9.5 V 12.5 M 15.5 10.5 H 15.6 M 17.5 11.5 H 17.6 M 15.5 12.5 H 15.6 M 13.5 11.5 H 13.6" 
+                                          Stroke="#F59E0B" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent" Width="16" Height="16" Stretch="Uniform" Margin="3,0,10,0" VerticalAlignment="Center"/>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="Free Fire &amp; Emulators" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                        <TextBlock Text="BlueStacks &amp; MSI Player" FontSize="9" Foreground="#64748B"/>
+                                    </StackPanel>
+                                    <Rectangle Name="NavIndicatorEmulators" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
+                                </Grid>
+                            </Button>
+                        </StackPanel>
+
+                        <!-- Spacer -->
+                        <Grid Grid.Row="1"/>
+
+                        <!-- Secondary Navigation (Settings, Backups, About) -->
+                        <StackPanel Grid.Row="2" Margin="0,0,0,10">
+                            <Border Height="1" Background="#121D2E" Margin="4,0,4,8"/>
+
+                            <!-- Settings (Gear Sublogo) -->
+                            <Button Name="NavBtnSettings" Style="{StaticResource SidebarNavButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="M 12 15 C 10.3 15 9 13.7 9 12 C 9 10.3 10.3 9 12 9 C 13.7 9 15 10.3 15 12 C 15 13.7 13.7 15 12 15 Z M 19.4 13 C 19.4 12.7 19.5 12.3 19.5 12 C 19.5 11.7 19.4 11.3 19.4 11 L 21.5 9.4 C 21.7 9.2 21.8 8.9 21.6 8.7 L 19.6 5.2 C 19.5 5 19.2 4.9 19 5 L 16.5 6 C 16 5.6 15.4 5.3 14.8 5.1 L 14.4 2.4 C 14.4 2.2 14.2 2 13.9 2 H 10 C 9.8 2 9.6 2.2 9.5 2.4 L 9.1 5.1 C 8.5 5.3 8 5.6 7.4 6 L 5 5 C 4.7 4.9 4.4 5 4.3 5.2 L 2.3 8.7 C 2.2 8.9 2.2 9.2 2.4 9.4 L 4.5 11 C 4.5 11.3 4.5 11.7 4.5 12 C 4.5 12.3 4.5 12.7 4.5 13 L 2.4 14.6 C 2.2 14.8 2.2 15.1 2.3 15.3 L 4.3 18.8 C 4.4 19 4.7 19.1 5 19 L 7.4 18 C 8 18.4 8.5 18.7 9.1 18.9 L 9.5 21.6 C 9.6 21.8 9.8 22 10 22 H 13.9 C 14.2 22 14.4 21.8 14.4 21.6 L 14.8 18.9 C 15.4 18.7 16 18.4 16.5 18 L 19 19 C 19.2 19.1 19.5 19 19.6 18.8 L 21.6 15.3 C 21.8 15.1 21.7 14.8 21.5 14.6 Z" 
+                                          Stroke="#64748B" StrokeThickness="1.2" Fill="Transparent" Width="13" Height="13" Stretch="Uniform" Margin="4,0,10,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Settings" FontSize="12" FontWeight="SemiBold" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Backups (Clock Sublogo) -->
+                            <Button Name="NavBtnBackups" Style="{StaticResource SidebarNavButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="M 12 2 C 6.5 2 2 6.5 2 12 C 2 17.5 6.5 22 12 22 C 17.5 22 22 17.5 22 12 C 22 6.5 17.5 2 12 2 Z M 12 6 V 12 L 16 14" 
+                                          Stroke="#64748B" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent" Width="13" Height="13" Stretch="Uniform" Margin="4,0,10,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Backups" FontSize="12" FontWeight="SemiBold" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- About (Info Sublogo) -->
+                            <Button Name="NavBtnAbout" Style="{StaticResource SidebarNavButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="M 12 2 C 6.5 2 2 6.5 2 12 C 2 17.5 6.5 22 12 22 C 17.5 22 22 17.5 22 12 C 22 6.5 17.5 2 12 2 Z M 12 8 H 12.01 M 12 11 V 17" 
+                                          Stroke="#64748B" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent" Width="13" Height="13" Stretch="Uniform" Margin="4,0,10,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="About" FontSize="12" FontWeight="SemiBold" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+
+                        <!-- Bottom System Status Card (Matching Reference Screenshot) -->
+                        <Border Grid.Row="3" CornerRadius="10" Background="{DynamicResource SidebarCardBgBrush}" BorderBrush="{DynamicResource SidebarCardBorderBrush}" BorderThickness="1" Padding="12,10">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,3">
+                                    <Ellipse Width="8" Height="8" Fill="#10B981" Margin="0,0,8,0">
+                                        <Ellipse.Effect>
+                                            <DropShadowEffect BlurRadius="8" Color="#10B981" Opacity="0.9" ShadowDepth="0"/>
+                                        </Ellipse.Effect>
+                                    </Ellipse>
+                                    <TextBlock Text="System Status" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                </StackPanel>
+                                <TextBlock Text="Optimized &amp; Healthy" FontSize="13.5" FontWeight="Bold" Foreground="#10B981" Margin="16,0,0,2"/>
+                                <TextBlock Name="TxtSystemStatusSub" Text="Last scan: Today, 12:14 PM" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Margin="16,0,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Right Workspace Content Area -->
+                <Grid Grid.Column="1">
+                    <Grid Margin="24,18,24,14">
+                        <TabControl Name="TabsWorkspace" Background="Transparent" BorderThickness="0">
+                            <TabControl.ItemContainerStyle>
+                                <Style TargetType="TabItem">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </Style>
+                            </TabControl.ItemContainerStyle>
+
+                            <!-- ============================================== -->
+                            <!-- TAB 0: OVERVIEW (THE EXACT REFERENCE SCREEN)   -->
+                            <!-- ============================================== -->
+                            <TabItem Header="Overview">
+                                <Grid>
+                                    <Grid.Triggers>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard Storyboard="{StaticResource TabEntranceAnim}"/>
+                                        </EventTrigger>
+                                    </Grid.Triggers>
+                                    <Grid.RenderTransform>
+                                        <TranslateTransform Y="0"/>
+                                    </Grid.RenderTransform>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Hero Header Section -->
+                                    <Grid Grid.Row="0" Margin="0,0,0,14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Left: Dynamic Greeting + Display Headline -->
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Name="TxtGreetingTime" Text="GOOD AFTERNOON" FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
+                                            <TextBlock Text="Your PC is ready." FontSize="29" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,3,0,3"/>
+                                            <TextBlock Text="Keep it fast, clean and focused - with a single click." FontSize="13.5" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        </StackPanel>
+
+                                        <!-- Right: Value Props + Scan My PC Button -->
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <StackPanel VerticalAlignment="Center" Margin="0,0,18,0">
+                                                <TextBlock Text="CLEANER" FontSize="10.5" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
+                                                <TextBlock Text="FASTER" FontSize="10.5" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
+                                                <TextBlock Text="SMOOTHER" FontSize="10.5" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
+                                                <TextBlock Text="YOUR WAY" FontSize="10.5" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
+                                            </StackPanel>
+
+                                            <!-- Scan My PC Primary CTA (Reticle Focus Viewfinder Icon) -->
+                                            <Button Name="BtnOverviewScan" Style="{StaticResource ButtonScanCTA}">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <!-- Exact Reticle Focus Viewfinder Icon -->
+                                                    <Viewbox Name="VbScanIcon" Width="18" Height="18" Margin="0,0,8,0" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                                        <Viewbox.RenderTransform>
+                                                            <RotateTransform Angle="0"/>
+                                                        </Viewbox.RenderTransform>
+                                                        <Canvas Width="24" Height="24">
+                                                            <!-- 4 Corner Focus Brackets -->
+                                                            <Path Data="M 4 8 V 5 C 4 4.4 4.4 4 5 4 H 8" Stroke="#000000" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                                            <Path Data="M 16 4 H 19 C 19.6 4 20 4.4 20 5 V 8" Stroke="#000000" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                                            <Path Data="M 4 16 V 19 C 4 19.6 4.4 20 5 20 H 8" Stroke="#00F5D4" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                                            <Path Data="M 16 20 H 19 C 19.6 20 20 19.6 20 19 V 16" Stroke="#000000" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                                            <!-- Center Target / Reticle -->
+                                                            <Path Data="M 9 12 H 15 M 12 9 V 15" Stroke="#000000" StrokeThickness="1.6" StrokeStartLineCap="Round"/>
+                                                        </Canvas>
+                                                    </Viewbox>
+                                                    <TextBlock Name="TxtOverviewScan" Text="Scan My PC" FontSize="14" FontWeight="Bold" Foreground="#000000" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- 2x3 Bento Action Cards Grid (1-to-1 Exact Squircles & Sublogos) -->
+                                    <Grid Grid.Row="1" Margin="0,4,0,18">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Card 1: Fix Broken Windows Files (Blue Squircle: Folder + Search Icon) -->
+                                        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource OverviewCard}" Margin="0,0,10,10">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <!-- Top: Blue Squircle + Arrow Button -->
+                                                <Grid Grid.Row="0" Margin="0,0,0,10">
+                                                    <Border Width="46" Height="46" CornerRadius="14" HorizontalAlignment="Left" Background="#0D1929" BorderBrush="#1E3A8A" BorderThickness="1">
+                                                        <!-- Folder + Search Icon Glyph -->
+                                                        <Path Data="M 4 6 C 4 4.9 4.9 4 6 4 H 10 L 12 7 H 18 C 19.1 7 20 7.9 20 9 V 13.5 C 19.4 13.2 18.7 13 18 13 C 15.2 13 13 15.2 13 18 C 13 18.7 13.2 19.4 13.5 20 H 6 C 4.9 20 4 19.1 4 18 Z M 18 15 C 16.3 15 15 16.3 15 18 C 15 19.7 16.3 21 18 21 C 19.7 21 21 19.7 21 18 C 21 16.3 19.7 15 18 15 Z M 20.5 20.5 L 22.5 22.5" 
+                                                              Fill="#FFFFFF" Stroke="#FFFFFF" StrokeThickness="0.6" Width="20" Height="20" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <Button Name="BtnNavCardSFC" Style="{StaticResource ButtonCircleNav}" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                                        <Path Data="M 4 7 L 10 7 M 7 4 L 10 7 L 7 10" Stroke="#94A3B8" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="10" Height="10" Stretch="Uniform"/>
+                                                    </Button>
+                                                </Grid>
+
+                                                <!-- Text Content -->
+                                                <StackPanel Grid.Row="1">
+                                                    <TextBlock Text="Fix Broken Windows Files" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Scan and repair corrupted or missing system files with fresh Microsoft copies." FontSize="12.5" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                </StackPanel>
+
+                                                <!-- Action Button -->
+                                                <Button Name="BtnOverviewSFC" Grid.Row="2" Content="Check &amp; Repair" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Card 2: Deep Windows Repair (Emerald Squircle: Windows 4-Pane Icon) -->
+                                        <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource OverviewCard}" Margin="0,0,10,10">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <!-- Top: Emerald Windows Squircle + Arrow Button -->
+                                                <Grid Grid.Row="0" Margin="0,0,0,10">
+                                                    <Border Width="46" Height="46" CornerRadius="14" HorizontalAlignment="Left" Background="#062419" BorderBrush="#065F46" BorderThickness="1">
+                                                        <!-- Exact Windows 4-Pane Logo Glyph -->
+                                                        <Canvas Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                            <Rectangle Canvas.Left="1" Canvas.Top="1" Width="8" Height="8" RadiusX="1" RadiusY="1" Fill="#FFFFFF"/>
+                                                            <Rectangle Canvas.Left="11" Canvas.Top="1" Width="8" Height="8" RadiusX="1" RadiusY="1" Fill="#FFFFFF"/>
+                                                            <Rectangle Canvas.Left="1" Canvas.Top="11" Width="8" Height="8" RadiusX="1" RadiusY="1" Fill="#FFFFFF"/>
+                                                            <Rectangle Canvas.Left="11" Canvas.Top="11" Width="8" Height="8" RadiusX="1" RadiusY="1" Fill="#FFFFFF"/>
+                                                        </Canvas>
+                                                    </Border>
+                                                    <Button Name="BtnNavCardDISM" Style="{StaticResource ButtonCircleNav}" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                                        <Path Data="M 4 7 L 10 7 M 7 4 L 10 7 L 7 10" Stroke="#94A3B8" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="10" Height="10" Stretch="Uniform"/>
+                                                    </Button>
+                                                </Grid>
+
+                                                <!-- Text Content -->
+                                                <StackPanel Grid.Row="1">
+                                                    <TextBlock Text="Deep Windows Repair" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Clean Microsoft files and fix stubborn Windows errors that normal repairs miss." FontSize="12.5" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                </StackPanel>
+
+                                                <!-- Action Button -->
+                                                <Button Name="BtnOverviewDISM" Grid.Row="2" Content="Run Deep Repair" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Card 3: Clean Old Windows Updates (Indigo Squircle: Modern Fluted Trash Can) -->
+                                        <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource OverviewCard}" Margin="0,0,0,10">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <!-- Top: Indigo Trash Squircle + Arrow Button -->
+                                                <Grid Grid.Row="0" Margin="0,0,0,10">
+                                                    <Border Width="46" Height="46" CornerRadius="14" HorizontalAlignment="Left" Background="#13132B" BorderBrush="#3730A3" BorderThickness="1">
+                                                        <!-- Modern Fluted Trash Can Glyph -->
+                                                        <Path Data="M 4 7 H 18 M 8 7 V 4.5 C 8 3.7 8.7 3 9.5 3 H 12.5 C 13.3 3 14 3.7 14 4.5 V 7 M 5.5 7 L 6.5 19 C 6.6 20.1 7.5 21 8.6 21 H 13.4 C 14.5 21 15.4 20.1 15.5 19 L 16.5 7 M 9 10.5 V 17 M 13 10.5 V 17" 
+                                                              Stroke="#FFFFFF" StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent" Width="18" Height="18" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <Button Name="BtnNavCardCleanup" Style="{StaticResource ButtonCircleNav}" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                                        <Path Data="M 4 7 L 10 7 M 7 4 L 10 7 L 7 10" Stroke="#94A3B8" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="10" Height="10" Stretch="Uniform"/>
+                                                    </Button>
+                                                </Grid>
+
+                                                <!-- Text Content -->
+                                                <StackPanel Grid.Row="1">
+                                                    <TextBlock Text="Clean Old Windows Updates" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Remove old update files and installation junk to free up valuable disk space." FontSize="12.5" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                </StackPanel>
+
+                                                <!-- Action Button -->
+                                                <Button Name="BtnOverviewCleanup" Grid.Row="2" Content="Clean Up" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Card 4: Free Up Trapped Memory (Amber Squircle: CPU Chip Processor) -->
+                                        <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource OverviewCard}" Margin="0,0,10,0">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <!-- Top: Amber Chip Squircle + Arrow Button -->
+                                                <Grid Grid.Row="0" Margin="0,0,0,10">
+                                                    <Border Width="46" Height="46" CornerRadius="14" HorizontalAlignment="Left" Background="#241804" BorderBrush="#78350F" BorderThickness="1">
+                                                        <!-- Exact CPU Chip Processor Glyph -->
+                                                        <Canvas Width="22" Height="22" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                            <!-- Outer body -->
+                                                            <Rectangle Canvas.Left="4" Canvas.Top="4" Width="14" Height="14" RadiusX="3" RadiusY="3" Fill="#FFFFFF"/>
+                                                            <!-- Center hollow core -->
+                                                            <Rectangle Canvas.Left="8" Canvas.Top="8" Width="6" Height="6" RadiusX="1" RadiusY="1" Fill="#241804"/>
+                                                            <!-- Pins Top -->
+                                                            <Line X1="7" Y1="1" X2="7" Y2="4" Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round"/>
+                                                            <Line X1="11" Y1="1" X2="11" Y2="4" Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round"/>
+                                                            <Line X1="15" Y1="1" X2="15" Y2="4" Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round"/>
+                                                            <!-- Pins Bottom -->
+                                                            <Line X1="7" Y1="18" X2="7" Y2="21" Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round"/>
+                                                            <Line X1="11" Y1="18" X2="11" Y2="21" Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round"/>
+                                                            <Line X1="15" Y1="18" X2="15" Y2="21" Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round"/>
+                                                            <!-- Pins Left -->
+                                                            <Line X1="1" Y1="7" X2="4" Y2="7" Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round"/>
+                                                            <Line X1="1" Y1="11" X2="4" Y2="11" Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round"/>
+                                                            <Line X1="1" Y1="15" X2="4" Y2="15" Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round"/>
+                                                            <!-- Pins Right -->
+                                                            <Line X1="18" Y1="7" X2="21" Y2="7" Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round"/>
+                                                            <Line X1="18" Y1="11" X2="21" Y2="11" Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round"/>
+                                                            <Line X1="18" Y1="15" X2="21" Y2="15" Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round"/>
+                                                        </Canvas>
+                                                    </Border>
+                                                    <Button Name="BtnNavCardRAM" Style="{StaticResource ButtonCircleNav}" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                                        <Path Data="M 4 7 L 10 7 M 7 4 L 10 7 L 7 10" Stroke="#94A3B8" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="10" Height="10" Stretch="Uniform"/>
+                                                    </Button>
+                                                </Grid>
+
+                                                <!-- Text Content -->
+                                                <StackPanel Grid.Row="1">
+                                                    <TextBlock Text="Free Up Trapped Memory" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Release unused RAM and clear memory caches for a smoother experience." FontSize="12.5" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                </StackPanel>
+
+                                                <!-- Action Button -->
+                                                <Button Name="BtnOverviewRAM" Grid.Row="2" Content="Free Up Memory" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Card 5: Turn Off Sleep File (Violet Squircle: Crescent Moon) -->
+                                        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource OverviewCard}" Margin="0,0,10,0">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <!-- Top: Violet Moon Squircle + Arrow Button -->
+                                                <Grid Grid.Row="0" Margin="0,0,0,10">
+                                                    <Border Width="46" Height="46" CornerRadius="14" HorizontalAlignment="Left" Background="#190E2B" BorderBrush="#5B21B6" BorderThickness="1">
+                                                        <!-- Exact Crescent Moon Glyph -->
+                                                        <Path Data="M 12 3 A 9 9 0 0 0 3 12 A 9 9 0 0 0 12 21 A 9 9 0 0 0 18.4 17.6 A 7.5 7.5 0 0 1 12 4.5 A 7.5 7.5 0 0 1 15 5.1 A 9 9 0 0 0 12 3 Z" 
+                                                              Fill="#FFFFFF" Width="18" Height="18" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <Button Name="BtnNavCardHiber" Style="{StaticResource ButtonCircleNav}" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                                        <Path Data="M 4 7 L 10 7 M 7 4 L 10 7 L 7 10" Stroke="#94A3B8" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="10" Height="10" Stretch="Uniform"/>
+                                                    </Button>
+                                                </Grid>
+
+                                                <!-- Text Content -->
+                                                <StackPanel Grid.Row="1">
+                                                    <TextBlock Text="Turn Off Sleep File" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Disable hibernation to get 16-32 GB of free drive space instantly." FontSize="12.5" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                </StackPanel>
+
+                                                <!-- Action Button -->
+                                                <Button Name="BtnOverviewHiber" Grid.Row="2" Content="Turn Off" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Card 6: Clean Temp & Game Caches (Rose Squircle: Gaming Controller) -->
+                                        <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource OverviewCard}" Margin="0,0,0,0">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <!-- Top: Rose Gamepad Squircle + Arrow Button -->
+                                                <Grid Grid.Row="0" Margin="0,0,0,10">
+                                                    <Border Width="46" Height="46" CornerRadius="14" HorizontalAlignment="Left" Background="#260B18" BorderBrush="#831843" BorderThickness="1">
+                                                        <!-- Exact Gaming Gamepad Glyph -->
+                                                        <Path Data="M 6 6 H 18 C 20.2 6 22 7.8 22 10 V 14 C 22 16.2 20.4 18 18.3 18.4 L 16 16 H 8 L 5.7 18.4 C 3.6 18 2 16.2 2 14 V 10 C 2 7.8 3.8 6 6 6 Z M 6 11 H 9 M 7.5 9.5 V 12.5 M 15.5 10.5 H 15.6 M 17.5 11.5 H 17.6 M 15.5 12.5 H 15.6 M 13.5 11.5 H 13.6" 
+                                                              Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent" Width="18" Height="18" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <Button Name="BtnNavCardCache" Style="{StaticResource ButtonCircleNav}" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                                        <Path Data="M 4 7 L 10 7 M 7 4 L 10 7 L 7 10" Stroke="#94A3B8" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="10" Height="10" Stretch="Uniform"/>
+                                                    </Button>
+                                                </Grid>
+
+                                                <!-- Text Content -->
+                                                <StackPanel Grid.Row="1">
+                                                    <TextBlock Text="Clean Temp &amp; Game Caches" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Remove temporary files and game caches to fix stutters and free up space." FontSize="12.5" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                </StackPanel>
+
+                                                <!-- Action Button -->
+                                                <Button Name="BtnOverviewCache" Grid.Row="2" Content="Clean Now" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Bottom System Overview Dock (Liquid Frosted Glass) -->
+                                    <Border Name="BrdOverviewDock" Grid.Row="2" CornerRadius="18" BorderThickness="1" Padding="18,10" Background="#08080B" BorderBrush="#1C1C22">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="16" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.4"/>
+                                        </Border.Effect>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Left: 3-Bar Equalizer Icon + Title -->
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
+                                                <Viewbox Width="22" Height="22" Margin="0,0,10,0" VerticalAlignment="Center">
+                                                    <Canvas Width="22" Height="22">
+                                                        <Rectangle Canvas.Left="2" Canvas.Top="8" Width="3" Height="10" RadiusX="1.5" RadiusY="1.5" Fill="#00F5A0"/>
+                                                        <Rectangle Canvas.Left="8" Canvas.Top="2" Width="3" Height="18" RadiusX="1.5" RadiusY="1.5" Fill="#00F5A0"/>
+                                                        <Rectangle Canvas.Left="14" Canvas.Top="5" Width="3" Height="14" RadiusX="1.5" RadiusY="1.5" Fill="#00F5A0"/>
+                                                    </Canvas>
+                                                </Viewbox>
+                                                <StackPanel VerticalAlignment="Center">
+                                                    <TextBlock Text="System Overview" FontSize="14.5" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                    <TextBlock Text="Live system resource usage" FontSize="11.5" Foreground="{DynamicResource TextMutedBrush}" Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                            </StackPanel>
+
+                                            <!-- Middle: Dark Capsule Container with 3 Circular Resource Gauges (CPU, RAM, Disk) -->
+                                            <Border Name="PnlTelemetryCapsule" Grid.Column="1" CornerRadius="12" BorderThickness="1" Padding="14,6" Margin="0,0,16,0" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#0C0C10" BorderBrush="#202028">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <!-- CPU Gauge -->
+                                                    <StackPanel Orientation="Horizontal" Margin="0,0,24,0" VerticalAlignment="Center">
+                                                        <!-- Dynamic Arc Ring -->
+                                                        <Canvas Width="36" Height="36" Margin="0,0,8,0" VerticalAlignment="Center">
+                                                            <Ellipse Canvas.Left="3" Canvas.Top="3" Width="30" Height="30" Stroke="#122018" StrokeThickness="3.2"/>
+                                                            <Path Name="ArcGaugeCPU" Stroke="#00F5A0" StrokeThickness="3.2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M 18,3 A 15,15 0 0,1 28.2,7.5"/>
+                                                        </Canvas>
+                                                        <StackPanel VerticalAlignment="Center" Margin="0,0,8,0">
+                                                            <TextBlock Text="CPU" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                                                            <TextBlock Name="TxtGaugeCPU" Text="12%" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                        </StackPanel>
+                                                        <!-- Realtime Sparkline -->
+                                                        <Canvas Width="42" Height="16" VerticalAlignment="Center">
+                                                            <Path Name="PathSparklineCPU" Data="M 0 11 C 4 11, 6 9, 10 9 C 14 9, 16 13, 20 13 C 24 13, 26 5, 30 5 C 34 5, 36 9, 42 7" Stroke="#00F5A0" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                                        </Canvas>
+                                                    </StackPanel>
+
+                                                    <!-- RAM Gauge -->
+                                                    <StackPanel Orientation="Horizontal" Margin="0,0,24,0" VerticalAlignment="Center">
+                                                        <!-- Dynamic Arc Ring -->
+                                                        <Canvas Width="36" Height="36" Margin="0,0,8,0" VerticalAlignment="Center">
+                                                            <Ellipse Canvas.Left="3" Canvas.Top="3" Width="30" Height="30" Stroke="#101828" StrokeThickness="3.2"/>
+                                                            <Path Name="ArcGaugeRAM" Stroke="#3B82F6" StrokeThickness="3.2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M 18,3 A 15,15 0 0,1 28.6,27.1"/>
+                                                        </Canvas>
+                                                        <StackPanel VerticalAlignment="Center" Margin="0,0,8,0">
+                                                            <TextBlock Text="RAM" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                                                            <TextBlock Name="TxtGaugeRAM" Text="30%" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Name="TxtGaugeRAMSub" Text="7.1 / 24 GB" FontSize="9" FontWeight="Medium" Foreground="#71717A" Margin="0,1,0,0"/>
+                                                        </StackPanel>
+                                                        <!-- Realtime Sparkline -->
+                                                        <Canvas Width="42" Height="16" VerticalAlignment="Center">
+                                                            <Path Name="PathSparklineRAM" Data="M 0 12 C 4 12, 8 11, 12 9 C 16 7, 20 12, 24 12 C 28 12, 32 6, 36 6 C 39 6, 41 8, 44 7" Stroke="#3B82F6" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                                        </Canvas>
+                                                    </StackPanel>
+
+                                                    <!-- SSD (C:) Gauge -->
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <!-- Dynamic Arc Ring -->
+                                                        <Canvas Width="36" Height="36" Margin="0,0,8,0" VerticalAlignment="Center">
+                                                            <Ellipse Canvas.Left="3" Canvas.Top="3" Width="30" Height="30" Stroke="#0E1C26" StrokeThickness="3.2"/>
+                                                            <Path Name="ArcGaugeDisk" Stroke="#38BDF8" StrokeThickness="3.2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M 18,3 A 15,15 0 1,1 7.73,28.93"/>
+                                                        </Canvas>
+                                                        <StackPanel VerticalAlignment="Center" Margin="0,0,8,0">
+                                                            <TextBlock Text="SSD (C:)" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                                                            <TextBlock Name="TxtGaugeDisk" Text="27%" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Name="TxtGaugeDiskSub" Text="349 GB Free" FontSize="9" FontWeight="Medium" Foreground="#71717A" Margin="0,1,0,0"/>
+                                                        </StackPanel>
+                                                        <!-- Realtime Sparkline -->
+                                                        <Canvas Width="42" Height="16" VerticalAlignment="Center">
+                                                            <Path Name="PathSparklineDisk" Data="M 0 13 C 5 13, 9 12, 14 10 C 19 8, 24 13, 29 13 C 34 13, 39 6, 44 6 C 48 6, 50 8, 54 7" Stroke="#38BDF8" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                                        </Canvas>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Border>
+
+                                            <!-- Right: Thin Divider + Activity Logs Interactive Trigger -->
+                                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Border Name="BrdOverviewDivider" Width="1" Height="28" Background="#1C1C22" Margin="0,0,16,0" VerticalAlignment="Center"/>
+                                                <Button Name="BtnOpenActivityLogs" ToolTip="Open Live System Activity &amp; Execution Logs" Style="{StaticResource ButtonSecondary}" Padding="12,6" VerticalAlignment="Center" Cursor="Hand">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <!-- Glowing Terminal / Activity Icon -->
+                                                        <Border Width="24" Height="24" CornerRadius="6" Background="#122018" BorderBrush="#1C3828" BorderThickness="1" Margin="0,0,10,0" VerticalAlignment="Center">
+                                                            <Path Data="M 2.5 3.5 L 6.5 7 L 2.5 10.5 M 8.5 10.5 L 12.5 10.5" Stroke="#00F5A0" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="13" Height="13" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <StackPanel VerticalAlignment="Center" Margin="0,0,8,0">
+                                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                <TextBlock Text="Activity Logs" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                                                                <Ellipse Width="6" Height="6" Fill="#00F5A0" Margin="6,0,0,0" VerticalAlignment="Center">
+                                                                    <Ellipse.Effect>
+                                                                        <DropShadowEffect BlurRadius="4" Color="#00F5A0" Opacity="0.8" ShadowDepth="0"/>
+                                                                    </Ellipse.Effect>
+                                                                </Ellipse>
+                                                            </StackPanel>
+                                                            <TextBlock Text="Live console &amp; audit" FontSize="10.5" Foreground="{DynamicResource TextMutedBrush}" Margin="0,1,0,0"/>
+                                                        </StackPanel>
+                                                        <!-- Subtle Expand Chevron -->
+                                                        <Path Data="M 1 1 L 4 4 L 7 1" Stroke="{DynamicResource TextMutedBrush}" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="8" Height="5" Margin="4,0,2,0" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+                            </TabItem>
+
+                            <!-- ============================================== -->
+                            <!-- TAB 1: QUICK BOOST (1-CLICK PROFILES)          -->
+                            <!-- ============================================== -->
+                            <TabItem Header="QuickBoost">
+                                <Grid>
+                                    <Grid.Triggers>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard Storyboard="{StaticResource TabEntranceAnim}"/>
+                                        </EventTrigger>
+                                    </Grid.Triggers>
+                                    <Grid.RenderTransform>
+                                        <TranslateTransform Y="0"/>
+                                    </Grid.RenderTransform>
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                        <StackPanel Margin="0,4,0,10">
+                                            <!-- Header Banner (Translucent Frosted Glass) -->
+                                            <Border CornerRadius="14" Margin="0,0,0,14" Padding="18,14" BorderThickness="1" Background="{DynamicResource SectionBannerBg}" BorderBrush="{DynamicResource SectionBannerBorder}">
+                                                <Border.Effect>
+                                                    <DropShadowEffect BlurRadius="20" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.45"/>
+                                                </Border.Effect>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Text="1-CLICK SPEED PROFILES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
+                                                        <TextBlock Text="Instantly optimize your computer for your exact workload." FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,3,0,2"/>
+                                                        <TextBlock Text="Every profile creates an automatic restore point before applying." FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                    </StackPanel>
+                                                    <Button Name="BtnScanSystem" Grid.Column="1" Content="Scan PC State" Style="{StaticResource ButtonSecondary}" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- Profile Cards Grid -->
+                                            <Grid Margin="0,0,0,12">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Profile 1: Everyday Instant PC Boost -->
+                                                <Border Grid.Column="0" Style="{StaticResource OverviewCard}" Margin="0,0,10,0">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <Border Width="44" Height="44" CornerRadius="13" HorizontalAlignment="Left" Margin="0,0,0,10" Background="#0D1929" BorderBrush="#1E3A8A" BorderThickness="1">
+                                                                <Path Data="M 13 2 L 4 14 H 11 L 9 22 L 20 10 H 13 Z" Fill="#FFFFFF" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                            <TextBlock Text="Everyday PC Boost" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Recommended for all PCs" FontSize="10" FontWeight="SemiBold" Foreground="#60A5FA" Margin="0,2,0,8"/>
+                                                        </StackPanel>
+                                                        <TextBlock Grid.Row="1" Text="Cleans up background tracking, turns off taskbar ads and news widgets, and speeds up right-click menus." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="18"/>
+                                                        <Button Name="BtnApplyPresetSafe" Grid.Row="2" Content="Boost My PC" Style="{StaticResource ButtonBlue}" Margin="0,14,0,0"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Profile 2: High-FPS Gaming Boost -->
+                                                <Border Grid.Column="1" Style="{StaticResource OverviewCard}" Margin="0,0,10,0">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <Border Width="44" Height="44" CornerRadius="13" HorizontalAlignment="Left" Margin="0,0,0,10" Background="#062419" BorderBrush="#065F46" BorderThickness="1">
+                                                                <Path Data="M 6 6 H 18 C 20.2 6 22 7.8 22 10 V 14 C 22 16.2 20.4 18 18.3 18.4 L 16 16 H 8 L 5.7 18.4 C 3.6 18 2 16.2 2 14 V 10 C 2 7.8 3.8 6 6 6 Z M 6 11 H 9 M 7.5 9.5 V 12.5 M 15.5 10.5 H 15.6 M 17.5 11.5 H 17.6 M 15.5 12.5 H 15.6 M 13.5 11.5 H 13.6" Stroke="#FFFFFF" StrokeThickness="1.5" Fill="Transparent" Width="18" Height="18" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                            <TextBlock Text="Gaming Rig Boost" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Maximum game smoothness" FontSize="10" FontWeight="SemiBold" Foreground="#34D399" Margin="0,2,0,8"/>
+                                                        </StackPanel>
+                                                        <TextBlock Grid.Row="1" Text="Unlocks the Ultimate Performance power plan, turns off Xbox recording stutter, and smooths out mouse aim." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="18"/>
+                                                        <Button Name="BtnApplyPresetGaming" Grid.Row="2" Content="Boost Gaming" Style="{StaticResource ButtonPrimary}" Margin="0,14,0,0"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Profile 3: Android Emulator Pro -->
+                                                <Border Grid.Column="2" Style="{StaticResource OverviewCard}">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <Border Width="44" Height="44" CornerRadius="13" HorizontalAlignment="Left" Margin="0,0,0,10" Background="#190E2B" BorderBrush="#5B21B6" BorderThickness="1">
+                                                                <Path Data="M 5 4 C 5 2.9 5.9 2 7 2 H 17 C 18.1 2 19 2.9 19 4 V 20 C 19 21.1 18.1 22 17 22 H 7 C 5.9 22 5 21.1 5 20 Z M 10 19 H 14" Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round" Fill="Transparent" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                            <TextBlock Text="Android Emulator Pro" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="BlueStacks &amp; MSI Player" FontSize="10" FontWeight="SemiBold" Foreground="#A78BFA" Margin="0,2,0,8"/>
+                                                        </StackPanel>
+                                                        <TextBlock Grid.Row="1" Text="Forces dedicated graphics card lock, sets up ASUS ROG Phone mode, and stops laggy internet packet delay." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="18"/>
+                                                        <Button Name="BtnApplyPresetEmulator" Grid.Row="2" Content="Boost Emulator" Style="{StaticResource ButtonPurple}" Margin="0,14,0,0"/>
+                                                    </Grid>
+                                                </Border>
+                                            </Grid>
+
+                                            <!-- Free Fire Hero Master Card (Translucent Flame Glass) -->
+                                            <Border CornerRadius="14" Margin="0,0,0,12" Padding="18,14" BorderThickness="1.5" Background="{DynamicResource WarningBannerBg}" BorderBrush="{DynamicResource WarningBannerBorder}">
+                                                <Border.Effect>
+                                                    <DropShadowEffect BlurRadius="12" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.35"/>
+                                                </Border.Effect>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Grid.Column="0" Width="46" Height="46" CornerRadius="14" Margin="0,0,14,0" VerticalAlignment="Center" Background="#2E1405" BorderBrush="#7C2D12" BorderThickness="1">
+                                                        <Path Data="M 12 2 C 12 2 14.5 5.5 14.5 8 C 14.5 9.4 13.9 10.6 13 11.5 C 13.7 11.6 14.4 11.4 15 11 C 15.6 12 16 13.1 16 14.5 C 16 18.1 13.1 21 9.5 21 C 5.9 21 3 18.1 3 14.5 C 3 10.9 6.2 7 8 5 C 8 6 8.5 7 9.5 7.5 C 9.5 5.5 10.5 3.5 12 2 Z" Fill="#FFFFFF" Width="20" Height="20" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                        <TextBlock Text="FREE FIRE MASTER 1-CLICK HYPER-BOOST" FontSize="13" FontWeight="Bold" Foreground="#F97316"/>
+                                                        <TextBlock Text="Unlock 240 FPS, dedicated GPU lock, smooth drag headshots, and low ping in one click." FontSize="11" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,2,0,0"/>
+                                                    </StackPanel>
+                                                    <Button Name="BtnMasterFreeFire" Grid.Column="2" Content="Apply Free Fire Boost" Style="{StaticResource ButtonFlame}" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- 100% Revert / Factory Reset Banner (Translucent Ruby Glass) -->
+                                            <Border CornerRadius="12" Padding="18,12" BorderThickness="1" Background="{DynamicResource DangerBannerBg}" BorderBrush="{DynamicResource DangerBannerBorder}">
+                                                <Border.Effect>
+                                                    <DropShadowEffect BlurRadius="12" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.35"/>
+                                                </Border.Effect>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                        <TextBlock Text="GUARANTEED 100% REVERSIBLE" FontSize="12" FontWeight="Bold" Foreground="#EF4444"/>
+                                                        <TextBlock Text="Return all settings and files back to original Windows defaults at any time." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    </StackPanel>
+                                                    <Button Name="BtnRevertAll" Grid.Column="1" Content="Undo All Changes" Style="{StaticResource ButtonDanger}" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Grid>
+                            </TabItem>
+
+                            <!-- ============================================== -->
+                            <!-- TAB 2: SYSTEM TWEAKS                           -->
+                            <!-- ============================================== -->
+                            <TabItem Header="Tweaks">
+                                <Grid Margin="0,4,0,0">
+                                    <Grid.Triggers>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard Storyboard="{StaticResource TabEntranceAnim}"/>
+                                        </EventTrigger>
+                                    </Grid.Triggers>
+                                    <Grid.RenderTransform>
+                                        <TranslateTransform Y="0"/>
+                                    </Grid.RenderTransform>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Tweaks Header & Filters (Translucent Frosted Glass) -->
+                                    <Border Grid.Row="0" CornerRadius="12" Padding="14,10" BorderThickness="1" Margin="0,0,0,10" Background="{DynamicResource SectionBannerBg}" BorderBrush="{DynamicResource SectionBannerBorder}">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="20" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.45"/>
+                                        </Border.Effect>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock Text="SYSTEM TWEAKS &amp; OPTIMIZATIONS" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
+                                                <TextBlock Text="Select individual settings to fine-tune your speed, privacy, and gaming experience." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Button Name="BtnSelectAllTweaks" Content="Select All" Style="{StaticResource ButtonSecondary}" Padding="10,5" Margin="0,0,6,0"/>
+                                                <Button Name="BtnDeselectAllTweaks" Content="Clear" Style="{StaticResource ButtonSecondary}" Padding="10,5" Margin="0,0,10,0"/>
+                                                <TextBox Name="TxtTweakSearch" Width="140" Height="28" Background="{DynamicResource InputSearchBg}" BorderBrush="{DynamicResource InputSearchBorder}" Foreground="{DynamicResource InputSearchFg}" Padding="6,4" FontSize="11"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Tweaks Scrollable Container -->
+                                    <Border Grid.Row="1" Style="{StaticResource CardBorder}" Padding="10">
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                            <StackPanel Name="PnlTweaksContainer" Margin="4"/>
+                                        </ScrollViewer>
+                                    </Border>
+
+                                    <!-- Tweaks Action Bar (Translucent Frosted Glass) -->
+                                    <Border Grid.Row="2" CornerRadius="10" Padding="12,10" BorderThickness="1" Margin="0,10,0,0" Background="{DynamicResource SectionBannerBg}" BorderBrush="{DynamicResource SectionBannerBorder}">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="16" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.4"/>
+                                        </Border.Effect>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <Button Name="BtnRevertSelectedTweaks" Content="Revert Selected" Style="{StaticResource ButtonDanger}" Margin="0,0,10,0"/>
+                                            <Button Name="BtnApplySelectedTweaks" Content="Apply Selected Tweaks" Style="{StaticResource ButtonPrimary}"/>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </TabItem>
+
+                            <!-- ============================================== -->
+                            <!-- TAB 3: APP CLEANER (SAFE DEBLOATER)            -->
+                            <!-- ============================================== -->
+                            <TabItem Header="Debloat">
+                                <Grid Margin="0,4,0,0">
+                                    <Grid.Triggers>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard Storyboard="{StaticResource TabEntranceAnim}"/>
+                                        </EventTrigger>
+                                    </Grid.Triggers>
+                                    <Grid.RenderTransform>
+                                        <TranslateTransform Y="0"/>
+                                    </Grid.RenderTransform>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Debloater Header (Translucent Frosted Glass) -->
+                                    <Border Grid.Row="0" CornerRadius="12" Padding="14,10" BorderThickness="1" Margin="0,0,0,10" Background="{DynamicResource SectionBannerBg}" BorderBrush="{DynamicResource SectionBannerBorder}">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="20" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.45"/>
+                                        </Border.Effect>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock Text="SAFE APP CLEANER (DEBLOATER)" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
+                                                <TextBlock Text="Remove pre-installed junk, advertising apps, and bloatware without breaking Windows." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Button Name="BtnScanBloat" Content="Scan Unwanted Apps" Style="{StaticResource ButtonSecondary}" Margin="0,0,8,0"/>
+                                                <Button Name="BtnRemoveBloat" Content="Remove Selected Apps" Style="{StaticResource ButtonDanger}"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Bloatware Container -->
+                                    <Border Grid.Row="1" Style="{StaticResource CardBorder}" Padding="10">
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                            <StackPanel Name="PnlBloatContainer" Margin="4"/>
+                                        </ScrollViewer>
+                                    </Border>
+
+                                    <!-- Whitelist Safety Guarantee (Translucent Emerald Glass) -->
+                                    <Border Grid.Row="2" CornerRadius="10" Padding="12,8" BorderThickness="1" Margin="0,10,0,0" Background="{DynamicResource SuccessBannerBg}" BorderBrush="{DynamicResource SuccessBannerBorder}">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="12" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.35"/>
+                                        </Border.Effect>
+                                        <TextBlock Text="&#x2713; 100% Whitelist Guarded: Microsoft Store, Calculator, Notepad, Photos, and Windows Update are NEVER removed." FontSize="10" FontWeight="SemiBold" Foreground="#10B981" HorizontalAlignment="Center"/>
+                                    </Border>
+                                </Grid>
+                            </TabItem>
+
+                            <!-- ============================================== -->
+                            <!-- TAB 4: SYSTEM HEALTH & MAINTENANCE             -->
+                            <!-- ============================================== -->
+                            <TabItem Header="Health">
+                                <Grid>
+                                    <Grid.Triggers>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard Storyboard="{StaticResource TabEntranceAnim}"/>
+                                        </EventTrigger>
+                                    </Grid.Triggers>
+                                    <Grid.RenderTransform>
+                                        <TranslateTransform Y="0"/>
+                                    </Grid.RenderTransform>
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                        <StackPanel Margin="0,4,0,10">
+                                            <!-- Header (Translucent Frosted Glass) -->
+                                            <Border CornerRadius="12" Padding="14,10" BorderThickness="1" Margin="0,0,0,12" Background="{DynamicResource SectionBannerBg}" BorderBrush="{DynamicResource SectionBannerBorder}">
+                                                <Border.Effect>
+                                                    <DropShadowEffect BlurRadius="20" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.45"/>
+                                                </Border.Effect>
+                                                <StackPanel>
+                                                    <TextBlock Text="SYSTEM HEALTH &amp; DRIVE REPAIR" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
+                                                    <TextBlock Text="Official Windows repair utilities to clean component stores, verify system files, and free disk space." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                </StackPanel>
+                                            </Border>
+
+                                            <!-- Maintenance Grid -->
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <!-- SFC -->
+                                                <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource OverviewCard}" Margin="0,0,10,10">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <TextBlock Text="Verify System Integrity (SFC)" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Scans all protected Windows files and replaces corrupted copies with official Microsoft files." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <Button Name="BtnRunSFC" Grid.Row="1" Content="Run SFC Scan" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- DISM -->
+                                                <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource OverviewCard}" Margin="0,0,0,10">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <TextBlock Text="Deep Component Store Repair (DISM)" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Repairs corrupted Windows image components using Windows Update as the clean source." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <Button Name="BtnRunDISM" Grid.Row="1" Content="Run DISM Repair" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Component Cleanup -->
+                                                <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource OverviewCard}" Margin="0,0,10,10">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <TextBlock Text="Clean Windows Update Components" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Deletes superseded Windows Update files to reclaim multiple gigabytes of disk space." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <Button Name="BtnRunComponentCleanup" Grid.Row="1" Content="Clean Update Store" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Flush Standby RAM -->
+                                                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource OverviewCard}" Margin="0,0,0,10">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <TextBlock Text="Flush Trapped Memory (RAM Cache)" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Instantly purges Windows standby lists and working sets to release memory for games." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <Button Name="BtnFlushRAM" Grid.Row="1" Content="Free Memory Now" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Hibernation Toggle -->
+                                                <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource OverviewCard}" Margin="0,0,10,0">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <TextBlock Text="Toggle Sleep File (Reclaim 16-32 GB)" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Disables the hibernation file to instantly recover drive space equal to your total RAM size." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <Button Name="BtnToggleHibernation" Grid.Row="1" Content="Toggle Sleep File" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Shader & Temp Clean -->
+                                                <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource OverviewCard}">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <TextBlock Text="Purge Shader Caches &amp; Temp Files" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Cleans DirectX and NVIDIA shader caches and Windows temporary storage to fix game stutters." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <Button Name="BtnCleanCaches" Grid.Row="1" Content="Clean Caches Now" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                    </Grid>
+                                                </Border>
+                                            </Grid>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Grid>
+                            </TabItem>
+
+                            <!-- ============================================== -->
+                            <!-- TAB 5: FREE FIRE & EMULATORS                   -->
+                            <!-- ============================================== -->
+                            <TabItem Header="Emulators">
+                                <Grid>
+                                    <Grid.Triggers>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard Storyboard="{StaticResource TabEntranceAnim}"/>
+                                        </EventTrigger>
+                                    </Grid.Triggers>
+                                    <Grid.RenderTransform>
+                                        <TranslateTransform Y="0"/>
+                                    </Grid.RenderTransform>
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                        <StackPanel Margin="0,4,0,10">
+                                            <!-- Topology Status Bar (Translucent Frosted Glass) -->
+                                            <Border CornerRadius="12" Padding="14,10" BorderThickness="1" Margin="0,0,0,12" Background="{DynamicResource SectionBannerBg}" BorderBrush="{DynamicResource SectionBannerBorder}">
+                                                <Border.Effect>
+                                                    <DropShadowEffect BlurRadius="20" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.45"/>
+                                                </Border.Effect>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Text="BLUESTACKS 5" FontSize="9" FontWeight="Bold" Foreground="#64748B"/>
+                                                        <TextBlock Name="TxtBS5Status" Text="Scanning..." FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="1">
+                                                        <TextBlock Text="MSI PLAYER" FontSize="9" FontWeight="Bold" Foreground="#64748B"/>
+                                                        <TextBlock Name="TxtMSIStatus" Text="Scanning..." FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="2">
+                                                        <TextBlock Text="ROG 240 FPS" FontSize="9" FontWeight="Bold" Foreground="#64748B"/>
+                                                        <TextBlock Name="TxtROGStatus" Text="Scanning..." FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="3">
+                                                        <TextBlock Text="SMOOTH AIM" FontSize="9" FontWeight="Bold" Foreground="#64748B"/>
+                                                        <TextBlock Name="TxtMouseAimStatus" Text="Scanning..." FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="4">
+                                                        <TextBlock Text="VBS SPEED" FontSize="9" FontWeight="Bold" Foreground="#64748B"/>
+                                                        <TextBlock Name="TxtVBSStatus" Text="Scanning..." FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- Emulator Controls Grid -->
+                                            <Grid Margin="0,0,0,12">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <!-- 240 FPS Unlock -->
+                                                <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource OverviewCard}" Margin="0,0,10,10">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <TextBlock Text="Unlock 240 FPS (ASUS ROG Profile)" FontSize="13" FontWeight="Bold" Foreground="#00F5D4"/>
+                                                            <TextBlock Text="Configures BlueStacks/MSI device profile to ASUS ROG Phone 2 to unlock high frame rate mode in Free Fire." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <Button Name="BtnFFUnlockFPS" Grid.Row="1" Content="Unlock 240 FPS" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Dedicated GPU Lock -->
+                                                <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource OverviewCard}" Margin="0,0,0,10">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <TextBlock Text="Force Dedicated High-Speed GPU" FontSize="13" FontWeight="Bold" Foreground="#3B82F6"/>
+                                                            <TextBlock Text="Forces Windows and emulator settings to run exclusively on dedicated NVIDIA/AMD graphics." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <Button Name="BtnFFGpuLock" Grid.Row="1" Content="Lock to Dedicated GPU" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Drag Headshot Mouse Smoothness -->
+                                                <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource OverviewCard}" Margin="0,0,10,10">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <TextBlock Text="Smooth Mouse Aim for Drag Headshots" FontSize="13" FontWeight="Bold" Foreground="#F59E0B"/>
+                                                            <TextBlock Text="Disables mouse acceleration and smooths vertical drag curve for predictable upward headshots." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <Button Name="BtnFFMouseAim" Grid.Row="1" Content="Apply Smooth Aim" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Low Ping Network -->
+                                                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource OverviewCard}" Margin="0,0,0,10">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <TextBlock Text="Low Ping Network (Fix Delayed Hits)" FontSize="13" FontWeight="Bold" Foreground="#10B981"/>
+                                                            <TextBlock Text="Disables multimedia throttling and optimizes system responsiveness for gaming packets without download bottlenecks." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <Button Name="BtnFFLowPing" Grid.Row="1" Content="Apply Low Ping" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                    </Grid>
+                                                </Border>
+
+
+                                                <!-- VBS / Security Toggle -->
+                                                <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource OverviewCard}" Margin="0,0,10,10">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <TextBlock Text="Emulator Speed Boost (Toggle VBS)" FontSize="13" FontWeight="Bold" Foreground="#EF4444"/>
+                                                            <TextBlock Text="Allows emulators to run with direct hardware virtualization instead of slowed nested layers." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <Button Name="BtnToggleVBS" Grid.Row="1" Content="Toggle VBS Mode" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Clean Cache -->
+                                                <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource OverviewCard}" Margin="0,0,0,10">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <TextBlock Text="Clean Emulator Logs &amp; Shader Caches" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Removes old logs and shader caches to fix emulator loading getting stuck at 99%." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <Button Name="BtnFFCleanCache" Grid.Row="1" Content="Clean Emulator Cache" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Reset Settings -->
+                                                <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource OverviewCard}">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
+                                                            <TextBlock Text="Reset All Game &amp; Emulator Settings" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Restores mouse acceleration, display resolutions, and network registry to original Windows defaults." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <Button Name="BtnFFRevert" Grid.Column="1" Content="Reset Game Settings" Style="{StaticResource ButtonDanger}" MinWidth="180" Height="36" VerticalAlignment="Center"/>
+                                                    </Grid>
+                                                </Border>
+                                            </Grid>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Grid>
+                            </TabItem>
+
+                            <!-- ============================================== -->
+                            <!-- TAB 6: SETTINGS                                -->
+                            <!-- ============================================== -->
+                            <TabItem Header="Settings">
+                                <Grid>
+                                    <Grid.Triggers>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard Storyboard="{StaticResource TabEntranceAnim}"/>
+                                        </EventTrigger>
+                                    </Grid.Triggers>
+                                    <Grid.RenderTransform>
+                                        <TranslateTransform Y="0"/>
+                                    </Grid.RenderTransform>
+                                    <StackPanel Margin="0,4,0,10">
+                                        <!-- Application Settings Header (Translucent Frosted Glass) -->
+                                        <Border CornerRadius="12" Padding="14,10" BorderThickness="1" Margin="0,0,0,14" Background="{DynamicResource SectionBannerBg}" BorderBrush="{DynamicResource SectionBannerBorder}">
+                                            <Border.Effect>
+                                                <DropShadowEffect BlurRadius="20" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.45"/>
+                                            </Border.Effect>
+                                            <StackPanel>
+                                                <TextBlock Text="APPLICATION SETTINGS" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
+                                                <TextBlock Text="Configure behavior, operating system compliance modes, and safety preferences." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Setting: Target OS -->
+                                        <Border Style="{StaticResource OverviewCard}" Margin="0,0,0,10">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="Target Operating System Detection" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                    <TextBlock Text="Automatically detect Windows version or force Windows 11 / Windows 10 rules." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <RadioButton Name="RdoOSAuto" Content="Auto-Detect" Foreground="{DynamicResource TextPrimaryBrush}" IsChecked="True" Margin="0,0,10,0"/>
+                                                    <RadioButton Name="RdoOSWin11" Content="Windows 11" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,10,0"/>
+                                                    <RadioButton Name="RdoOSWin10" Content="Windows 10" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Setting: Safety Backups -->
+                                        <Border Style="{StaticResource OverviewCard}" Margin="0,0,0,10">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="Automatic System Restore Point Creation" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                    <TextBlock Text="Always create a restore point before running any speed profile or repair." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                                <CheckBox Name="ChkAutoRestorePoint" Content="Enabled (Recommended)" Foreground="{DynamicResource AccentBrush}" IsChecked="True" Grid.Column="1" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Reset Preferences -->
+                                        <Border Style="{StaticResource OverviewCard}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="Reset Application Preferences" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                    <TextBlock Text="Reset all UI selections, cached statuses, and logs." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                                <Button Name="BtnResetSettings" Content="Reset Preferences" Style="{StaticResource ButtonSecondary}" Grid.Column="1" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
+                            </TabItem>
+
+                            <!-- ============================================== -->
+                            <!-- TAB 7: BACKUPS & SYSTEM RESTORE                -->
+                            <!-- ============================================== -->
+                            <TabItem Header="Backups">
+                                <Grid Margin="0,4,0,0">
+                                    <Grid.Triggers>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard Storyboard="{StaticResource TabEntranceAnim}"/>
+                                        </EventTrigger>
+                                    </Grid.Triggers>
+                                    <Grid.RenderTransform>
+                                        <TranslateTransform Y="0"/>
+                                    </Grid.RenderTransform>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                      <!-- Backups Header (Translucent Frosted Glass) -->
+                                      <Border Grid.Row="0" CornerRadius="12" Padding="14,10" BorderThickness="1" Margin="0,0,0,10" Background="{DynamicResource SectionBannerBg}" BorderBrush="{DynamicResource SectionBannerBorder}">
+                                          <Border.Effect>
+                                              <DropShadowEffect BlurRadius="20" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.45"/>
+                                          </Border.Effect>
+                                          <Grid>
+                                              <Grid.ColumnDefinitions>
+                                                  <ColumnDefinition Width="*"/>
+                                                  <ColumnDefinition Width="Auto"/>
+                                              </Grid.ColumnDefinitions>
+                                              <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                  <TextBlock Text="SYSTEM RESTORE &amp; REGISTRY BACKUPS" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
+                                                  <TextBlock Text="Windows restore points and backup archives recorded before changes were made." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                              </StackPanel>
+                                              <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                  <Button Name="BtnRefreshBackups" Content="Refresh" Margin="0,0,8,0" Style="{StaticResource ButtonSecondary}"/>
+                                                  <Button Name="BtnOpenBackupsFolder" Content="Open Folder" Margin="0,0,8,0" Style="{StaticResource ButtonSecondary}"/>
+                                                  <Button Name="BtnLaunchSystemRestore" Content="Windows Restore Wizard" Margin="0,0,8,0" Style="{StaticResource ButtonSecondary}"/>
+                                                  <Button Name="BtnCreateRestorePoint" Content="Create Backup Point" Style="{StaticResource ButtonPrimary}"/>
+                                              </StackPanel>
+                                          </Grid>
+                                      </Border>
+
+                                      <!-- Backups List -->
+                                      <Border Grid.Row="1" Style="{StaticResource OverviewCard}" Padding="14">
+                                          <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                              <StackPanel>
+                                                  <Grid Margin="0,0,0,10">
+                                                      <TextBlock Text="System Restore Points &amp; Registry Snapshots" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                                                      <TextBlock Name="TxtBackupsCount" Text="Loading backup points..." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                                  </Grid>
+                                                  <StackPanel Name="PnlRestorePointsList"/>
+                                              </StackPanel>
+                                          </ScrollViewer>
+                                      </Border>
+
+                                     <!-- Revert All Button (Translucent Ruby Glass) -->
+                                     <Border Grid.Row="2" CornerRadius="10" Padding="12,10" BorderThickness="1" Margin="0,10,0,0" Background="{DynamicResource DangerBannerBg}" BorderBrush="{DynamicResource DangerBannerBorder}">
+                                         <Border.Effect>
+                                             <DropShadowEffect BlurRadius="12" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.35"/>
+                                         </Border.Effect>
+                                         <Grid>
+                                             <Grid.ColumnDefinitions>
+                                                 <ColumnDefinition Width="*"/>
+                                                 <ColumnDefinition Width="Auto"/>
+                                             </Grid.ColumnDefinitions>
+                                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                 <TextBlock Text="Emergency Factory Reset" FontSize="12" FontWeight="Bold" Foreground="#EF4444"/>
+                                                 <TextBlock Text="Revert every tweak, registry entry, and configuration back to original Windows defaults." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                             </StackPanel>
+                                             <Button Name="BtnUndoAllRestore" Grid.Column="1" Content="Undo Everything" Style="{StaticResource ButtonDanger}"/>
+                                         </Grid>
+                                     </Border>
+                                </Grid>
+                            </TabItem>
+
+                            <!-- ============================================== -->
+                            <!-- TAB 8: ABOUT                                   -->
+                            <!-- ============================================== -->
+                            <TabItem Header="About">
+                                <Grid>
+                                    <Grid.Triggers>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard Storyboard="{StaticResource TabEntranceAnim}"/>
+                                        </EventTrigger>
+                                    </Grid.Triggers>
+                                    <Grid.RenderTransform>
+                                        <TranslateTransform Y="0"/>
+                                    </Grid.RenderTransform>
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                        <StackPanel Margin="0,4,0,10">
+                                            <Border Style="{StaticResource OverviewCard}" Padding="20">
+                                                <StackPanel HorizontalAlignment="Center">
+                                                    <!-- Official Microchip Arrow Brand Logo -->
+                                                    <Image Name="ImgAboutLogo" Source="Assets/app_icon.png" Width="72" Height="72" Margin="0,0,0,14" HorizontalAlignment="Center"
+                                                           RenderOptions.BitmapScalingMode="HighQuality" SnapsToDevicePixels="True">
+                                                        <Image.Effect>
+                                                            <DropShadowEffect BlurRadius="16" Color="#00F5D4" Opacity="0.4" ShadowDepth="0"/>
+                                                        </Image.Effect>
+                                                    </Image>
+
+                                                    <TextBlock Text="ANXIOUSLY OPTIMIZED" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="Consumer Edition v2.5.0 &#x2022; Build 2026" FontSize="11" Foreground="#00F5D4" HorizontalAlignment="Center" Margin="0,3,0,10"/>
+                                                    
+                                                    <TextBlock Text="AnxiouslyOptimized is a safe, simple, and transparent Windows optimization utility engineered for everyday users, PC gamers, and mobile emulator players." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="520" LineHeight="17" Margin="0,0,0,16"/>
+
+                                                    <!-- Specifications Card (Translucent Frosted Glass) -->
+                                                    <Border CornerRadius="10" BorderThickness="1" Padding="16,12" Width="480" Background="{DynamicResource SectionBannerBg}" BorderBrush="{DynamicResource SectionBannerBorder}">
+                                                        <Border.Effect>
+                                                            <DropShadowEffect BlurRadius="16" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.15"/>
+                                                        </Border.Effect>
+                                                        <StackPanel>
+                                                            <TextBlock Text="HARDWARE AUDIT SUMMARY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}" Margin="0,0,0,8"/>
+                                                            <Grid Margin="0,0,0,4">
+                                                                <TextBlock Text="Processor (CPU):" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                                <TextBlock Name="TxtHardwareCPU" Text="Detecting..." FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Right"/>
+                                                            </Grid>
+                                                            <Grid Margin="0,0,0,4">
+                                                                <TextBlock Text="Installed RAM:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                                <TextBlock Name="TxtHardwareRAM" Text="Detecting..." FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Right"/>
+                                                            </Grid>
+                                                            <Grid Margin="0,0,0,4">
+                                                                <TextBlock Text="Graphics Card (GPU):" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                                <TextBlock Name="TxtHardwareGPU" Text="Detecting..." FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Right"/>
+                                                            </Grid>
+                                                            <Grid Margin="0,0,0,4">
+                                                                <TextBlock Text="Storage (SSD):" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                                <TextBlock Name="TxtHardwareStorage" Text="Detecting..." FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Right"/>
+                                                            </Grid>
+                                                            <Grid>
+                                                                <TextBlock Text="Operating System:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                                <TextBlock Name="TxtHardwareOS" Text="Detecting..." FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Right"/>
+                                                            </Grid>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </StackPanel>
+                                            </Border>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
+
+                        <!-- Expandable Console Drawer (Global Activity Log) -->
+                        <Border Name="BrdConsoleDrawer" VerticalAlignment="Bottom" CornerRadius="16" BorderThickness="1" Margin="0,10,0,0" Padding="14" Visibility="Collapsed" Background="#050507" BorderBrush="#1C1C24">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="20" ShadowDepth="4" Direction="270" Color="#000000" Opacity="0.6"/>
+                            </Border.Effect>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="180"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0" Margin="0,0,0,8">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Ellipse Width="8" Height="8" Fill="#00F5A0" Margin="0,0,8,0">
+                                            <Ellipse.Effect>
+                                                <DropShadowEffect BlurRadius="8" Color="#00F5A0" Opacity="0.9" ShadowDepth="0"/>
+                                            </Ellipse.Effect>
+                                        </Ellipse>
+                                        <TextBlock Text="SYSTEM ACTIVITY &amp; EXECUTION LOGS" FontSize="12.5" FontWeight="Bold" Foreground="#00F5D4" VerticalAlignment="Center" Margin="0,0,14,0"/>
+                                        <TextBlock Name="TxtStatusBar" Text="Ready - All systems optimized and healthy" FontSize="11.5" FontWeight="SemiBold" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Name="BtnToggleLogs" Content="Activity Log" Visibility="Collapsed"/>
+                                        <Button Name="BtnClearLogs" Content="Clear Logs" Style="{StaticResource ButtonSecondary}" Padding="10,4" FontSize="11.5" FontWeight="SemiBold" Margin="0,0,8,0"/>
+                                        <Button Name="BtnCopyLogs" Content="Copy" Style="{StaticResource ButtonSecondary}" Padding="10,4" FontSize="11.5" FontWeight="SemiBold" Margin="0,0,8,0"/>
+                                        <Button Name="BtnCloseDrawer" Content="&#x2715; Close" Style="{StaticResource ButtonSecondary}" Padding="10,4" FontSize="11.5" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Grid>
+                                <Border Grid.Row="1" CornerRadius="8" Background="#020204" BorderBrush="#141418" BorderThickness="1" Padding="10,8">
+                                    <TextBox Name="TxtConsoleLogs" Background="Transparent" Foreground="#00F5A0" BorderThickness="0" FontFamily="Cascadia Code, Consolas, JetBrains Mono, monospace" FontSize="12.5" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" CaretBrush="#00F5D4"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
+

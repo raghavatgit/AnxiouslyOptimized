@@ -1,0 +1,182 @@
+[
+    {
+        "id":  "win11_classic_context_menu",
+        "title":  "Fast Right-Click Menu",
+        "category":  "Speed \u0026 Performance",
+        "impact":  "Safe",
+        "description":  "Brings back the classic fast right-click menu and removes the slow \u0027Show more options\u0027 delay.",
+        "checkScript":  "(Test-Path \u0027HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32\u0027)",
+        "applyScript":  "$clsid = \u0027HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32\u0027; if (!(Test-Path $clsid)) { New-Item -Path $clsid -Force | Out-Null }; Set-ItemProperty -Path $clsid -Name \u0027(Default)\u0027 -Value \u0027\u0027 -Type String",
+        "revertScript":  "Remove-Item -Path \u0027HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\u0027 -Recurse -Force -ErrorAction SilentlyContinue"
+    },
+    {
+        "id":  "win11_taskbar_clean",
+        "title":  "Clean Up Taskbar (Hide Widgets \u0026 Copilot)",
+        "category":  "Clean Windows 11",
+        "impact":  "Safe",
+        "description":  "Hides laggy news widgets and Copilot buttons from your taskbar to save memory.",
+        "checkScript":  "((Get-ItemProperty -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\u0027 -ErrorAction SilentlyContinue).TaskbarDa -eq 0)",
+        "applyScript":  "$adv = \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\u0027; Set-ItemProperty -Path $adv -Name \u0027TaskbarDa\u0027 -Value 0 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path $adv -Name \u0027TaskbarMn\u0027 -Value 0 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path $adv -Name \u0027ShowCopilotButton\u0027 -Value 0 -Type DWord -ErrorAction SilentlyContinue",
+        "revertScript":  "$adv = \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\u0027; Set-ItemProperty -Path $adv -Name \u0027TaskbarDa\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path $adv -Name \u0027TaskbarMn\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path $adv -Name \u0027ShowCopilotButton\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue"
+    },
+    {
+        "id":  "win11_explorer_clean",
+        "title":  "Clean Up File Explorer",
+        "category":  "Speed \u0026 Performance",
+        "impact":  "Safe",
+        "description":  "Stops File Explorer from loading recent file clutter and recommendations when opened.",
+        "checkScript":  "((Get-ItemProperty -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\u0027 -ErrorAction SilentlyContinue).ShowRecommendations -eq 0)",
+        "applyScript":  "$exp = \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\u0027; Set-ItemProperty -Path $exp -Name \u0027ShowRecommendations\u0027 -Value 0 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path $exp -Name \u0027ShowRecent\u0027 -Value 0 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path $exp -Name \u0027ShowFrequent\u0027 -Value 0 -Type DWord -ErrorAction SilentlyContinue",
+        "revertScript":  "$exp = \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\u0027; Set-ItemProperty -Path $exp -Name \u0027ShowRecommendations\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path $exp -Name \u0027ShowRecent\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path $exp -Name \u0027ShowFrequent\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue"
+    },
+    {
+        "id":  "bing_search_start",
+        "title":  "Instant Start Menu Search",
+        "category":  "Speed \u0026 Performance",
+        "impact":  "Safe",
+        "description":  "Stops Start Menu from searching the web on Bing. Finding local files and opening apps becomes instant.",
+        "checkScript":  "((Get-ItemProperty -Path \u0027HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer\u0027 -ErrorAction SilentlyContinue).DisableSearchBoxSuggestions -eq 1)",
+        "applyScript":  "if (!(Test-Path \u0027HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer\u0027)) { New-Item -Path \u0027HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer\u0027 -Force | Out-Null }; Set-ItemProperty -Path \u0027HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer\u0027 -Name \u0027DisableSearchBoxSuggestions\u0027 -Value 1 -Type DWord; if (!(Test-Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search\u0027)) { New-Item -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search\u0027 -Force | Out-Null }; Set-ItemProperty -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search\u0027 -Name \u0027BingSearchEnabled\u0027 -Value 0 -Type DWord; Set-ItemProperty -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search\u0027 -Name \u0027CortanaConsent\u0027 -Value 0 -Type DWord",
+        "revertScript":  "Remove-ItemProperty -Path \u0027HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer\u0027 -Name \u0027DisableSearchBoxSuggestions\u0027 -ErrorAction SilentlyContinue; Set-ItemProperty -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search\u0027 -Name \u0027BingSearchEnabled\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search\u0027 -Name \u0027CortanaConsent\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue"
+    },
+    {
+        "id":  "consumer_features",
+        "title":  "Block Suggested Apps \u0026 Ads in Start",
+        "category":  "Clean Windows 11",
+        "impact":  "Safe",
+        "description":  "Stops Windows from automatically installing unwanted games or showing app ads in your Start Menu.",
+        "checkScript":  "((Get-ItemProperty -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager\u0027 -ErrorAction SilentlyContinue).SystemPaneSuggestionsEnabled -eq 0)",
+        "applyScript":  "$cdm = \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager\u0027; if (!(Test-Path $cdm)) { New-Item -Path $cdm -Force | Out-Null }; Set-ItemProperty -Path $cdm -Name \u0027SystemPaneSuggestionsEnabled\u0027 -Value 0 -Type DWord; Set-ItemProperty -Path $cdm -Name \u0027SilentInstalledAppsEnabled\u0027 -Value 0 -Type DWord; Set-ItemProperty -Path $cdm -Name \u0027SoftLandingEnabled\u0027 -Value 0 -Type DWord; Set-ItemProperty -Path $cdm -Name \u0027SubscribedContent-338388Enabled\u0027 -Value 0 -Type DWord; Set-ItemProperty -Path $cdm -Name \u0027SubscribedContent-338389Enabled\u0027 -Value 0 -Type DWord",
+        "revertScript":  "$cdm = \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager\u0027; Set-ItemProperty -Path $cdm -Name \u0027SystemPaneSuggestionsEnabled\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path $cdm -Name \u0027SilentInstalledAppsEnabled\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path $cdm -Name \u0027SoftLandingEnabled\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue"
+    },
+    {
+        "id":  "telemetry_services",
+        "title":  "Stop Background Diagnostic Tracking",
+        "category":  "Privacy \u0026 Background Data",
+        "impact":  "Safe",
+        "description":  "Pauses Windows background activity tracking when idle. Saves CPU and battery without breaking Windows Update.",
+        "checkScript":  "((Get-Service -ErrorAction SilentlyContinue).StartType -eq \u0027Manual\u0027)",
+        "applyScript":  "Stop-Service -Name \u0027DiagTrack\u0027 -Force -ErrorAction SilentlyContinue; Set-Service -Name \u0027DiagTrack\u0027 -StartupType Manual -ErrorAction SilentlyContinue; Set-Service -Name \u0027dmwappushservice\u0027 -StartupType Manual -ErrorAction SilentlyContinue",
+        "revertScript":  "Set-Service -Name \u0027DiagTrack\u0027 -StartupType Automatic -ErrorAction SilentlyContinue; Start-Service -Name \u0027DiagTrack\u0027 -ErrorAction SilentlyContinue; Set-Service -Name \u0027dmwappushservice\u0027 -StartupType Automatic -ErrorAction SilentlyContinue"
+    },
+    {
+        "id":  "telemetry_registry",
+        "title":  "Turn Off Diagnostic Data Sharing",
+        "category":  "Privacy \u0026 Background Data",
+        "impact":  "Safe",
+        "description":  "Limits diagnostic reporting sent to Microsoft to the absolute minimum required.",
+        "checkScript":  "((Get-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection\u0027 -ErrorAction SilentlyContinue).AllowTelemetry -eq 0)",
+        "applyScript":  "if (!(Test-Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection\u0027)) { New-Item -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection\u0027 -Force | Out-Null }; Set-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection\u0027 -Name \u0027AllowTelemetry\u0027 -Value 0 -Type DWord",
+        "revertScript":  "Remove-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection\u0027 -Name \u0027AllowTelemetry\u0027 -ErrorAction SilentlyContinue"
+    },
+    {
+        "id":  "advertising_id",
+        "title":  "Turn Off Advertising Tracking ID",
+        "category":  "Privacy \u0026 Background Data",
+        "impact":  "Safe",
+        "description":  "Stops Windows and apps from tracking your activity to show targeted ads.",
+        "checkScript":  "((Get-ItemProperty -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo\u0027 -ErrorAction SilentlyContinue).Enabled -eq 0)",
+        "applyScript":  "if (!(Test-Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo\u0027)) { New-Item -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo\u0027 -Force | Out-Null }; Set-ItemProperty -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo\u0027 -Name \u0027Enabled\u0027 -Value 0 -Type DWord; if (!(Test-Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy\u0027)) { New-Item -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy\u0027 -Force | Out-Null }; Set-ItemProperty -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy\u0027 -Name \u0027TailoredExperiencesWithDiagnosticDataEnabled\u0027 -Value 0 -Type DWord",
+        "revertScript":  "Set-ItemProperty -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo\u0027 -Name \u0027Enabled\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy\u0027 -Name \u0027TailoredExperiencesWithDiagnosticDataEnabled\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue"
+    },
+    {
+        "id":  "game_dvr",
+        "title":  "Stop Game Stutter (Turn Off Background Recording)",
+        "category":  "Gaming \u0026 Performance",
+        "impact":  "Gaming",
+        "description":  "Turns off Xbox background video recording, which stops sudden FPS drops and stutters while gaming.",
+        "checkScript":  "((Get-ItemProperty -Path \u0027HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\GameDVR\u0027 -ErrorAction SilentlyContinue).AppCaptureEnabled -eq 0)",
+        "applyScript":  "$gdvr = \u0027HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\GameDVR\u0027; if (!(Test-Path $gdvr)) { New-Item -Path $gdvr -Force | Out-Null }; Set-ItemProperty -Path $gdvr -Name \u0027AppCaptureEnabled\u0027 -Value 0 -Type DWord; Set-ItemProperty -Path \u0027HKCU:\\System\\GameConfigStore\u0027 -Name \u0027GameDVR_Enabled\u0027 -Value 0 -Type DWord -ErrorAction SilentlyContinue; if (!(Test-Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR\u0027)) { New-Item -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR\u0027 -Force | Out-Null }; Set-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR\u0027 -Name \u0027AllowGameDVR\u0027 -Value 0 -Type DWord",
+        "revertScript":  "Set-ItemProperty -Path \u0027HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\GameDVR\u0027 -Name \u0027AppCaptureEnabled\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path \u0027HKCU:\\System\\GameConfigStore\u0027 -Name \u0027GameDVR_Enabled\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue; Remove-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR\u0027 -Name \u0027AllowGameDVR\u0027 -ErrorAction SilentlyContinue"
+    },
+    {
+        "id":  "mouse_acceleration",
+        "title":  "Smooth \u0026 Predictable Mouse Aim",
+        "category":  "Gaming \u0026 Performance",
+        "impact":  "Gaming",
+        "description":  "Turns off mouse speed jumping so your cursor moves at an even, natural speed. Essential for gaming.",
+        "checkScript":  "((Get-ItemProperty -Path \u0027HKCU:\\Control Panel\\Mouse\u0027 -ErrorAction SilentlyContinue).MouseSpeed -eq \u00270\u0027)",
+        "applyScript":  "$mouse = \u0027HKCU:\\Control Panel\\Mouse\u0027; Set-ItemProperty -Path $mouse -Name \u0027MouseSpeed\u0027 -Value \u00270\u0027 -Type String; Set-ItemProperty -Path $mouse -Name \u0027MouseThreshold1\u0027 -Value \u00270\u0027 -Type String; Set-ItemProperty -Path $mouse -Name \u0027MouseThreshold2\u0027 -Value \u00270\u0027 -Type String",
+        "revertScript":  "$mouse = \u0027HKCU:\\Control Panel\\Mouse\u0027; Set-ItemProperty -Path $mouse -Name \u0027MouseSpeed\u0027 -Value \u00271\u0027 -Type String; Set-ItemProperty -Path $mouse -Name \u0027MouseThreshold1\u0027 -Value \u00276\u0027 -Type String; Set-ItemProperty -Path $mouse -Name \u0027MouseThreshold2\u0027 -Value \u002710\u0027 -Type String"
+    },
+    {
+        "id":  "ultimate_performance_plan",
+        "title":  "Ultimate Performance Power Plan",
+        "category":  "Gaming \u0026 Performance",
+        "impact":  "Safe",
+        "description":  "Keeps your processor ready and responsive at all times without letting it slow down into idle mode.",
+        "checkScript":  "((\u0026 powercfg /getactivescheme 2\u003e$null) -match \u0027Ultimate|High\u0027)",
+        "applyScript":  "$ultimateGuid = \u0027e9a42b02-d5df-448d-aa00-03f14749eb61\u0027; \u0026 powercfg -duplicatescheme $ultimateGuid 2\u003e$null | Out-Null; \u0026 powercfg /setactive $ultimateGuid 2\u003e$null; if ($LASTEXITCODE -ne 0) { \u0026 powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c 2\u003e$null }",
+        "revertScript":  "\u0026 powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e 2\u003e$null"
+    },
+    {
+        "id":  "hags_scheduling",
+        "title":  "Speed Up Graphics Card Processing",
+        "category":  "Gaming \u0026 Performance",
+        "impact":  "Safe",
+        "description":  "Lets your graphics card manage its own memory for lower input lag in modern games.",
+        "checkScript":  "((Get-ItemProperty -Path \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers\u0027 -ErrorAction SilentlyContinue).HwSchMode -eq 2)",
+        "applyScript":  "Set-ItemProperty -Path \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers\u0027 -Name \u0027HwSchMode\u0027 -Value 2 -Type DWord -ErrorAction SilentlyContinue",
+        "revertScript":  "Set-ItemProperty -Path \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers\u0027 -Name \u0027HwSchMode\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue"
+    },
+    {
+        "id":  "network_autotuning",
+        "title":  "Maximize Download \u0026 Internet Speed",
+        "category":  "Speed \u0026 Performance",
+        "impact":  "Safe",
+        "description":  "Optimizes internet connection settings so you get the full speed of your broadband connection.",
+        "checkScript":  "((\u0026 netsh int tcp show global 2\u003e$null) -match \u0027Receive Window Auto-Tuning Level\\s*:\\s*normal\u0027)",
+        "applyScript":  "\u0026 netsh int tcp set global autotuninglevel=normal 2\u003e$null | Out-Null; \u0026 netsh int tcp set global ecncapability=disabled 2\u003e$null | Out-Null",
+        "revertScript":  "\u0026 netsh int tcp set global autotuninglevel=normal 2\u003e$null | Out-Null"
+    },
+    {
+        "id":  "fast_ntfs_access",
+        "title":  "Faster Game \u0026 File Loading",
+        "category":  "Speed \u0026 Performance",
+        "impact":  "Safe",
+        "description":  "Stops Windows from writing a timestamp every single time a file is read, speeding up SSD drive access.",
+        "checkScript":  "((\u0026 fsutil behavior query disablelastaccess 2\u003e$null) -match \u00271|3\u0027)",
+        "applyScript":  "\u0026 fsutil behavior set disablelastaccess 1 2\u003e$null | Out-Null",
+        "revertScript":  "\u0026 fsutil behavior set disablelastaccess 2 2\u003e$null | Out-Null"
+    },
+    {
+        "id":  "emulator_bluestacks_fps",
+        "title":  "Set BlueStacks 5 to 240 FPS",
+        "category":  "Android Emulators",
+        "impact":  "Gaming",
+        "description":  "Unlocks high frame rate mode in BlueStacks so compatible mobile games run at up to 240 FPS.",
+        "checkScript":  "$p = \"$env:ProgramData\\BlueStacks_nxt\\bluestacks.conf\"; if (Test-Path $p) { ((Get-Content $p -Raw -ErrorAction SilentlyContinue) -match \u0027enable_high_fps=\"1\"\u0027) } else { $false }",
+        "applyScript":  "$p = \u0027$env:ProgramData\\BlueStacks_nxt\\bluestacks.conf\u0027; if (Test-Path $p) { $orig = \"$p.bak_original\"; if (-not (Test-Path $orig)) { Copy-Item $p $orig -Force }; $c = [System.IO.File]::ReadAllText($p); $inst = \u0027Pie64\u0027; if ($c -match \u0027bst\\.installed_images=\"([^\"]+)\"\u0027) { $inst = $Matches[1] }; $c = $c -replace \"bst\\.instance\\.$inst\\.enable_high_fps=`\"[01]`\"\", \"bst.instance.$inst.enable_high_fps=`\"1`\"\"; $c = $c -replace \"bst\\.instance\\.$inst\\.max_fps=`\"\\d+`\"\", \"bst.instance.$inst.max_fps=`\"240`\"\"; $c = $c -replace \"bst\\.instance\\.$inst\\.enable_fps_display=`\"[01]`\"\", \"bst.instance.$inst.enable_fps_display=`\"1`\"\"; $u = [System.Text.UTF8Encoding]::new($false); [System.IO.File]::WriteAllText($p, $c, $u) }",
+        "revertScript":  "$p = \u0027$env:ProgramData\\BlueStacks_nxt\\bluestacks.conf\u0027; $orig = \"$p.bak_original\"; if (Test-Path $orig) { Copy-Item $orig $p -Force } elseif (Test-Path \"$p.bak_anxious\") { Copy-Item \"$p.bak_anxious\" $p -Force }"
+    },
+    {
+        "id":  "cpu_core_parking",
+        "checkScript":  "((\u0026 powercfg /query SCHEME_CURRENT SUB_PROCESSOR CPMINCORES 2\u003e$null) -match \u00270x00000064\u0027)",
+        "revertScript":  "\u0026 powercfg -setacvalueindex SCHEME_CURRENT 54533251-82be-4824-96c1-47b60b740d00 0cc5b647-c1df-4637-891a-dec35c318583 5 2\u003e$null | Out-Null; \u0026 powercfg -setacvalueindex SCHEME_CURRENT 54533251-82be-4824-96c1-47b60b740d00 ea062031-0e34-4ff1-9b6d-eb1059334028 100 2\u003e$null | Out-Null; \u0026 powercfg -setactive SCHEME_CURRENT 2\u003e$null | Out-Null",
+        "impact":  "Gaming",
+        "title":  "Keep All CPU Cores Awake (Stops Stutter)",
+        "category":  "Gaming \u0026 Performance",
+        "applyScript":  "\u0026 powercfg -setacvalueindex SCHEME_CURRENT 54533251-82be-4824-96c1-47b60b740d00 0cc5b647-c1df-4637-891a-dec35c318583 100 2\u003e$null | Out-Null; \u0026 powercfg -setacvalueindex SCHEME_CURRENT 54533251-82be-4824-96c1-47b60b740d00 ea062031-0e34-4ff1-9b6d-eb1059334028 100 2\u003e$null | Out-Null; \u0026 powercfg -setactive SCHEME_CURRENT 2\u003e$null | Out-Null",
+        "description":  "Stops processor cores from going to sleep while plugged in, preventing micro-stutters during heavy games."
+    },
+    {
+        "id":  "delivery_optimization_p2p",
+        "checkScript":  "((Get-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization\u0027 -ErrorAction SilentlyContinue).DODownloadMode -eq 0)",
+        "revertScript":  "Remove-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization\u0027 -Name \u0027DODownloadMode\u0027 -ErrorAction SilentlyContinue; Set-Service -Name \u0027DoSvc\u0027 -StartupType Automatic -ErrorAction SilentlyContinue; Start-Service -Name \u0027DoSvc\u0027 -ErrorAction SilentlyContinue",
+        "impact":  "Safe",
+        "title":  "Stop Background Windows Update Uploads",
+        "category":  "Speed \u0026 Performance",
+        "applyScript":  "if (!(Test-Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization\u0027)) { New-Item -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization\u0027 -Force | Out-Null }; Set-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization\u0027 -Name \u0027DODownloadMode\u0027 -Value 0 -Type DWord; Set-Service -Name \u0027DoSvc\u0027 -StartupType Automatic -ErrorAction SilentlyContinue; Start-Service -Name \u0027DoSvc\u0027 -ErrorAction SilentlyContinue",
+        "description":  "Stops Windows from using your internet upload bandwidth to send updates to other computers."
+    },
+    {
+        "id":  "gpu_msi_mode",
+        "checkScript":  "$reg = \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Enum\\PCI\u0027; $found = $false; Get-ChildItem $reg -Recurse -Filter \u0027MSI-Supported\u0027 -ErrorAction SilentlyContinue | ForEach-Object { if ((Get-ItemProperty -Path $_.PSPath -Name \u0027MSISupported\u0027 -ErrorAction SilentlyContinue).MSISupported -eq 1) { $found = $true } }; $found",
+        "revertScript":  "$gpus = Get-CimInstance -ClassName Win32_VideoController -ErrorAction SilentlyContinue; foreach ($g in $gpus) { $pnp = $g.PNPDeviceID; if ($pnp) { $msiPath = \"HKLM:\\SYSTEM\\CurrentControlSet\\Enum\\$pnp\\Device Parameters\\Interrupt Management\\MessageSignaledInterruptProperties\"; if (Test-Path $msiPath) { Set-ItemProperty -Path $msiPath -Name \u0027MSISupported\u0027 -Value 0 -Type DWord -ErrorAction SilentlyContinue } } }",
+        "impact":  "Gaming",
+        "title":  "Direct Graphics Card Communication",
+        "category":  "Gaming \u0026 Performance",
+        "applyScript":  "$gpus = Get-CimInstance -ClassName Win32_VideoController -ErrorAction SilentlyContinue; foreach ($g in $gpus) { $pnp = $g.PNPDeviceID; if ($pnp) { $msiPath = \"HKLM:\\SYSTEM\\CurrentControlSet\\Enum\\$pnp\\Device Parameters\\Interrupt Management\\MessageSignaledInterruptProperties\"; if (!(Test-Path $msiPath)) { New-Item -Path $msiPath -Force | Out-Null }; Set-ItemProperty -Path $msiPath -Name \u0027MSISupported\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue } }",
+        "description":  "Helps your graphics card talk directly to the processor without waiting in line, reducing input lag."
+    }
+]

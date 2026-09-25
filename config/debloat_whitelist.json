@@ -1,0 +1,15 @@
+[
+  "Microsoft.WindowsStore",
+  "Microsoft.WindowsCalculator",
+  "Microsoft.WindowsNotepad",
+  "Microsoft.WindowsTerminal",
+  "Microsoft.Paint",
+  "Microsoft.Windows.Photos",
+  "Microsoft.ScreenSketch",
+  "Microsoft.XboxIdentityProvider",
+  "Microsoft.Xbox.TCUI",
+  "Microsoft.UI.Xaml",
+  "Microsoft.VCLibs",
+  "Microsoft.NET.Native.Runtime",
+  "Microsoft.DesktopAppInstaller"
+]
