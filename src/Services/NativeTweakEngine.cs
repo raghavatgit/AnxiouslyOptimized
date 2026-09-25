@@ -5,11 +5,14 @@ using System.ServiceProcess;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
+using AnxiouslyOptimized.Models;
 
 namespace AnxiouslyOptimized.Services
 {
     public static class NativeTweakEngine
     {
+        public static TransactionJournal ActiveJournal = null;
+
         #region Registry Helper Methods
         public static int GetDword(RegistryHive hive, string subKey, string valueName, int defaultValue = -1)
         {
@@ -36,6 +39,13 @@ namespace AnxiouslyOptimized.Services
         {
             try
             {
+                if (ActiveJournal != null)
+                {
+                    int prev = GetDword(hive, subKey, valueName, -1);
+                    string target = (hive == RegistryHive.LocalMachine ? "HKLM\\" : "HKCU\\") + subKey;
+                    SafetyService.RecordRegistryChange(ActiveJournal, target, valueName, prev == -1 ? null : (object)prev, prev == -1 ? RegistryValueKind.None : RegistryValueKind.DWord, value);
+                }
+
                 using (var baseKey = RegistryKey.OpenBaseKey(hive, RegistryView.Registry64))
                 using (var key = baseKey.CreateSubKey(subKey))
                 {
@@ -70,6 +80,13 @@ namespace AnxiouslyOptimized.Services
         {
             try
             {
+                if (ActiveJournal != null)
+                {
+                    string prev = GetString(hive, subKey, valueName, null);
+                    string target = (hive == RegistryHive.LocalMachine ? "HKLM\\" : "HKCU\\") + subKey;
+                    SafetyService.RecordRegistryChange(ActiveJournal, target, valueName, prev, prev == null ? RegistryValueKind.None : RegistryValueKind.String, value);
+                }
+
                 using (var baseKey = RegistryKey.OpenBaseKey(hive, RegistryView.Registry64))
                 using (var key = baseKey.CreateSubKey(subKey))
                 {
@@ -139,6 +156,11 @@ namespace AnxiouslyOptimized.Services
 
         public static bool SetServiceStartMode(string serviceName, int startMode)
         {
+            if (ActiveJournal != null)
+            {
+                int prev = GetServiceStartMode(serviceName);
+                SafetyService.RecordServiceChange(ActiveJournal, serviceName, prev, startMode);
+            }
             return SetDword(RegistryHive.LocalMachine, @"SYSTEM\CurrentControlSet\Services\" + serviceName, "Start", startMode);
         }
 

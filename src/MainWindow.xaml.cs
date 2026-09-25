@@ -99,6 +99,7 @@ namespace AnxiouslyOptimized
         private List<CleanerTargetCategory> _cleanerCategories = new List<CleanerTargetCategory>();
         private List<DnsProviderItem> _dnsProviders = new List<DnsProviderItem>();
         private List<SoftwarePackageItem> _softwarePackages = new List<SoftwarePackageItem>();
+        private List<TransactionJournal> _transactionJournals = new List<TransactionJournal>();
 
         public MainWindow()
         {
@@ -1858,6 +1859,268 @@ namespace AnxiouslyOptimized
                 BtnApplySelectedTweaks.Click += async (s, e) => await ApplySelectedTweaksAsync(true);
             if (BtnRevertSelectedTweaks != null)
                 BtnRevertSelectedTweaks.Click += async (s, e) => await ApplySelectedTweaksAsync(false);
+
+            // Initialize Feature 6: Commercial Safety & Transactional Rollback Hub
+            InitializeTransactionalSafetyHub();
+        }
+        #endregion
+
+        #region Commercial Safety & Transactional Rollback Hub (Feature 6)
+        private async void InitializeTransactionalSafetyHub()
+        {
+            if (BtnValidateVss != null)
+                BtnValidateVss.Click += async (s, e) => await ValidateVssSafetyAsync();
+
+            if (BtnGenerateDesktopUndo != null)
+                BtnGenerateDesktopUndo.Click += (s, e) => GenerateLatestDesktopUndo();
+
+            await ValidateVssSafetyAsync();
+            await LoadAndRenderJournalsAsync();
+        }
+
+        private async Task ValidateVssSafetyAsync()
+        {
+            if (BtnValidateVss != null)
+            {
+                BtnValidateVss.IsEnabled = false;
+                BtnValidateVss.Content = "Checking...";
+            }
+
+            try
+            {
+                var vss = await SafetyService.ValidateVssAndDiskHealthAsync(Log);
+                if (TxtVssStatus != null)
+                    TxtVssStatus.Text = vss.StatusMessage;
+
+                if (TxtVssBadge != null)
+                {
+                    TxtVssBadge.Text = vss.IsVssAvailable ? "VSS ACTIVE" : "VSS CHECK";
+                    TxtVssBadge.Foreground = vss.IsVssAvailable
+                        ? new SolidColorBrush(Color.FromRgb(16, 185, 129))
+                        : new SolidColorBrush(Color.FromRgb(245, 158, 11));
+                }
+            }
+            finally
+            {
+                if (BtnValidateVss != null)
+                {
+                    BtnValidateVss.IsEnabled = true;
+                    BtnValidateVss.Content = "CHECK VSS HEALTH";
+                }
+            }
+        }
+
+        private async Task LoadAndRenderJournalsAsync()
+        {
+            if (PnlTransactionJournals == null) return;
+
+            await Task.Run(() =>
+            {
+                _transactionJournals = SafetyService.LoadAllJournals();
+            });
+
+            if (TxtJournalCount != null)
+            {
+                int count = _transactionJournals != null ? _transactionJournals.Count : 0;
+                TxtJournalCount.Text = string.Format("{0} Transaction Journal{1}", count, count == 1 ? "" : "s");
+            }
+
+            PnlTransactionJournals.Children.Clear();
+
+            if (_transactionJournals == null || _transactionJournals.Count == 0)
+            {
+                var emptyBorder = new Border
+                {
+                    CornerRadius = new CornerRadius(8),
+                    BorderThickness = new Thickness(1),
+                    Padding = new Thickness(14, 10, 14, 10),
+                    Margin = new Thickness(0, 0, 0, 4)
+                };
+                emptyBorder.SetResourceReference(Border.BackgroundProperty, "TweakCardBg");
+                emptyBorder.SetResourceReference(Border.BorderBrushProperty, "TweakCardBorder");
+
+                var tb = new TextBlock
+                {
+                    Text = "No transaction journals recorded yet. Any profile or tweak applied will create an atomic rollback entry here.",
+                    FontSize = 11,
+                    FontStyle = FontStyles.Italic
+                };
+                tb.SetResourceReference(TextBlock.ForegroundProperty, "TextMutedBrush");
+                emptyBorder.Child = tb;
+                PnlTransactionJournals.Children.Add(emptyBorder);
+                return;
+            }
+
+            foreach (var j in _transactionJournals)
+            {
+                var card = new Border
+                {
+                    CornerRadius = new CornerRadius(8),
+                    BorderThickness = new Thickness(1),
+                    Padding = new Thickness(12, 8, 12, 8),
+                    Margin = new Thickness(0, 0, 0, 6)
+                };
+                card.SetResourceReference(Border.BackgroundProperty, "TweakCardBg");
+                card.SetResourceReference(Border.BorderBrushProperty, "TweakCardBorder");
+
+                var grid = new Grid();
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                // Left: Title, Date, Step Count
+                var leftStack = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+                var titleText = new TextBlock
+                {
+                    Text = j.Title,
+                    FontSize = 12,
+                    FontWeight = FontWeights.Bold
+                };
+                titleText.SetResourceReference(TextBlock.ForegroundProperty, "TextPrimaryBrush");
+
+                var metaText = new TextBlock
+                {
+                    Text = string.Format("{0} \u2022 {1} step(s) recorded", j.TimestampFormatted, j.TotalActions),
+                    FontSize = 10,
+                    Margin = new Thickness(0, 2, 0, 0)
+                };
+                metaText.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
+
+                leftStack.Children.Add(titleText);
+                leftStack.Children.Add(metaText);
+                Grid.SetColumn(leftStack, 0);
+                grid.Children.Add(leftStack);
+
+                // Middle: Status badge
+                var badge = new Border
+                {
+                    CornerRadius = new CornerRadius(4),
+                    BorderThickness = new Thickness(1),
+                    Padding = new Thickness(8, 2, 8, 2),
+                    Margin = new Thickness(8, 0, 8, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                var badgeText = new TextBlock
+                {
+                    FontSize = 9.5,
+                    FontWeight = FontWeights.Bold
+                };
+
+                if (j.IsRolledBack)
+                {
+                    badge.Background = new SolidColorBrush(Color.FromRgb(26, 26, 34));
+                    badge.BorderBrush = new SolidColorBrush(Color.FromRgb(100, 116, 139));
+                    badgeText.Text = "ROLLED BACK";
+                    badgeText.Foreground = new SolidColorBrush(Color.FromRgb(148, 163, 184));
+                }
+                else
+                {
+                    badge.Background = new SolidColorBrush(Color.FromRgb(6, 38, 24));
+                    badge.BorderBrush = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+                    badgeText.Text = "COMMITTED & SAFE";
+                    badgeText.Foreground = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+                }
+                badge.Child = badgeText;
+                Grid.SetColumn(badge, 1);
+                grid.Children.Add(badge);
+
+                // Right: Action buttons
+                var btnStack = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+
+                if (!j.IsRolledBack)
+                {
+                    var btnRollback = new Button
+                    {
+                        Content = "Rollback (LIFO)",
+                        FontSize = 10.5,
+                        Padding = new Thickness(10, 4, 10, 4),
+                        Margin = new Thickness(0, 0, 6, 0)
+                    };
+                    btnRollback.SetResourceReference(Button.StyleProperty, "ButtonDanger");
+                    var currentJournal = j;
+                    btnRollback.Click += async (s, e) =>
+                    {
+                        var confirm = MessageBox.Show(
+                            string.Format("Rollback all {0} changes from '{1}'?\n\nThis will restore exact original registry values, service startup modes, and configurations in reverse chronological order.", currentJournal.TotalActions, currentJournal.Title),
+                            "Confirm Transaction Rollback",
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Question);
+
+                        if (confirm == MessageBoxResult.Yes)
+                        {
+                            btnRollback.IsEnabled = false;
+                            btnRollback.Content = "Reverting...";
+                            bool ok = await SafetyService.RollbackTransactionAsync(currentJournal, Log);
+                            if (ok)
+                            {
+                                MessageBox.Show(
+                                    string.Format("Transaction '{0}' was rolled back successfully.\n\nAll {1} steps have been returned to their pre-tweak states.", currentJournal.Title, currentJournal.TotalActions),
+                                    "Rollback Completed",
+                                    MessageBoxButton.OK,
+                                    MessageBoxImage.Information);
+                            }
+                            await LoadAndRenderJournalsAsync();
+                        }
+                    };
+                    btnStack.Children.Add(btnRollback);
+                }
+
+                var btnDesktopUndo = new Button
+                {
+                    Content = "Export .BAT",
+                    FontSize = 10,
+                    Padding = new Thickness(8, 4, 8, 4)
+                };
+                btnDesktopUndo.SetResourceReference(Button.StyleProperty, "ButtonSecondary");
+                var cj = j;
+                btnDesktopUndo.Click += (s, e) =>
+                {
+                    string path = SafetyService.GenerateEmergencyDesktopBatch(cj, Log);
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        MessageBox.Show(
+                            string.Format("Emergency standalone recovery script created on your Desktop:\n\n{0}\n\nDouble-click this .bat file at any time to undo these {1} steps even if Windows boots into Safe Mode.", Path.GetFileName(path), cj.TotalActions),
+                            "Desktop Emergency Script Ready",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                    }
+                };
+                btnStack.Children.Add(btnDesktopUndo);
+
+                Grid.SetColumn(btnStack, 2);
+                grid.Children.Add(btnStack);
+
+                card.Child = grid;
+                PnlTransactionJournals.Children.Add(card);
+            }
+        }
+
+        private void GenerateLatestDesktopUndo()
+        {
+            if (_transactionJournals != null && _transactionJournals.Count > 0)
+            {
+                var latest = _transactionJournals[0];
+                string path = SafetyService.GenerateEmergencyDesktopBatch(latest, Log);
+                if (!string.IsNullOrEmpty(path))
+                {
+                    MessageBox.Show(
+                        string.Format("Emergency standalone recovery script created on your Desktop:\n\n{0}\n\nThis script contains zero dependencies and restores all settings without needing .NET or this app.", Path.GetFileName(path)),
+                        "Emergency Undo Script Created",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+            }
+            else
+            {
+                // Create a baseline undo script
+                var dummy = SafetyService.BeginTransaction("Baseline Windows Safe Recovery");
+                string path = SafetyService.GenerateEmergencyDesktopBatch(dummy, Log);
+                MessageBox.Show(
+                    "Emergency disaster recovery script created on your Desktop: AnxiouslyOptimized_Emergency_Undo.bat",
+                    "Desktop Recovery Script Ready",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
         }
         #endregion
 
@@ -2052,6 +2315,10 @@ namespace AnxiouslyOptimized
             string title = !string.IsNullOrEmpty(preset.Title) ? preset.Title : presetKey;
             Log(string.Format("Activating Profile: {0}...", title));
 
+            // Feature 6: Atomic Transaction Journal
+            var journal = SafetyService.BeginTransaction(string.Format("Profile: {0}", title));
+            NativeTweakEngine.ActiveJournal = journal;
+
             if (ChkAutoRestorePoint != null && ChkAutoRestorePoint.IsChecked == true)
             {
                 await SafetyService.CreateRestorePointAsync(string.Format("AnxiouslyOptimized {0} Snapshot", title), Log);
@@ -2066,6 +2333,10 @@ namespace AnxiouslyOptimized
                     if (ok) tw.IsApplied = true;
                 }
             }
+
+            NativeTweakEngine.ActiveJournal = null;
+            SafetyService.CommitTransaction(journal, Log);
+            await LoadAndRenderJournalsAsync();
 
             UpdateReadinessScore();
             Log(string.Format("Profile '{0}' applied successfully.", title));
@@ -2083,11 +2354,19 @@ namespace AnxiouslyOptimized
             string action = apply ? "Applying" : "Reverting";
             Log(string.Format("{0} {1} selected tweaks...", action, selected.Count));
 
+            // Feature 6: Atomic Transaction Journal
+            var journal = SafetyService.BeginTransaction(string.Format("{0} {1} Selected Tweak(s)", action, selected.Count));
+            NativeTweakEngine.ActiveJournal = journal;
+
             foreach (var tw in selected)
             {
                 bool ok = await TweakService.ExecuteTweakActionAsync(tw, apply, Log);
                 if (ok) tw.IsApplied = apply;
             }
+
+            NativeTweakEngine.ActiveJournal = null;
+            SafetyService.CommitTransaction(journal, Log);
+            await LoadAndRenderJournalsAsync();
 
             UpdateReadinessScore();
             Log(string.Format("{0} batch completed.", action));
@@ -2098,11 +2377,19 @@ namespace AnxiouslyOptimized
             var applied = _allTweaks.Where(t => t.IsApplied).ToList();
             Log(string.Format("Reverting all {0} applied optimizations...", applied.Count));
 
+            // Feature 6: Atomic Transaction Journal
+            var journal = SafetyService.BeginTransaction(string.Format("Emergency Reset: {0} Tweak(s)", applied.Count));
+            NativeTweakEngine.ActiveJournal = journal;
+
             foreach (var tw in applied)
             {
                 bool ok = await TweakService.ExecuteTweakActionAsync(tw, false, Log);
                 if (ok) tw.IsApplied = false;
             }
+
+            NativeTweakEngine.ActiveJournal = null;
+            SafetyService.CommitTransaction(journal, Log);
+            await LoadAndRenderJournalsAsync();
 
             UpdateReadinessScore();
             Log("All optimizations reverted to default state.");

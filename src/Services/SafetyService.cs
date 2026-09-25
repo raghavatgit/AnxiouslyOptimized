@@ -548,5 +548,338 @@ namespace AnxiouslyOptimized.Services
             }
             catch { }
         }
+        #region Transactional Rollback & Journal Architecture (Feature 6)
+        public static string GetJournalDirectory()
+        {
+            string dir = Path.Combine(GetBackupsDirectory(), "journal");
+            if (!Directory.Exists(dir))
+            {
+                try { Directory.CreateDirectory(dir); } catch { }
+            }
+            return dir;
+        }
+
+        public static TransactionJournal BeginTransaction(string title)
+        {
+            return new TransactionJournal
+            {
+                Title = title
+            };
+        }
+
+        public static void RecordRegistryChange(TransactionJournal journal, string keyPath, string valueName, object originalValue, Microsoft.Win32.RegistryValueKind originalKind, object newValue)
+        {
+            if (journal == null) return;
+
+            var step = new TransactionStep
+            {
+                StepType = "RegistryValue",
+                Target = keyPath,
+                PropertyOrName = valueName,
+                OriginalValue = originalValue != null ? originalValue.ToString() : null,
+                OriginalKind = originalKind.ToString(),
+                NewValue = newValue != null ? newValue.ToString() : null
+            };
+            journal.Steps.Add(step);
+        }
+
+        public static void RecordServiceChange(TransactionJournal journal, string serviceName, int originalStartMode, int newStartMode)
+        {
+            if (journal == null) return;
+
+            var step = new TransactionStep
+            {
+                StepType = "ServiceStartMode",
+                Target = @"HKLM\SYSTEM\CurrentControlSet\Services\" + serviceName,
+                PropertyOrName = "Start",
+                OriginalValue = originalStartMode.ToString(),
+                OriginalKind = "DWord",
+                NewValue = newStartMode.ToString()
+            };
+            journal.Steps.Add(step);
+        }
+
+        public static void CommitTransaction(TransactionJournal journal, Action<string> log)
+        {
+            if (journal == null || journal.Steps.Count == 0) return;
+
+            try
+            {
+                string dir = GetJournalDirectory();
+                string path = Path.Combine(dir, journal.JournalId + ".json");
+                string json = _serializer.Serialize(journal);
+                File.WriteAllText(path, json, Encoding.UTF8);
+
+                if (log != null)
+                    log(string.Format("Transaction journal '{0}' committed ({1} action(s) recorded).", journal.Title, journal.Steps.Count));
+
+                // Auto-generate Desktop Emergency Undo script
+                GenerateEmergencyDesktopBatch(journal, log);
+            }
+            catch (Exception ex)
+            {
+                if (log != null) log("Journal commit error: " + ex.Message);
+            }
+        }
+
+        public static List<TransactionJournal> LoadAllJournals()
+        {
+            var list = new List<TransactionJournal>();
+            string dir = GetJournalDirectory();
+            if (Directory.Exists(dir))
+            {
+                var files = Directory.GetFiles(dir, "TRX_*.json");
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        string json = File.ReadAllText(file);
+                        var raw = _serializer.Deserialize<Dictionary<string, object>>(json);
+                        if (raw != null)
+                        {
+                            var j = new TransactionJournal();
+                            if (raw.ContainsKey("JournalId")) j.JournalId = raw["JournalId"] as string ?? j.JournalId;
+                            if (raw.ContainsKey("Title")) j.Title = raw["Title"] as string ?? "";
+                            if (raw.ContainsKey("TimestampFormatted")) j.TimestampFormatted = raw["TimestampFormatted"] as string ?? "";
+                            if (raw.ContainsKey("IsRolledBack")) j.IsRolledBack = Convert.ToBoolean(raw["IsRolledBack"]);
+
+                            DateTime dt;
+                            if (raw.ContainsKey("Timestamp") && DateTime.TryParse(raw["Timestamp"] as string, out dt))
+                                j.Timestamp = dt;
+
+                            if (raw.ContainsKey("Steps"))
+                            {
+                                var stepsRaw = raw["Steps"] as System.Collections.ArrayList;
+                                if (stepsRaw != null)
+                                {
+                                    foreach (Dictionary<string, object> stepDict in stepsRaw)
+                                    {
+                                        var step = new TransactionStep();
+                                        if (stepDict.ContainsKey("StepType")) step.StepType = stepDict["StepType"] as string;
+                                        if (stepDict.ContainsKey("Target")) step.Target = stepDict["Target"] as string;
+                                        if (stepDict.ContainsKey("PropertyOrName")) step.PropertyOrName = stepDict["PropertyOrName"] as string;
+                                        if (stepDict.ContainsKey("OriginalValue")) step.OriginalValue = stepDict["OriginalValue"] as string;
+                                        if (stepDict.ContainsKey("OriginalKind")) step.OriginalKind = stepDict["OriginalKind"] as string;
+                                        if (stepDict.ContainsKey("NewValue")) step.NewValue = stepDict["NewValue"] as string;
+                                        j.Steps.Add(step);
+                                    }
+                                }
+                            }
+                            list.Add(j);
+                        }
+                    }
+                    catch { }
+                }
+            }
+            return list.OrderByDescending(j => j.Timestamp).ToList();
+        }
+
+        public static async Task<bool> RollbackTransactionAsync(TransactionJournal journal, Action<string> log)
+        {
+            return await Task.Run(() =>
+            {
+                if (journal == null || journal.Steps == null || journal.Steps.Count == 0)
+                {
+                    if (log != null) log("No steps in transaction to rollback.");
+                    return false;
+                }
+
+                if (log != null)
+                    log(string.Format("Initiating transactional rollback for '{0}' ({1} step(s) in reverse LIFO order)...", journal.Title, journal.Steps.Count));
+
+                // Reverse LIFO order
+                var reversed = new List<TransactionStep>(journal.Steps);
+                reversed.Reverse();
+
+                int reverted = 0;
+                foreach (var step in reversed)
+                {
+                    try
+                    {
+                        if (step.StepType == "RegistryValue" || step.StepType == "ServiceStartMode")
+                        {
+                            bool isHklm = step.Target.StartsWith("HKLM", StringComparison.OrdinalIgnoreCase) ||
+                                          step.Target.StartsWith("HKEY_LOCAL_MACHINE", StringComparison.OrdinalIgnoreCase);
+
+                            string subkey = step.Target;
+                            if (subkey.StartsWith(@"HKLM\", StringComparison.OrdinalIgnoreCase)) subkey = subkey.Substring(5);
+                            else if (subkey.StartsWith(@"HKCU\", StringComparison.OrdinalIgnoreCase)) subkey = subkey.Substring(5);
+                            else if (subkey.StartsWith(@"HKEY_LOCAL_MACHINE\", StringComparison.OrdinalIgnoreCase)) subkey = subkey.Substring(19);
+                            else if (subkey.StartsWith(@"HKEY_CURRENT_USER\", StringComparison.OrdinalIgnoreCase)) subkey = subkey.Substring(18);
+
+                            Microsoft.Win32.RegistryKey root = isHklm ? Microsoft.Win32.Registry.LocalMachine : Microsoft.Win32.Registry.CurrentUser;
+
+                            using (var key = root.CreateSubKey(subkey))
+                            {
+                                if (key != null)
+                                {
+                                    if (step.OriginalValue == null || step.OriginalKind == "None")
+                                    {
+                                        // It was newly added, so delete it during rollback
+                                        try { key.DeleteValue(step.PropertyOrName, false); } catch { }
+                                    }
+                                    else
+                                    {
+                                        if (step.OriginalKind == "DWord")
+                                        {
+                                            int val = Convert.ToInt32(step.OriginalValue);
+                                            key.SetValue(step.PropertyOrName, val, Microsoft.Win32.RegistryValueKind.DWord);
+                                        }
+                                        else if (step.OriginalKind == "QWord")
+                                        {
+                                            long val = Convert.ToInt64(step.OriginalValue);
+                                            key.SetValue(step.PropertyOrName, val, Microsoft.Win32.RegistryValueKind.QWord);
+                                        }
+                                        else
+                                        {
+                                            key.SetValue(step.PropertyOrName, step.OriginalValue, Microsoft.Win32.RegistryValueKind.String);
+                                        }
+                                    }
+                                    reverted++;
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (log != null)
+                            log(string.Format("Rollback step error on {0}: {1}", step.Target, ex.Message));
+                    }
+                }
+
+                journal.IsRolledBack = true;
+
+                // Re-save updated journal
+                try
+                {
+                    string path = Path.Combine(GetJournalDirectory(), journal.JournalId + ".json");
+                    File.WriteAllText(path, _serializer.Serialize(journal), Encoding.UTF8);
+                }
+                catch { }
+
+                if (log != null)
+                    log(string.Format("Rollback successful! {0}/{1} steps cleanly restored.", reverted, journal.Steps.Count));
+
+                return true;
+            });
+        }
+
+        public static string GenerateEmergencyDesktopBatch(TransactionJournal journal, Action<string> log)
+        {
+            try
+            {
+                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                string batPath = Path.Combine(desktop, "AnxiouslyOptimized_Emergency_Undo.bat");
+
+                var sb = new StringBuilder();
+                sb.AppendLine("@echo off");
+                sb.AppendLine(":: ===================================================================");
+                sb.AppendLine(":: ANXIOUSLYOPTIMIZED EMERGENCY ROLLBACK RECOVERY SCRIPT");
+                sb.AppendLine(":: Standalone Zero-Dependency Disaster Recovery (No .NET required)");
+                sb.AppendLine(":: Created by Raghav Goyal - AnxiouslyOptimized Engine");
+                sb.AppendLine(":: ===================================================================");
+                sb.AppendLine("echo.");
+                sb.AppendLine("echo [!] Checking for Administrative privileges...");
+                sb.AppendLine("net session >nul 2>&1");
+                sb.AppendLine("if %errorLevel% neq 0 (");
+                sb.AppendLine("    echo [ERROR] Please right-click this script and select 'Run as administrator'.");
+                sb.AppendLine("    pause");
+                sb.AppendLine("    exit /b 1");
+                sb.AppendLine(")");
+                sb.AppendLine("echo [OK] Administrator rights confirmed.");
+                sb.AppendLine("echo [!] Restoring system registry keys and service configurations...");
+                sb.AppendLine("echo.");
+
+                var reversed = new List<TransactionStep>(journal.Steps);
+                reversed.Reverse();
+
+                foreach (var step in reversed)
+                {
+                    if (step.StepType == "RegistryValue" || step.StepType == "ServiceStartMode")
+                    {
+                        string safeTarget = step.Target;
+                        if (step.OriginalValue == null || step.OriginalKind == "None")
+                        {
+                            sb.AppendLine(string.Format("reg.exe delete \"{0}\" /v \"{1}\" /f >nul 2>&1", safeTarget, step.PropertyOrName));
+                        }
+                        else
+                        {
+                            string regType = "REG_DWORD";
+                            if (step.OriginalKind == "String") regType = "REG_SZ";
+                            else if (step.OriginalKind == "QWord") regType = "REG_QWORD";
+
+                            sb.AppendLine(string.Format("reg.exe add \"{0}\" /v \"{1}\" /t {2} /d \"{3}\" /f >nul 2>&1",
+                                safeTarget, step.PropertyOrName, regType, step.OriginalValue));
+                        }
+                    }
+                }
+
+                sb.AppendLine("echo.");
+                sb.AppendLine("echo [SUCCESS] Emergency restoration complete. All settings have been reset.");
+                sb.AppendLine("echo.");
+                sb.AppendLine("pause");
+
+                File.WriteAllText(batPath, sb.ToString(), Encoding.ASCII);
+                if (log != null)
+                    log(string.Format("Emergency recovery script generated on Desktop: '{0}'", Path.GetFileName(batPath)));
+
+                return batPath;
+            }
+            catch (Exception ex)
+            {
+                if (log != null) log("Emergency script error: " + ex.Message);
+                return string.Empty;
+            }
+        }
+
+        public static async Task<VssStatusResult> ValidateVssAndDiskHealthAsync(Action<string> log)
+        {
+            return await Task.Run(() =>
+            {
+                var res = new VssStatusResult
+                {
+                    IsVssAvailable = false,
+                    FreeSpaceMb = 0,
+                    StatusMessage = "Checking..."
+                };
+
+                try
+                {
+                    // Check free disk space on C:
+                    var drive = new DriveInfo("C");
+                    res.FreeSpaceMb = drive.AvailableFreeSpace / (1024 * 1024);
+
+                    // Check Volume Shadow Copy service state
+                    using (var sc = new System.ServiceProcess.ServiceController("VSS"))
+                    {
+                        res.IsVssAvailable = (sc.Status == System.ServiceProcess.ServiceControllerStatus.Running ||
+                                              sc.Status == System.ServiceProcess.ServiceControllerStatus.Stopped);
+                    }
+
+                    if (res.FreeSpaceMb > 500 && res.IsVssAvailable)
+                    {
+                        res.StatusMessage = string.Format("VSS Operational ({0} MB free space on C:)", res.FreeSpaceMb);
+                    }
+                    else if (res.FreeSpaceMb <= 500)
+                    {
+                        res.StatusMessage = string.Format("Low Disk Space Warning: Only {0} MB free on C:", res.FreeSpaceMb);
+                    }
+                    else
+                    {
+                        res.StatusMessage = "VSS Service Not Available";
+                    }
+
+                    if (log != null) log(res.StatusMessage);
+                }
+                catch (Exception ex)
+                {
+                    res.StatusMessage = "VSS Check Note: " + ex.Message;
+                    if (log != null) log(res.StatusMessage);
+                }
+
+                return res;
+            });
+        }
+        #endregion
     }
 }

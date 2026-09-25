@@ -66,6 +66,7 @@
     <Compile Include="Models\SystemSpecs.cs" />
     <Compile Include="Models\PresetConfig.cs" />
     <Compile Include="Models\BackupEntry.cs" />
+    <Compile Include="Models\TransactionJournal.cs" />
     <Compile Include="Services\HardwareService.cs" />
     <Compile Include="Services\NativeTweakEngine.cs" />
     <Compile Include="Services\ThemeManager.cs" />
