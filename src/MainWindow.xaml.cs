@@ -98,6 +98,7 @@ namespace AnxiouslyOptimized
         private bool _isScanning = false;
         private List<CleanerTargetCategory> _cleanerCategories = new List<CleanerTargetCategory>();
         private List<DnsProviderItem> _dnsProviders = new List<DnsProviderItem>();
+        private List<SoftwarePackageItem> _softwarePackages = new List<SoftwarePackageItem>();
 
         public MainWindow()
         {
@@ -112,6 +113,7 @@ namespace AnxiouslyOptimized
             InitializeActiveGameModeDaemon();
             InitializeDeepCleaner();
             InitializeNetworkEngine();
+            InitializeRuntimeHub();
             InitializeSettingsAndBackups();
 
             ThemeManager.LoadSavedTheme(this);
@@ -1431,6 +1433,286 @@ namespace AnxiouslyOptimized
                     "TCP/IP Stack Tuned",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
+            }
+        }
+        #endregion
+
+        #region Automated Gaming Runtimes & WinGet Hub (Feature 5)
+        private void InitializeRuntimeHub()
+        {
+            bool hasWinGet = RuntimeHubService.IsWinGetAvailable();
+            if (TxtWinGetStatus != null)
+            {
+                TxtWinGetStatus.Text = hasWinGet ? "WinGet CLI Active (Silent Mode)" : "Direct Microsoft CDN Mode";
+                TxtWinGetStatus.Foreground = hasWinGet ? new SolidColorBrush(Color.FromRgb(16, 185, 129)) : new SolidColorBrush(Color.FromRgb(245, 158, 11));
+            }
+
+            _softwarePackages = RuntimeHubService.GetCatalog();
+            RenderSoftwarePackages();
+
+            if (BtnScanSoftware != null)
+                BtnScanSoftware.Click += async (s, e) => await ScanSoftwareAsync();
+
+            if (BtnInstallSelectedSoftware != null)
+                BtnInstallSelectedSoftware.Click += async (s, e) => await InstallSelectedSoftwareAsync();
+
+            if (BtnSelectAllSoftware != null)
+                BtnSelectAllSoftware.Click += (s, e) => SelectMissingSoftware(true);
+
+            if (BtnDeselectAllSoftware != null)
+                BtnDeselectAllSoftware.Click += (s, e) => SelectMissingSoftware(false);
+        }
+
+        private void SelectMissingSoftware(bool selectOnlyMissing)
+        {
+            if (_softwarePackages == null) return;
+            foreach (var pkg in _softwarePackages)
+            {
+                pkg.IsSelected = selectOnlyMissing ? !pkg.IsInstalled : false;
+            }
+            RenderSoftwarePackages();
+        }
+
+        private void RenderSoftwarePackages()
+        {
+            if (PnlSoftwarePackages == null || _softwarePackages == null) return;
+
+            PnlSoftwarePackages.Children.Clear();
+
+            foreach (var pkg in _softwarePackages)
+            {
+                var border = new Border
+                {
+                    CornerRadius = new CornerRadius(8),
+                    BorderThickness = new Thickness(1),
+                    Margin = new Thickness(0, 0, 0, 7),
+                    Padding = new Thickness(12, 9, 12, 9)
+                };
+                border.SetResourceReference(Border.BackgroundProperty, "TweakCardBg");
+                border.SetResourceReference(Border.BorderBrushProperty, "TweakCardBorder");
+
+                var grid = new Grid();
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                // Left Column: CheckBox, Name, Category pill, Description
+                var leftStack = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+                var titleStack = new StackPanel { Orientation = Orientation.Horizontal };
+
+                var chk = new CheckBox
+                {
+                    IsChecked = pkg.IsSelected,
+                    Cursor = Cursors.Hand,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                chk.Checked += (s, e) => pkg.IsSelected = true;
+                chk.Unchecked += (s, e) => pkg.IsSelected = false;
+
+                var txtTitle = new TextBlock
+                {
+                    Text = pkg.Name,
+                    FontSize = 12.5,
+                    FontWeight = FontWeights.Bold,
+                    Margin = new Thickness(6, 0, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                txtTitle.SetResourceReference(TextBlock.ForegroundProperty, "TextPrimaryBrush");
+
+                var catPill = new Border
+                {
+                    CornerRadius = new CornerRadius(4),
+                    Background = new SolidColorBrush(Color.FromRgb(29, 14, 46)),
+                    BorderBrush = new SolidColorBrush(Color.FromRgb(88, 28, 135)),
+                    BorderThickness = new Thickness(1),
+                    Padding = new Thickness(6, 1, 6, 1),
+                    Margin = new Thickness(8, 0, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                var txtCat = new TextBlock
+                {
+                    Text = pkg.Category,
+                    FontSize = 9,
+                    FontWeight = FontWeights.Bold,
+                    Foreground = new SolidColorBrush(Color.FromRgb(168, 85, 247))
+                };
+                catPill.Child = txtCat;
+
+                titleStack.Children.Add(chk);
+                titleStack.Children.Add(txtTitle);
+                titleStack.Children.Add(catPill);
+                leftStack.Children.Add(titleStack);
+
+                var txtDesc = new TextBlock
+                {
+                    Text = pkg.Description,
+                    FontSize = 10.5,
+                    Margin = new Thickness(24, 3, 0, 0),
+                    TextWrapping = TextWrapping.Wrap
+                };
+                txtDesc.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
+                leftStack.Children.Add(txtDesc);
+
+                Grid.SetColumn(leftStack, 0);
+                grid.Children.Add(leftStack);
+
+                // Middle Column: Status Badge
+                var statusBadge = new Border
+                {
+                    CornerRadius = new CornerRadius(6),
+                    BorderThickness = new Thickness(1),
+                    Padding = new Thickness(10, 4, 10, 4),
+                    Margin = new Thickness(10, 0, 10, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                var txtStatus = new TextBlock
+                {
+                    Text = pkg.IsInstalled ? "INSTALLED" : "AVAILABLE",
+                    FontSize = 10,
+                    FontWeight = FontWeights.Bold
+                };
+
+                if (pkg.IsInstalled)
+                {
+                    statusBadge.Background = new SolidColorBrush(Color.FromRgb(6, 38, 24));
+                    statusBadge.BorderBrush = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+                    txtStatus.Foreground = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+                }
+                else
+                {
+                    statusBadge.Background = new SolidColorBrush(Color.FromRgb(38, 26, 12));
+                    statusBadge.BorderBrush = new SolidColorBrush(Color.FromRgb(245, 158, 11));
+                    txtStatus.Foreground = new SolidColorBrush(Color.FromRgb(245, 158, 11));
+                }
+                statusBadge.Child = txtStatus;
+
+                Grid.SetColumn(statusBadge, 1);
+                grid.Children.Add(statusBadge);
+
+                // Right Column: Individual Install Button
+                var btnInstallThis = new Button
+                {
+                    Content = pkg.IsInstalled ? "Reinstall" : "Install",
+                    FontSize = 10.5,
+                    Padding = new Thickness(12, 4, 12, 4),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                btnInstallThis.SetResourceReference(Button.StyleProperty, "ButtonSecondary");
+                var currentPkg = pkg;
+                btnInstallThis.Click += async (s, e) =>
+                {
+                    btnInstallThis.IsEnabled = false;
+                    btnInstallThis.Content = "Installing...";
+                    bool ok = await RuntimeHubService.InstallPackageAsync(currentPkg, Log);
+                    btnInstallThis.IsEnabled = true;
+                    btnInstallThis.Content = ok ? "Reinstall" : "Retry";
+                    await ScanSoftwareAsync();
+                };
+
+                Grid.SetColumn(btnInstallThis, 2);
+                grid.Children.Add(btnInstallThis);
+
+                border.Child = grid;
+                PnlSoftwarePackages.Children.Add(border);
+            }
+        }
+
+        private async Task ScanSoftwareAsync()
+        {
+            if (BtnScanSoftware != null)
+            {
+                BtnScanSoftware.IsEnabled = false;
+                BtnScanSoftware.Content = "Checking...";
+            }
+            if (TxtSoftwareStatus != null)
+                TxtSoftwareStatus.Text = "Scanning Windows registry and program paths for installed runtimes...";
+            if (TxtSoftwareStatusBadge != null)
+                TxtSoftwareStatusBadge.Text = "SCANNING...";
+
+            try
+            {
+                await RuntimeHubService.CheckInstalledStatusAsync(_softwarePackages, Log);
+                RenderSoftwarePackages();
+
+                int installed = _softwarePackages.Count(p => p.IsInstalled);
+                int missing = _softwarePackages.Count - installed;
+
+                if (TxtSoftwareStatus != null)
+                    TxtSoftwareStatus.Text = string.Format("Found {0} installed, {1} ready to deploy.", installed, missing);
+
+                if (TxtSoftwareStatusBadge != null)
+                {
+                    TxtSoftwareStatusBadge.Text = string.Format("{0} MISSING", missing);
+                    TxtSoftwareStatusBadge.Foreground = missing == 0 ? new SolidColorBrush(Color.FromRgb(16, 185, 129)) : new SolidColorBrush(Color.FromRgb(245, 158, 11));
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("Software check error: " + ex.Message);
+            }
+            finally
+            {
+                if (BtnScanSoftware != null)
+                {
+                    BtnScanSoftware.IsEnabled = true;
+                    BtnScanSoftware.Content = "CHECK RUNTIMES";
+                }
+            }
+        }
+
+        private async Task InstallSelectedSoftwareAsync()
+        {
+            var selected = _softwarePackages.Where(p => p.IsSelected && !p.IsInstalled).ToList();
+            if (selected.Count == 0)
+            {
+                MessageBox.Show("Please select at least one missing software package or runtime to install.", "No Packages Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var confirm = MessageBox.Show(
+                string.Format("Are you sure you want to install {0} selected software package(s)?\n\nPackages will be downloaded directly from official Microsoft/vendor endpoints and installed silently in the background.", selected.Count),
+                "Confirm Silent Software Installation",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (confirm != MessageBoxResult.Yes) return;
+
+            if (BtnInstallSelectedSoftware != null)
+            {
+                BtnInstallSelectedSoftware.IsEnabled = false;
+                BtnInstallSelectedSoftware.Content = "Installing...";
+            }
+            if (TxtSoftwareStatus != null)
+                TxtSoftwareStatus.Text = string.Format("Deploying {0} packages silently in background...", selected.Count);
+            if (TxtSoftwareStatusBadge != null)
+            {
+                TxtSoftwareStatusBadge.Text = "INSTALLING...";
+                TxtSoftwareStatusBadge.Foreground = new SolidColorBrush(Color.FromRgb(168, 85, 247));
+            }
+
+            try
+            {
+                int success = await RuntimeHubService.InstallSelectedBatchAsync(_softwarePackages, Log);
+
+                MessageBox.Show(
+                    string.Format("Deployment Complete!\n\nSuccessfully installed: {0} of {1} package(s).\n\nYour gaming runtimes are now up to date.", success, selected.Count),
+                    "Software Deployment Hub",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                await ScanSoftwareAsync();
+            }
+            catch (Exception ex)
+            {
+                Log("Installation error: " + ex.Message);
+            }
+            finally
+            {
+                if (BtnInstallSelectedSoftware != null)
+                {
+                    BtnInstallSelectedSoftware.IsEnabled = true;
+                    BtnInstallSelectedSoftware.Content = "INSTALL SELECTED";
+                }
             }
         }
         #endregion

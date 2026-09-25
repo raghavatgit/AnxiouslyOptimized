@@ -1724,6 +1724,72 @@
                                                     </Grid>
                                                 </Border>
                                             </Grid>
+
+                                            <!-- Feature 5: Automated Gaming Runtimes & WinGet Software Deployment Hub -->
+                                            <Border CornerRadius="14" Padding="18,16" BorderThickness="1" Margin="0,14,0,14" Background="{DynamicResource OverviewCardBg}" BorderBrush="#A855F7">
+                                                <Border.Effect>
+                                                    <DropShadowEffect BlurRadius="22" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.55"/>
+                                                </Border.Effect>
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+
+                                                    <!-- Header & Master Buttons -->
+                                                    <Grid Grid.Row="0">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Border Grid.Column="0" Width="38" Height="38" CornerRadius="10" Background="#1D0E2B" BorderBrush="#A855F7" BorderThickness="1" Margin="0,0,14,0">
+                                                            <Path Data="M 12 2 L 2 7 L 12 12 L 22 7 L 12 2 Z M 2 17 L 12 22 L 22 17 M 2 12 L 12 17 L 22 12" 
+                                                                  Stroke="#A855F7" StrokeThickness="1.5" StrokeLineJoin="Round" Fill="Transparent" Width="18" Height="18" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="AUTOMATED GAMING RUNTIMES &amp; WINGET HUB" FontSize="13.5" FontWeight="Bold" Foreground="#A855F7"/>
+                                                                <Border Name="BadgeSoftwareStatus" CornerRadius="6" Background="#1D0E2E" BorderBrush="#581C87" BorderThickness="1" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                                                                    <TextBlock Name="TxtSoftwareStatusBadge" Text="READY TO SCAN" FontSize="9.5" FontWeight="Bold" Foreground="#A855F7"/>
+                                                                </Border>
+                                                            </StackPanel>
+                                                            <TextBlock Text="Detects missing Visual C++ 2005-2022 runtimes, DirectX components, and deploys competitive gaming tools silently." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <Button Name="BtnScanSoftware" Content="CHECK RUNTIMES" Style="{StaticResource ButtonSecondary}" Padding="12,8" Margin="0,0,6,0"/>
+                                                            <Button Name="BtnInstallSelectedSoftware" Content="INSTALL SELECTED" Style="{StaticResource ButtonPurple}" Padding="14,8"/>
+                                                        </StackPanel>
+                                                    </Grid>
+
+                                                    <!-- Telemetry & WinGet Status Bar -->
+                                                    <Border Grid.Row="1" CornerRadius="10" Padding="14,10" Background="#060608" BorderBrush="#16161C" BorderThickness="1" Margin="0,12,0,10">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="2*"/>
+                                                                <ColumnDefinition Width="3*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <StackPanel Grid.Column="0">
+                                                                <TextBlock Text="DEPLOYMENT ENGINE" FontSize="9.5" FontWeight="Bold" Foreground="#64748B"/>
+                                                                <TextBlock Name="TxtWinGetStatus" Text="Detecting WinGet / CDN..." FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,2,0,0"/>
+                                                            </StackPanel>
+                                                            <StackPanel Grid.Column="1">
+                                                                <TextBlock Text="CATALOGUE STATUS" FontSize="9.5" FontWeight="Bold" Foreground="#64748B"/>
+                                                                <TextBlock Name="TxtSoftwareStatus" Text="Select runtimes or gaming utilities to install silently in background" FontSize="11.5" FontWeight="SemiBold" Foreground="#A855F7" Margin="0,2,0,0"/>
+                                                            </StackPanel>
+                                                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                                <Button Name="BtnSelectAllSoftware" Content="Select Missing" Style="{StaticResource ButtonSecondary}" Padding="8,4" FontSize="10" Margin="0,0,6,0"/>
+                                                                <Button Name="BtnDeselectAllSoftware" Content="Deselect All" Style="{StaticResource ButtonSecondary}" Padding="8,4" FontSize="10"/>
+                                                            </StackPanel>
+                                                        </Grid>
+                                                    </Border>
+
+                                                    <!-- Dynamic Software Packages Container -->
+                                                    <StackPanel Name="PnlSoftwarePackages" Grid.Row="2"/>
+                                                </Grid>
+                                            </Border>
                                         </StackPanel>
                                     </ScrollViewer>
                                 </Grid>
