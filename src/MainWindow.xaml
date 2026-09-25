@@ -1860,6 +1860,70 @@
                                                 </Grid>
                                             </Border>
 
+                                            <!-- Feature 4: Low-Latency Network & Multi-Threaded DNS Benchmark Engine -->
+                                            <Border CornerRadius="14" Padding="18,16" BorderThickness="1" Margin="0,0,0,14" Background="{DynamicResource OverviewCardBg}" BorderBrush="#38BDF8">
+                                                <Border.Effect>
+                                                    <DropShadowEffect BlurRadius="22" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.55"/>
+                                                </Border.Effect>
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+
+                                                    <!-- Header & Master Buttons -->
+                                                    <Grid Grid.Row="0">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Border Grid.Column="0" Width="38" Height="38" CornerRadius="10" Background="#0C1D2A" BorderBrush="#38BDF8" BorderThickness="1" Margin="0,0,14,0">
+                                                            <Path Data="M 12 2 C 6.48 2 2 6.48 2 12 C 2 17.52 6.48 22 12 22 C 17.52 22 22 17.52 22 12 C 22 6.48 17.52 2 12 2 Z M 11 4.07 C 7.6 4.52 5 7.42 5 11 H 11 V 4.07 Z M 13 4.07 V 11 H 19 C 19 7.42 16.4 4.52 13 4.07 Z M 5 13 C 5 16.58 7.6 19.48 11 19.93 V 13 H 5 Z M 13 19.93 C 16.4 19.48 19 16.58 19 13 H 13 V 19.93 Z" 
+                                                                  Fill="#38BDF8" Width="18" Height="18" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="LOW-LATENCY NETWORK &amp; MULTI-THREADED DNS ENGINE" FontSize="13.5" FontWeight="Bold" Foreground="#38BDF8"/>
+                                                                <Border Name="BadgeNetworkStatus" CornerRadius="6" Background="#0C1E2E" BorderBrush="#164E63" BorderThickness="1" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                                                                    <TextBlock Name="TxtNetworkStatusBadge" Text="READY TO BENCHMARK" FontSize="9.5" FontWeight="Bold" Foreground="#38BDF8"/>
+                                                                </Border>
+                                                            </StackPanel>
+                                                            <TextBlock Text="Concurrently tests live ping across Cloudflare, Google, Quad9, and OpenDNS, configures active NIC with 1 click, and tunes TCP/IP stack." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <Button Name="BtnBenchmarkDns" Content="BENCHMARK DNS" Style="{StaticResource ButtonSecondary}" Padding="12,8" Margin="0,0,6,0"/>
+                                                            <Button Name="BtnApplyFastestDns" Content="APPLY FASTEST DNS" Style="{StaticResource ButtonPrimary}" Padding="14,8" Margin="0,0,6,0"/>
+                                                            <Button Name="BtnResetDns" Content="RESET DHCP" Style="{StaticResource ButtonSecondary}" Padding="10,8"/>
+                                                        </StackPanel>
+                                                    </Grid>
+
+                                                    <!-- Telemetry & TCP Optimization Bar -->
+                                                    <Border Grid.Row="1" CornerRadius="10" Padding="14,10" Background="#060608" BorderBrush="#16161C" BorderThickness="1" Margin="0,12,0,10">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="2*"/>
+                                                                <ColumnDefinition Width="3*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <StackPanel Grid.Column="0">
+                                                                <TextBlock Text="ACTIVE NETWORK ADAPTER" FontSize="9.5" FontWeight="Bold" Foreground="#64748B"/>
+                                                                <TextBlock Name="TxtActiveAdapterName" Text="Detecting adapter..." FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,2,0,0"/>
+                                                            </StackPanel>
+                                                            <StackPanel Grid.Column="1">
+                                                                <TextBlock Text="BENCHMARK &amp; PACKET STATUS" FontSize="9.5" FontWeight="Bold" Foreground="#64748B"/>
+                                                                <TextBlock Name="TxtDnsBenchmarkStatus" Text="Click 'BENCHMARK DNS' to measure live round-trip latency" FontSize="11.5" FontWeight="SemiBold" Foreground="#38BDF8" Margin="0,2,0,0"/>
+                                                            </StackPanel>
+                                                            <Button Name="BtnOptimizeTcpStack" Grid.Column="2" Content="TUNE TCP STACK (NO-DELAY)" Style="{StaticResource ButtonSecondary}" Padding="12,6" VerticalAlignment="Center"/>
+                                                        </Grid>
+                                                    </Border>
+
+                                                    <!-- DNS Providers Dynamic Container -->
+                                                    <StackPanel Name="PnlDnsProviders" Grid.Row="2"/>
+                                                </Grid>
+                                            </Border>
+
                                             <!-- Emulator Controls Grid -->
                                             <Grid Margin="0,0,0,12">
                                                 <Grid.ColumnDefinitions>

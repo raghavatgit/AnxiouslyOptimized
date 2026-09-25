@@ -97,6 +97,7 @@ namespace AnxiouslyOptimized
         private FrameworkElement[] _navIndicators;
         private bool _isScanning = false;
         private List<CleanerTargetCategory> _cleanerCategories = new List<CleanerTargetCategory>();
+        private List<DnsProviderItem> _dnsProviders = new List<DnsProviderItem>();
 
         public MainWindow()
         {
@@ -110,6 +111,7 @@ namespace AnxiouslyOptimized
             InitializeFreeFireActions();
             InitializeActiveGameModeDaemon();
             InitializeDeepCleaner();
+            InitializeNetworkEngine();
             InitializeSettingsAndBackups();
 
             ThemeManager.LoadSavedTheme(this);
@@ -1151,6 +1153,284 @@ namespace AnxiouslyOptimized
                     BtnPurgeJunk.IsEnabled = true;
                     BtnPurgeJunk.Content = "PURGE SELECTED";
                 }
+            }
+        }
+        #endregion
+
+        #region Low-Latency Network & Multi-Threaded DNS Engine (Feature 4)
+        private void InitializeNetworkEngine()
+        {
+            if (TxtActiveAdapterName != null)
+                TxtActiveAdapterName.Text = NetworkService.GetActiveNetworkInterfaceName();
+
+            _dnsProviders = NetworkService.GetDefaultProviders();
+            RenderDnsProviders();
+
+            if (BtnBenchmarkDns != null)
+                BtnBenchmarkDns.Click += async (s, e) => await BenchmarkDnsAsync();
+
+            if (BtnApplyFastestDns != null)
+                BtnApplyFastestDns.Click += async (s, e) => await ApplyFastestDnsAsync();
+
+            if (BtnResetDns != null)
+                BtnResetDns.Click += async (s, e) => await ResetDnsAsync();
+
+            if (BtnOptimizeTcpStack != null)
+                BtnOptimizeTcpStack.Click += async (s, e) => await OptimizeTcpStackAsync();
+        }
+
+        private void RenderDnsProviders()
+        {
+            if (PnlDnsProviders == null || _dnsProviders == null) return;
+
+            PnlDnsProviders.Children.Clear();
+
+            foreach (var provider in _dnsProviders)
+            {
+                var border = new Border
+                {
+                    CornerRadius = new CornerRadius(8),
+                    BorderThickness = new Thickness(1),
+                    Margin = new Thickness(0, 0, 0, 7),
+                    Padding = new Thickness(12, 9, 12, 9)
+                };
+                border.SetResourceReference(Border.BackgroundProperty, "TweakCardBg");
+                border.SetResourceReference(Border.BorderBrushProperty, "TweakCardBorder");
+
+                var grid = new Grid();
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                // Left Column: Name & Description
+                var leftStack = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+                var titleStack = new StackPanel { Orientation = Orientation.Horizontal };
+
+                var txtTitle = new TextBlock
+                {
+                    Text = provider.Name,
+                    FontSize = 12.5,
+                    FontWeight = FontWeights.Bold
+                };
+                txtTitle.SetResourceReference(TextBlock.ForegroundProperty, "TextPrimaryBrush");
+                titleStack.Children.Add(txtTitle);
+
+                var txtIps = new TextBlock
+                {
+                    Text = string.Format(" ({0}, {1})", provider.PrimaryDns, provider.SecondaryDns),
+                    FontSize = 11,
+                    Foreground = new SolidColorBrush(Color.FromRgb(148, 163, 184)),
+                    Margin = new Thickness(6, 1, 0, 0)
+                };
+                titleStack.Children.Add(txtIps);
+
+                if (provider.IsFastest)
+                {
+                    var fastBadge = new Border
+                    {
+                        CornerRadius = new CornerRadius(4),
+                        Background = new SolidColorBrush(Color.FromRgb(6, 38, 24)),
+                        BorderBrush = new SolidColorBrush(Color.FromRgb(16, 185, 129)),
+                        BorderThickness = new Thickness(1),
+                        Padding = new Thickness(6, 1, 6, 1),
+                        Margin = new Thickness(8, 0, 0, 0),
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    var txtFast = new TextBlock
+                    {
+                        Text = "FASTEST",
+                        FontSize = 9,
+                        FontWeight = FontWeights.Bold,
+                        Foreground = new SolidColorBrush(Color.FromRgb(16, 185, 129))
+                    };
+                    fastBadge.Child = txtFast;
+                    titleStack.Children.Add(fastBadge);
+                }
+
+                leftStack.Children.Add(titleStack);
+
+                var txtDesc = new TextBlock
+                {
+                    Text = provider.Description,
+                    FontSize = 10.5,
+                    Margin = new Thickness(0, 3, 0, 0),
+                    TextWrapping = TextWrapping.Wrap
+                };
+                txtDesc.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
+                leftStack.Children.Add(txtDesc);
+
+                Grid.SetColumn(leftStack, 0);
+                grid.Children.Add(leftStack);
+
+                // Middle Column: Latency Badge
+                var latencyBadge = new Border
+                {
+                    CornerRadius = new CornerRadius(6),
+                    BorderThickness = new Thickness(1),
+                    Padding = new Thickness(10, 4, 10, 4),
+                    Margin = new Thickness(10, 0, 10, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                var txtLatency = new TextBlock
+                {
+                    Text = provider.LatencyDisplay,
+                    FontSize = 11,
+                    FontWeight = FontWeights.Bold
+                };
+
+                if (provider.IsFastest)
+                {
+                    latencyBadge.Background = new SolidColorBrush(Color.FromRgb(6, 38, 24));
+                    latencyBadge.BorderBrush = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+                    txtLatency.Foreground = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+                }
+                else if (provider.PingMs > 0)
+                {
+                    latencyBadge.Background = new SolidColorBrush(Color.FromRgb(18, 18, 24));
+                    latencyBadge.BorderBrush = new SolidColorBrush(Color.FromRgb(42, 42, 56));
+                    txtLatency.Foreground = new SolidColorBrush(Color.FromRgb(56, 189, 248));
+                }
+                else
+                {
+                    latencyBadge.Background = new SolidColorBrush(Color.FromRgb(18, 18, 24));
+                    latencyBadge.BorderBrush = new SolidColorBrush(Color.FromRgb(42, 42, 56));
+                    txtLatency.Foreground = new SolidColorBrush(Color.FromRgb(113, 113, 122));
+                }
+
+                latencyBadge.Child = txtLatency;
+                Grid.SetColumn(latencyBadge, 1);
+                grid.Children.Add(latencyBadge);
+
+                // Right Column: Apply 1-Click Button
+                var btnApplyThis = new Button
+                {
+                    Content = "Apply",
+                    FontSize = 10.5,
+                    Padding = new Thickness(12, 4, 12, 4),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                btnApplyThis.SetResourceReference(Button.StyleProperty, "ButtonSecondary");
+                var currentProvider = provider;
+                btnApplyThis.Click += async (s, e) =>
+                {
+                    bool ok = await NetworkService.ApplyDnsToActiveAdapterAsync(currentProvider, Log);
+                    if (ok)
+                    {
+                        MessageBox.Show(
+                            string.Format("{0} applied to active network card '{1}'.\n\nWindows DNS cache successfully flushed.", currentProvider.Name, NetworkService.GetActiveNetworkInterfaceName()),
+                            "DNS Applied",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                    }
+                };
+
+                Grid.SetColumn(btnApplyThis, 2);
+                grid.Children.Add(btnApplyThis);
+
+                border.Child = grid;
+                PnlDnsProviders.Children.Add(border);
+            }
+        }
+
+        private async Task BenchmarkDnsAsync()
+        {
+            if (BtnBenchmarkDns != null)
+            {
+                BtnBenchmarkDns.IsEnabled = false;
+                BtnBenchmarkDns.Content = "Pinging...";
+            }
+            if (TxtDnsBenchmarkStatus != null)
+                TxtDnsBenchmarkStatus.Text = "Sending ICMP packets across all providers concurrently...";
+            if (TxtNetworkStatusBadge != null)
+                TxtNetworkStatusBadge.Text = "BENCHMARKING...";
+
+            try
+            {
+                _dnsProviders = await NetworkService.BenchmarkAllProvidersAsync(Log);
+                RenderDnsProviders();
+
+                var fastest = _dnsProviders.FirstOrDefault(p => p.IsFastest);
+                if (fastest != null)
+                {
+                    if (TxtDnsBenchmarkStatus != null)
+                        TxtDnsBenchmarkStatus.Text = string.Format("Fastest: {0} ({1} ms round-trip time)", fastest.Name, fastest.PingMs);
+
+                    if (TxtNetworkStatusBadge != null)
+                    {
+                        TxtNetworkStatusBadge.Text = string.Format("FASTEST: {0}ms", fastest.PingMs);
+                        TxtNetworkStatusBadge.Foreground = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("DNS benchmark error: " + ex.Message);
+            }
+            finally
+            {
+                if (BtnBenchmarkDns != null)
+                {
+                    BtnBenchmarkDns.IsEnabled = true;
+                    BtnBenchmarkDns.Content = "BENCHMARK DNS";
+                }
+            }
+        }
+
+        private async Task ApplyFastestDnsAsync()
+        {
+            var fastest = _dnsProviders.FirstOrDefault(p => p.IsFastest);
+            if (fastest == null || fastest.PingMs <= 0)
+            {
+                await BenchmarkDnsAsync();
+                fastest = _dnsProviders.FirstOrDefault(p => p.IsFastest);
+            }
+
+            if (fastest == null)
+            {
+                MessageBox.Show("Could not find a responding DNS provider. Check your network connection.", "DNS Benchmark Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            bool ok = await NetworkService.ApplyDnsToActiveAdapterAsync(fastest, Log);
+            if (ok)
+            {
+                MessageBox.Show(
+                    string.Format("Successfully applied the fastest DNS ({0}) to active adapter '{1}'.\n\nRound-trip latency: {2} ms\nWindows DNS cache flushed.", fastest.Name, NetworkService.GetActiveNetworkInterfaceName(), fastest.PingMs),
+                    "Fastest DNS Applied",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+        }
+
+        private async Task ResetDnsAsync()
+        {
+            bool ok = await NetworkService.ResetDnsToAutomaticAsync(Log);
+            if (ok)
+            {
+                MessageBox.Show(
+                    string.Format("DNS configuration on '{0}' has been restored to Automatic (DHCP).\n\nWindows DNS cache flushed.", NetworkService.GetActiveNetworkInterfaceName()),
+                    "DNS Restored to Automatic",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+        }
+
+        private async Task OptimizeTcpStackAsync()
+        {
+            bool ok = await NetworkService.ApplyLowLatencyTcpStackAsync(Log);
+            if (ok)
+            {
+                MessageBox.Show(
+                    "Competitive Low-Latency TCP Stack Optimized!\n\n" +
+                    "- Nagle's Algorithm Disabled (TcpAckFrequency=1, TCPNoDelay=1)\n" +
+                    "- Multimedia Throttling Index Disabled\n" +
+                    "- SystemResponsiveness Set to 0 (Zero Packet Buffering)\n" +
+                    "- Explicit Congestion Notification (ECN) Enabled\n\n" +
+                    "Game packets will now be transmitted immediately without artificial delay.",
+                    "TCP/IP Stack Tuned",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
             }
         }
         #endregion

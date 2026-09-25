@@ -76,6 +76,7 @@
     <Compile Include="Services\EmulatorService.cs" />
     <Compile Include="Services\ActiveGameModeDaemon.cs" />
     <Compile Include="Services\DeepCleanerService.cs" />
+    <Compile Include="Services\NetworkService.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\tweaks_win11.json" />
