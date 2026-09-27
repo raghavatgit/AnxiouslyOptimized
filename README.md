@@ -17,7 +17,19 @@ No complicated settings, no confusing tech jargon, and no risky registry tricks.
 
 ---
 
-## Ready-to-Use Programs (`dist/`)
+## Quick Start: Instant Run (Zero Installation)
+
+Launch **AnxiouslyOptimized** on any Windows 10 or Windows 11 computer directly from PowerShell without manual downloads, Git cloning, or installations. Open PowerShell and run:
+
+```powershell
+irm https://raw.githubusercontent.com/raghavatgit/AnxiouslyOptimized/main/run.ps1 | iex
+```
+
+- **Auto-Elevation**: Automatically requests Administrator rights via Windows UAC if not already running elevated.
+- **Zero-Dependency Streaming**: Fetches the standalone Direct3D hardware-accelerated binary directly into a local temp directory.
+- **Instant Cold Boot**: Launches the native liquid-glass interface in under 2 seconds.
+
+---
 
 The software is pre-packaged into single-click programs that work right out of the box:
 
@@ -115,19 +127,26 @@ optimizefiles/
 
 ## How to Run & Distribute
 
-### Option 1: Standalone Native `.EXE` (Recommended for Customers)
+### Option 1: One-Line PowerShell Command (Zero Installation)
+Any user can open PowerShell and paste:
+```powershell
+irm https://raw.githubusercontent.com/raghavatgit/AnxiouslyOptimized/main/run.ps1 | iex
+```
+This automatically verifies Administrator permissions, downloads the standalone Direct3D binary, and launches the application with zero installation.
+
+### Option 2: Standalone Native `.EXE` (Recommended for Local Distribution)
 Simply give your customer the `.exe` from the `dist/` directory:
 * `dist\AnxiouslyOptimized.exe` (Native C# WPF, 275 KB, zero dependencies)
 
 Customers double-click, click **Yes** on the Windows UAC prompt, and the app launches instantaneously (<50ms startup). No PowerShell, no terminal, no installations required.
 
-### Option 2: One-Click Desktop Launcher (.BAT)
+### Option 3: One-Click Desktop Launcher (.BAT)
 Customers can also double-click:
 ```bat
 Launch-AnxiouslyOptimized.bat
 ```
 
-### Option 3: Command Line / Scripting Automation
+### Option 4: Command Line / Scripting Automation
 For advanced users, system administrators, or silent scripts:
 ```powershell
 # Scan current settings:
