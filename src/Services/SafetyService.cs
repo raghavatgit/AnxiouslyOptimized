@@ -17,7 +17,11 @@ namespace AnxiouslyOptimized.Services
 
         public static string GetBackupsDirectory()
         {
-            string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "backups");
+            // H-8 fix: use a user-writable path instead of BaseDirectory (which may be Program Files)
+            string dir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "AnxiouslyOptimized",
+                "backups");
             if (!Directory.Exists(dir))
             {
                 try { Directory.CreateDirectory(dir); } catch { }
@@ -167,13 +171,21 @@ namespace AnxiouslyOptimized.Services
             string safeName = Regex.Replace(backupName, @"[^a-zA-Z0-9_\-]", "_");
             string combinedFile = Path.Combine(backupsDir, string.Format("RegistryBackup_{0}_{1}.reg", safeName, timestamp));
 
+            // M-5 fix: include all keys that NativeTweakEngine touches
             string[] keysToExport = new string[]
             {
                 @"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer",
                 @"HKCU\Software\Microsoft\Windows\CurrentVersion\GameDVR",
                 @"HKCU\Control Panel\Mouse",
                 @"HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers",
-                @"HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile"
+                @"HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile",
+                @"HKCU\Software\Policies\Microsoft\Windows\Explorer",
+                @"HKCU\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo",
+                @"HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager",
+                @"HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection",
+                @"HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization",
+                @"HKLM\SYSTEM\CurrentControlSet\Control\FileSystem",
+                @"HKCU\Software\Classes\CLSID"
             };
 
             var sb = new StringBuilder();
@@ -580,7 +592,11 @@ namespace AnxiouslyOptimized.Services
                 OriginalKind = originalKind.ToString(),
                 NewValue = newValue != null ? newValue.ToString() : null
             };
-            journal.Steps.Add(step);
+            // C-1 fix: List<T> is not thread-safe; multiple concurrent tweaks share the same journal
+            lock (journal.Steps)
+            {
+                journal.Steps.Add(step);
+            }
         }
 
         public static void RecordServiceChange(TransactionJournal journal, string serviceName, int originalStartMode, int newStartMode)
@@ -596,7 +612,11 @@ namespace AnxiouslyOptimized.Services
                 OriginalKind = "DWord",
                 NewValue = newStartMode.ToString()
             };
-            journal.Steps.Add(step);
+            // C-1 fix: lock same as RecordRegistryChange
+            lock (journal.Steps)
+            {
+                journal.Steps.Add(step);
+            }
         }
 
         public static void CommitTransaction(TransactionJournal journal, Action<string> log)
@@ -720,6 +740,7 @@ namespace AnxiouslyOptimized.Services
                                     }
                                     else
                                     {
+                                        // C-3 fix: restore correct registry kind - was silently writing ExpandString/Binary back as String
                                         if (step.OriginalKind == "DWord")
                                         {
                                             int val = Convert.ToInt32(step.OriginalValue);
@@ -729,6 +750,23 @@ namespace AnxiouslyOptimized.Services
                                         {
                                             long val = Convert.ToInt64(step.OriginalValue);
                                             key.SetValue(step.PropertyOrName, val, Microsoft.Win32.RegistryValueKind.QWord);
+                                        }
+                                        else if (step.OriginalKind == "ExpandString")
+                                        {
+                                            key.SetValue(step.PropertyOrName, step.OriginalValue, Microsoft.Win32.RegistryValueKind.ExpandString);
+                                        }
+                                        else if (step.OriginalKind == "MultiString")
+                                        {
+                                            // MultiString values are stored as newline-delimited in the journal
+                                            string[] parts = step.OriginalValue.Split(new char[] { '\n' }, StringSplitOptions.None);
+                                            key.SetValue(step.PropertyOrName, parts, Microsoft.Win32.RegistryValueKind.MultiString);
+                                        }
+                                        else if (step.OriginalKind == "Binary")
+                                        {
+                                            // Binary values stored as hex string in the journal are not supported for auto-restore
+                                            // Log a warning rather than silently writing wrong type
+                                            if (log != null)
+                                                log(string.Format("  [WARN] Binary registry value '{0}' at '{1}' cannot be auto-restored; restore manually.", step.PropertyOrName, step.Target));
                                         }
                                         else
                                         {
@@ -747,7 +785,17 @@ namespace AnxiouslyOptimized.Services
                     }
                 }
 
-                journal.IsRolledBack = true;
+                // M-8 fix: only mark rolled back if at least one step was actually reverted
+                if (reverted > 0)
+                {
+                    journal.IsRolledBack = true;
+                }
+                else
+                {
+                    if (log != null)
+                        log("[WARN] No steps were successfully reverted. Journal not marked as rolled back.");
+                    return false;
+                }
 
                 // Re-save updated journal
                 try
@@ -769,7 +817,9 @@ namespace AnxiouslyOptimized.Services
             try
             {
                 string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-                string batPath = Path.Combine(desktop, "AnxiouslyOptimized_Emergency_Undo.bat");
+                // L-6 fix: timestamp the filename so multiple sessions do not overwrite each other
+                string batName = string.Format("AnxiouslyOptimized_Emergency_Undo_{0}.bat", journal.JournalId);
+                string batPath = Path.Combine(desktop, batName);
 
                 var sb = new StringBuilder();
                 sb.AppendLine("@echo off");
@@ -797,7 +847,11 @@ namespace AnxiouslyOptimized.Services
                 {
                     if (step.StepType == "RegistryValue" || step.StepType == "ServiceStartMode")
                     {
-                        string safeTarget = step.Target;
+                        // C-4 fix: reg.exe requires full hive names; HKCU\ and HKLM\ short forms are silently ignored
+                        string safeTarget = step.Target
+                            .Replace("HKLM\\", "HKEY_LOCAL_MACHINE\\")
+                            .Replace("HKCU\\", "HKEY_CURRENT_USER\\");
+
                         if (step.OriginalValue == null || step.OriginalKind == "None")
                         {
                             sb.AppendLine(string.Format("reg.exe delete \"{0}\" /v \"{1}\" /f >nul 2>&1", safeTarget, step.PropertyOrName));
@@ -806,7 +860,9 @@ namespace AnxiouslyOptimized.Services
                         {
                             string regType = "REG_DWORD";
                             if (step.OriginalKind == "String") regType = "REG_SZ";
+                            else if (step.OriginalKind == "ExpandString") regType = "REG_EXPAND_SZ";
                             else if (step.OriginalKind == "QWord") regType = "REG_QWORD";
+                            else if (step.OriginalKind == "Binary") regType = "REG_BINARY";
 
                             sb.AppendLine(string.Format("reg.exe add \"{0}\" /v \"{1}\" /t {2} /d \"{3}\" /f >nul 2>&1",
                                 safeTarget, step.PropertyOrName, regType, step.OriginalValue));

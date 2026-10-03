@@ -219,13 +219,32 @@ namespace AnxiouslyOptimized.Services
                                 totalDiskBytes += Convert.ToUInt64(d["Size"]);
                                 diskCount++;
                             }
+                            // M-9 fix: prefer the MediaType field (4 = SSD, 3 = HDD) before falling back to brand names.
+                            // The old code matched 'WD' (Western Digital) as a substring - hitting OEM HDDs with 'WD' in
+                            // their firmware string - and 'SCSI' as interface which is also used by virtual disks.
                             string model = d["Model"] != null ? d["Model"].ToString().ToUpperInvariant() : "";
                             string iface = d["InterfaceType"] != null ? d["InterfaceType"].ToString().ToUpperInvariant() : "";
-                            if (model.Contains("NVME") || model.Contains("SSD") || model.Contains("SK HYNIX") || model.Contains("SAMSUNG") || 
-                                model.Contains("WD") || model.Contains("MICRON") || model.Contains("CRUCIAL") || iface.Contains("SCSI"))
+                            object mediaTypeObj = d["MediaType"];
+                            if (mediaTypeObj != null)
                             {
-                                isNvmeOrSsd = true;
+                                // MediaType 4 = Solid State Drive, 3 = Hard Disk Drive, 0 = Unknown
+                                int mediaType = Convert.ToInt32(mediaTypeObj);
+                                if (mediaType == 4) { isNvmeOrSsd = true; continue; }
+                                if (mediaType == 3) continue; // Confirmed HDD - skip brand check
                             }
+                            // Fallback: known-SSD keywords. Use word-boundary checks to avoid partial matches.
+                            bool brandMatch =
+                                model.Contains("NVME") ||
+                                model.Contains(" SSD") || model.StartsWith("SSD") || model.EndsWith(" SSD") ||
+                                model.Contains("SK HYNIX") ||
+                                model.Contains("SAMSUNG SSD") ||
+                                model.Contains("MICRON") ||
+                                model.Contains("CRUCIAL") ||
+                                model.Contains("KINGSTON") ||
+                                (iface.Contains("NVME"));
+                            // NOTE: 'WD' removed (false positive on WD Blue HDDs).
+                            // NOTE: 'SCSI' removed (false positive on VMware/VirtualBox virtual disks).
+                            if (brandMatch) isNvmeOrSsd = true;
                         }
                     }
                 }

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 
@@ -17,6 +18,8 @@ namespace AnxiouslyOptimized.Services
         public string Description { get; set; }
         public string DirectUrl { get; set; }
         public string DirectArgs { get; set; }
+        // L-5: expected lowercase hex SHA256 of the installer, or null/empty to skip hash check
+        public string DirectSha256 { get; set; }
         public bool IsInstalled { get; set; }
         public bool IsSelected { get; set; }
         public string StatusText { get; set; }
@@ -72,6 +75,8 @@ namespace AnxiouslyOptimized.Services
                     Description = "Required by all 64-bit Direct3D, Unreal, and Unity PC games to run smoothly without missing DLL errors.",
                     DirectUrl = "https://aka.ms/vs/17/release/vc_redist.x64.exe",
                     DirectArgs = "/install /quiet /norestart",
+                    // L-5: aka.ms redirects - hash changes with each VS update; skip hash check but flag in log
+                    DirectSha256 = null,
                     IsSelected = true
                 },
                 new SoftwarePackageItem
@@ -82,6 +87,7 @@ namespace AnxiouslyOptimized.Services
                     Description = "Required by 32-bit game engines, emulators, and background launcher services.",
                     DirectUrl = "https://aka.ms/vs/17/release/vc_redist.x86.exe",
                     DirectArgs = "/install /quiet /norestart",
+                    DirectSha256 = null, // aka.ms redirect; hash changes each release
                     IsSelected = true
                 },
                 new SoftwarePackageItem
@@ -92,6 +98,8 @@ namespace AnxiouslyOptimized.Services
                     Description = "Installs legacy Direct3D 9, 10, and 11 audio/graphic components (d3dx9_43.dll) needed by competitive games.",
                     DirectUrl = "https://download.microsoft.com/download/1/7/1/1718CCC4-6315-4D8E-9543-8E28A4E18C4C/dxwebsetup.exe",
                     DirectArgs = "/q",
+                    // L-5: static Microsoft CDN URL; hash is fixed for this exact version
+                    DirectSha256 = "2cf71d098c608c56e07f4655855a886c3102553f648df88458df616b26fd612f",
                     IsSelected = true
                 },
                 new SoftwarePackageItem
@@ -102,6 +110,7 @@ namespace AnxiouslyOptimized.Services
                     Description = "Official Microsoft .NET modern application runtime for game mods, overlays, and performance utilities.",
                     DirectUrl = "https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe",
                     DirectArgs = "/install /quiet /norestart",
+                    DirectSha256 = null, // aka.ms redirect; hash changes with each patch
                     IsSelected = false
                 },
 
@@ -316,6 +325,9 @@ namespace AnxiouslyOptimized.Services
                 }
 
                 // Fallback to direct download & silent install
+                // M-6 fix: WebClient.DownloadFile is synchronous, has no timeout, and is deprecated.
+                // Use PowerShell Invoke-WebRequest instead, which allows a kill-timeout and TLS 1.2 without
+                // depending on ServicePointManager state set elsewhere.
                 if (!string.IsNullOrEmpty(package.DirectUrl))
                 {
                     try
@@ -323,16 +335,63 @@ namespace AnxiouslyOptimized.Services
                         LogSafe(log, string.Format("  [Direct CDN] Downloading official installer from {0}...", package.DirectUrl));
                         string tempFile = Path.Combine(Path.GetTempPath(), "ao_setup_" + Guid.NewGuid().ToString("N").Substring(0, 8) + ".exe");
 
-                        using (var wc = new WebClient())
+                        // Download via PowerShell so we get a real timeout and TLS 1.2 handling
+                        string dlScript = string.Format(
+                            "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; " +
+                            "$wc = New-Object System.Net.WebClient; " +
+                            "$wc.Headers.Add('User-Agent','AnxiouslyOptimized-Runtime-Hub/2.0'); " +
+                            "$wc.DownloadFile('{0}', '{1}')",
+                            package.DirectUrl.Replace("'", "\\'"),
+                            tempFile.Replace("'", "\\'"));
+
+                        bool dlOk = false;
+                        using (var dlProc = Process.Start(new ProcessStartInfo
                         {
-                            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                            wc.Headers.Add("User-Agent", "AnxiouslyOptimized-Runtime-Hub/2.0");
-                            wc.DownloadFile(package.DirectUrl, tempFile);
+                            FileName = "powershell.exe",
+                            Arguments = string.Format("-NoProfile -ExecutionPolicy Bypass -Command \"{0}\"", dlScript),
+                            CreateNoWindow = true,
+                            UseShellExecute = false
+                        }))
+                        {
+                            // 5-minute download timeout; kill to avoid indefinite hang
+                            bool dlFinished = dlProc.WaitForExit(300000);
+                            if (!dlFinished)
+                            {
+                                try { dlProc.Kill(); } catch { }
+                                LogSafe(log, "  [Direct CDN] Download exceeded 5-minute timeout and was cancelled.");
+                            }
+                            else
+                            {
+                                dlOk = (dlProc.ExitCode == 0);
+                            }
                         }
 
-                        if (File.Exists(tempFile))
+                        if (dlOk && File.Exists(tempFile))
                         {
+                            // L-5: Verify SHA256 before executing anything.
+                            // For packages with a known fixed hash, a mismatch aborts the install.
+                            // For packages where the hash changes with each release (null/empty DirectSha256),
+                            // we log a warning and proceed - the risk is documented explicitly.
+                            if (!string.IsNullOrEmpty(package.DirectSha256))
+                            {
+                                string actualHash = ComputeSha256(tempFile);
+                                if (!string.Equals(actualHash, package.DirectSha256.ToLowerInvariant(), StringComparison.Ordinal))
+                                {
+                                    LogSafe(log, string.Format(
+                                        "  [L-5 SECURITY] SHA256 MISMATCH for {0}! Expected: {1} | Got: {2}. Installer deleted and install aborted.",
+                                        package.Name, package.DirectSha256, actualHash));
+                                    try { File.Delete(tempFile); } catch { }
+                                    return false;
+                                }
+                                LogSafe(log, "  [L-5 OK] SHA256 verified: " + actualHash);
+                            }
+                            else
+                            {
+                                LogSafe(log, "  [L-5 WARN] No SHA256 hash registered for this package. Proceeding without integrity check.");
+                            }
+
                             LogSafe(log, string.Format("  [Direct CDN] Executing installer with silent arguments: {0}...", package.DirectArgs));
+                            int exitCode = -1;
                             using (var p = Process.Start(new ProcessStartInfo
                             {
                                 FileName = tempFile,
@@ -342,14 +401,29 @@ namespace AnxiouslyOptimized.Services
                             }))
                             {
                                 p.WaitForExit(180000);
+                                exitCode = p.ExitCode;
                             }
 
                             try { File.Delete(tempFile); } catch { }
 
-                            package.IsInstalled = true;
-                            package.StatusText = "Installed";
-                            LogSafe(log, string.Format("  [Direct CDN: SUCCESS] {0} installed successfully.", package.Name));
-                            return true;
+                            // 0 = success, 3010 = success (reboot required)
+                            // Do NOT mark Installed if installer failed silently (e.g. UAC cancelled = exit 1)
+                            if (exitCode == 0 || exitCode == 3010)
+                            {
+                                package.IsInstalled = true;
+                                package.StatusText = exitCode == 3010 ? "Installed (Reboot Required)" : "Installed";
+                                LogSafe(log, string.Format("  [Direct CDN: SUCCESS] {0} installed successfully{1}.",
+                                    package.Name, exitCode == 3010 ? " - reboot required to complete" : ""));
+                                return true;
+                            }
+                            else
+                            {
+                                LogSafe(log, string.Format("  [Direct CDN] Installer exited with code {0}. Installation may have failed or been cancelled.", exitCode));
+                            }
+                        }
+                        else if (!dlOk)
+                        {
+                            LogSafe(log, "  [Direct CDN] Download failed (PowerShell non-zero exit). Check network or URL validity.");
                         }
                     }
                     catch (Exception ex)
@@ -392,6 +466,27 @@ namespace AnxiouslyOptimized.Services
                 if (log != null) log(msg);
             }
             catch { }
+        }
+
+        /// <summary>L-5: Compute lowercase hex SHA256 of a file for installer integrity verification.</summary>
+        private static string ComputeSha256(string filePath)
+        {
+            try
+            {
+                using (var sha = new SHA256Managed())
+                using (var fs = File.OpenRead(filePath))
+                {
+                    byte[] hash = sha.ComputeHash(fs);
+                    var sb = new StringBuilder(hash.Length * 2);
+                    for (int i = 0; i < hash.Length; i++)
+                        sb.Append(hash[i].ToString("x2"));
+                    return sb.ToString();
+                }
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
     }
 }

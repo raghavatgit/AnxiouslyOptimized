@@ -84,6 +84,8 @@
     <EmbeddedResource Include="Assets\tweaks_win11.json" />
     <EmbeddedResource Include="Assets\tweaks_win10.json" />
     <EmbeddedResource Include="Assets\presets.json" />
+    <EmbeddedResource Include="Assets\debloat_blacklist.json" />
+    <EmbeddedResource Include="Assets\debloat_whitelist.json" />
     <EmbeddedResource Include="Assets\icon.ico" />
     <Resource Include="Assets\app_icon.png" />
     <Resource Include="Assets\logo.png" />

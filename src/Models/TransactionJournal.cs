@@ -35,7 +35,8 @@ namespace AnxiouslyOptimized.Models
 
         public TransactionJournal()
         {
-            JournalId = "TRX_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            // C-2 fix: include milliseconds + GUID fragment to prevent collision on rapid successive applies
+            JournalId = "TRX_" + DateTime.Now.ToString("yyyyMMdd_HHmmss_fff") + "_" + Guid.NewGuid().ToString("N").Substring(0, 4);
             Timestamp = DateTime.Now;
             TimestampFormatted = DateTime.Now.ToString("MMM dd, yyyy - hh:mm tt");
             Steps = new List<TransactionStep>();

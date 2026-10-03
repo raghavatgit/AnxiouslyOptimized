@@ -151,6 +151,11 @@ namespace AnxiouslyOptimized.Services
                 var providers = GetDefaultProviders();
 
                 var tasks = providers.Select(p => Task.Run(() => BenchmarkSingleProvider(p))).ToArray();
+                // H-10: Task.WaitAll is a full memory barrier (acquire/release fence). All writes made by
+                // each BenchmarkSingleProvider task to its own DnsProviderItem (PingMs, PacketLossPercent)
+                // are guaranteed to be visible to this thread after WaitAll returns.
+                // Each task owns a different DnsProviderItem object so there is no concurrent write conflict.
+                // IMPORTANT: do NOT share a single DnsProviderItem across multiple tasks - that would be a race.
                 Task.WaitAll(tasks);
 
                 // Identify the fastest DNS provider with 0% loss
@@ -225,13 +230,21 @@ namespace AnxiouslyOptimized.Services
                 {
                     // 1. Primary DNS
                     string primaryArgs = string.Format("interface ip set dns name=\"{0}\" static {1} primary", nicName, provider.PrimaryDns);
-                    RunProcessSilent("netsh.exe", primaryArgs);
+                    int exitPrimary = RunProcessSilent("netsh.exe", primaryArgs);
+                    if (exitPrimary != 0)
+                    {
+                        LogSafe(log, string.Format("  [WARN] netsh set primary DNS exited with code {0}. DNS may not have been applied (try running as Administrator).", exitPrimary));
+                    }
 
                     // 2. Secondary DNS
                     if (!string.IsNullOrEmpty(provider.SecondaryDns))
                     {
                         string secondaryArgs = string.Format("interface ip add dns name=\"{0}\" {1} index=2", nicName, provider.SecondaryDns);
-                        RunProcessSilent("netsh.exe", secondaryArgs);
+                        int exitSecondary = RunProcessSilent("netsh.exe", secondaryArgs);
+                        if (exitSecondary != 0)
+                        {
+                            LogSafe(log, string.Format("  [WARN] netsh set secondary DNS exited with code {0}.", exitSecondary));
+                        }
                     }
 
                     // 3. Flush Windows DNS cache
@@ -339,7 +352,8 @@ namespace AnxiouslyOptimized.Services
             });
         }
 
-        private static void RunProcessSilent(string fileName, string args)
+        // H-3 fix: returns the process exit code so callers can detect silent netsh failures
+        private static int RunProcessSilent(string fileName, string args)
         {
             try
             {
@@ -352,9 +366,10 @@ namespace AnxiouslyOptimized.Services
                 }))
                 {
                     p.WaitForExit(3000);
+                    return p.ExitCode;
                 }
             }
-            catch { }
+            catch { return -1; }
         }
 
         private static void LogSafe(Action<string> log, string msg)

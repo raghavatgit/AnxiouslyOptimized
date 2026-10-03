@@ -298,8 +298,14 @@ namespace AnxiouslyOptimized.Services
                     return true;
 
                 case "network_autotuning":
+                    // M-1 fix: match the specific labelled line, not just any occurrence of 'normal'.
+                    // The output line is: "Receive Window Auto-Tuning Level        : normal"
+                    // Matching 'normal' anywhere in full output was a false-positive (error lines also contain that word).
                     string netshOutput = RunToolSilent("netsh.exe", "int tcp show global");
-                    isApplied = netshOutput.IndexOf("normal", StringComparison.OrdinalIgnoreCase) >= 0;
+                    isApplied = System.Text.RegularExpressions.Regex.IsMatch(
+                        netshOutput,
+                        @"Receive Window Auto.Tuning Level\s*:\s*normal",
+                        System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                     return true;
 
                 case "fast_ntfs_access":
@@ -419,14 +425,23 @@ namespace AnxiouslyOptimized.Services
                     return true;
 
                 case "ultimate_performance_plan":
+                    // M-7 fix: -duplicatescheme was called unconditionally on every apply,
+                    // creating a new duplicate entry in the user's power plan list each time.
+                    // Check /list first and only duplicate if the GUID is not already present.
                     string ultimateGuid = "e9a42b02-d5df-448d-aa00-03f14749eb61";
-                    RunToolSilent("powercfg.exe", "-duplicatescheme " + ultimateGuid);
+                    string existingPlans = RunToolSilent("powercfg.exe", "/list");
+                    if (existingPlans.IndexOf(ultimateGuid, StringComparison.OrdinalIgnoreCase) < 0)
+                    {
+                        RunToolSilent("powercfg.exe", "-duplicatescheme " + ultimateGuid);
+                    }
                     string setRes = RunToolSilent("powercfg.exe", "/setactive " + ultimateGuid);
                     if (setRes.IndexOf("error", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
+                        // Ultimate Performance not available on this SKU - fall back to High Performance
                         RunToolSilent("powercfg.exe", "/setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c");
                     }
                     return true;
+
 
                 case "hags_scheduling":
                     SetDword(RegistryHive.LocalMachine, @"SYSTEM\CurrentControlSet\Control\GraphicsDrivers", "HwSchMode", 2);
@@ -696,9 +711,10 @@ namespace AnxiouslyOptimized.Services
 
                 using (var p = Process.Start(psi))
                 {
-                    string output = p.StandardOutput.ReadToEnd();
+                    // H-5 fix: ReadToEnd before WaitForExit to prevent stdout pipe buffer deadlock
+                    var stdoutTask = p.StandardOutput.ReadToEndAsync();
                     p.WaitForExit(3000);
-                    return output ?? string.Empty;
+                    return stdoutTask.IsCompleted ? stdoutTask.Result : (stdoutTask.Wait(500) ? stdoutTask.Result : string.Empty);
                 }
             }
             catch (Exception ex)

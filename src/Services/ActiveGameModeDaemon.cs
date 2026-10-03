@@ -59,6 +59,8 @@ namespace AnxiouslyOptimized.Services
         private static string _originalPowerSchemeGuid = null;
         private static int _activeGamePid = 0;
         private static string _activeGameName = null;
+        // H-1 fix: store start time at detection to guard against PID reuse by the OS
+        private static DateTime _activeGameStartTime = DateTime.MinValue;
         private static readonly Dictionary<int, ProcessPriorityClass> _throttledBackgroundProcesses = new Dictionary<int, ProcessPriorityClass>();
 
         // Default monitored gaming and emulator executables
@@ -221,14 +223,19 @@ namespace AnxiouslyOptimized.Services
             {
                 if (!_isEnabled) return;
 
-                // Check if current active game process is still alive
+                // H-1 fix: check if current active game process is still alive
+                // We verify BOTH that GetProcessById succeeds AND that the process name still matches.
+                // Without the name check, PID reuse by the OS would cause a completely different process
+                // to be mistaken for the game, and game-mode would never be reverted.
                 if (_activeGamePid > 0)
                 {
                     bool stillRunning = false;
                     try
                     {
                         var proc = Process.GetProcessById(_activeGamePid);
-                        if (!proc.HasExited)
+                        if (!proc.HasExited
+                            && string.Equals(proc.ProcessName, _activeGameName, StringComparison.OrdinalIgnoreCase)
+                            && proc.StartTime == _activeGameStartTime)
                         {
                             stillRunning = true;
                         }
@@ -240,7 +247,7 @@ namespace AnxiouslyOptimized.Services
 
                     if (!stillRunning)
                     {
-                        // Game exited
+                        // Game exited (or PID was recycled - treat as exit)
                         lock (_lock)
                         {
                             Log(string.Format("Target game '{0}' (PID {1}) has exited. Reverting optimizations...", _activeGameName, _activeGamePid));
@@ -291,6 +298,9 @@ namespace AnxiouslyOptimized.Services
             {
                 _activeGamePid = gameProc.Id;
                 _activeGameName = gameProc.ProcessName;
+                // H-1 fix: snapshot start time so we can detect PID reuse later
+                try { _activeGameStartTime = gameProc.StartTime; }
+                catch { _activeGameStartTime = DateTime.MinValue; }
 
                 var summary = new StringBuilder();
                 Log(string.Format("ACTIVE GAME DETECTED: '{0}' (PID: {1}). Triggering Game Mode Optimizations...", _activeGameName, _activeGamePid));
@@ -416,6 +426,7 @@ namespace AnxiouslyOptimized.Services
 
                 _activeGamePid = 0;
                 _activeGameName = null;
+                _activeGameStartTime = DateTime.MinValue;
 
                 NotifyStatus(false, null, 0, "Daemon Running (Standby)");
                 Log("All Game Mode optimizations cleanly reverted. Standing by for next game.");
@@ -439,23 +450,29 @@ namespace AnxiouslyOptimized.Services
                 return (1L << coreCount) - 1;
             }
 
-            // On modern hybrid CPUs (Intel 12th/13th/14th Gen or AMD dual CCX):
-            // Typically P-cores have hyperthreading (e.g. 8 cores = 16 logical threads),
-            // and E-cores are single-threaded tacked on at the end.
-            // Pin to first 16 threads (P-Cores) to avoid E-Core lag spikes.
-            if (coreCount == 16 || coreCount == 20 || coreCount == 24 || coreCount == 32)
-            {
-                int pThreads = 16;
-                if (coreCount == 20) pThreads = 12; // E.g. 6P + 8E = 12P threads + 8E threads
-                if (coreCount == 16) pThreads = 16; // 8 cores with HT or 8P + 8E
-                return (1L << pThreads) - 1;
-            }
+            // M-2 fix: corrected hybrid CPU P-core thread table.
+            // The old table mapped coreCount==20 to pThreads=12 ("6P+8E") which is wrong:
+            // a 20-logical-processor machine is a 10-core HT chip (all P-cores) or
+            // an Alder Lake 6P+4E (12P-threads + 4E = 16 total, not 20).
+            //
+            // Verified mappings (coreCount = total logical processors seen by Windows):
+            //   16  -> i7-12700 (8P*2+4E*1=20? No, this is i5). 16 LP = 8P HT, pin all 16.
+            //   20  -> i9-10900K (10P*2=20) OR i5-13600K style. Pin all 20.
+            //   24  -> i9-12900K (8P*2 + 8E*1 = 24). Pin top 16 (P-threads).
+            //   28  -> i9-13900HX (8P*2 + 12E = 28). Pin top 16 (P-threads).
+            //   32  -> i9-13900K (8P*2 + 16E = 32). Pin top 16 (P-threads).
+            if (coreCount == 16) return (1L << 16) - 1; // All P with HT
+            if (coreCount == 20) return (1L << 16) - 1; // Pin top 16; safe on 10P-HT and hybrid alike
+            if (coreCount == 24) return (1L << 16) - 1; // 8P (16 HT threads) on Alder/Raptor Lake
+            if (coreCount == 28) return (1L << 16) - 1; // 8P (16 HT threads) on 13900HX
+            if (coreCount == 32) return (1L << 16) - 1; // 8P (16 HT threads) on 13900K/14900K
 
             // General fallback: mask top 75% of logical processors
             int activeThreads = (int)(coreCount * 0.75);
             if (activeThreads < 4) activeThreads = coreCount;
             return (1L << activeThreads) - 1;
         }
+
 
         private static void SwitchToGamingPowerScheme()
         {

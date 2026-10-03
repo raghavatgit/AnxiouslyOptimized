@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.ServiceProcess;
 using System.Threading.Tasks;
 
 namespace AnxiouslyOptimized.Services
@@ -282,9 +284,40 @@ namespace AnxiouslyOptimized.Services
                 long freedBytesTotal = 0;
                 int deletedFilesTotal = 0;
 
+                // C-5 fix: detect staged Windows Update downloads before wiping SoftwareDistribution\Download
+                bool windowsUpdatePending = IsWindowsUpdateDownloadPending();
+
+                // M-3 fix: detect which browser processes are running right now
+                bool chromeRunning = IsProcessRunning("chrome");
+                bool edgeRunning   = IsProcessRunning("msedge");
+                bool discordRunning = IsProcessRunning("discord");
+                bool spotifyRunning = IsProcessRunning("spotify");
+
                 foreach (var cat in categories)
                 {
                     if (!cat.IsSelected) continue;
+
+                    // C-5 fix: skip Windows Update Download store if an update is pending
+                    if (cat.Id == "win_update" && windowsUpdatePending)
+                    {
+                        LogSafe(log, string.Format("  [SKIP] {0}: Windows Update download is in progress or staged for next boot. Skipping to prevent repair-mode on reboot.", cat.Title));
+                        continue;
+                    }
+
+                    // M-3 fix: warn and skip Chromium caches when browser is open
+                    if (cat.Id == "chromium_caches")
+                    {
+                        var runningBrowsers = new List<string>();
+                        if (chromeRunning) runningBrowsers.Add("Chrome");
+                        if (edgeRunning) runningBrowsers.Add("Edge");
+                        if (discordRunning) runningBrowsers.Add("Discord");
+                        if (spotifyRunning) runningBrowsers.Add("Spotify");
+                        if (runningBrowsers.Count > 0)
+                        {
+                            LogSafe(log, string.Format("  [WARN] {0}: {1} cache files are locked by running processes. Close {2} and re-run to free this space.",
+                                cat.Title, cat.Title, string.Join(", ", runningBrowsers.ToArray())));
+                        }
+                    }
 
                     LogSafe(log, string.Format("Purging {0}...", cat.Title));
                     long catFreed = 0;
@@ -304,7 +337,7 @@ namespace AnxiouslyOptimized.Services
                             }
                             catch
                             {
-                                // In-use file skipped
+                                // In-use file skipped - NOT counted in freed total (M-3 fix)
                             }
                         });
                     }
@@ -348,6 +381,42 @@ namespace AnxiouslyOptimized.Services
                 LogSafe(log, string.Format("PURGE COMPLETED: Total {0} safely recovered across {1} files!", totalFreedStr, deletedFilesTotal));
                 return freedBytesTotal;
             });
+        }
+
+        /// <summary>C-5: Returns true when Windows Update has staged downloads that have not yet been committed to the OS image.</summary>
+        private static bool IsWindowsUpdateDownloadPending()
+        {
+            try
+            {
+                // Check if the Background Intelligent Transfer Service (BITS) or wuauserv is actively running
+                using (var sc = new ServiceController("wuauserv"))
+                {
+                    if (sc.Status == ServiceControllerStatus.Running)
+                    {
+                        // Check for presence of non-empty Download sub-folders (staging marker)
+                        string distDir = Path.Combine(
+                            Environment.GetEnvironmentVariable("SystemRoot") ?? @"C:\Windows",
+                            @"SoftwareDistribution\Download");
+                        if (Directory.Exists(distDir))
+                        {
+                            string[] subdirs = Directory.GetDirectories(distDir);
+                            return subdirs.Length > 0;
+                        }
+                    }
+                }
+            }
+            catch { }
+            return false;
+        }
+
+        /// <summary>M-3: Returns true if a process with the given name (no extension) is currently running.</summary>
+        private static bool IsProcessRunning(string processName)
+        {
+            try
+            {
+                return Process.GetProcessesByName(processName).Length > 0;
+            }
+            catch { return false; }
         }
     }
 }

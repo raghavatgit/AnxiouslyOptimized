@@ -201,22 +201,36 @@ namespace AnxiouslyOptimized.Services
                         proc.StandardInput.WriteLine(sbScript.ToString());
                         proc.StandardInput.Close();
 
-                        string line;
-                        while ((line = proc.StandardOutput.ReadLine()) != null)
+                        // H-9 fix: ReadToEnd BEFORE WaitForExit - if we WaitForExit first, the
+                        // process blocks writing to the pipe once the buffer fills, causing a deadlock.
+                        var stdoutTask = proc.StandardOutput.ReadToEndAsync();
+                        bool finished = proc.WaitForExit(20000);
+                        if (!finished)
                         {
+                            try { proc.Kill(); } catch { }
+                            log("[WARN] Tweak audit PowerShell timed out after 20s. Some results may be missing.");
+                        }
+
+                        string allOutput = stdoutTask.IsCompleted ? stdoutTask.Result : (stdoutTask.Wait(2000) ? stdoutTask.Result : string.Empty);
+
+                        foreach (var rawLine in allOutput.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            string line = rawLine.Trim();
                             if (line.StartsWith("AO_RESULT:"))
                             {
-                                var parts = line.Split(':');
-                                if (parts.Length >= 3)
+                                // M-4 fix: split only on the FIRST two colons to preserve tweak IDs that contain colons
+                                int firstColon = line.IndexOf(':', 0);          // after "AO_RESULT"
+                                int secondColon = line.IndexOf(':', firstColon + 1); // after the tweak id
+                                if (firstColon >= 0 && secondColon > firstColon)
                                 {
-                                    string id = parts[1];
-                                    bool isApplied = parts[2].Trim().Equals("True", StringComparison.OrdinalIgnoreCase);
+                                    string id = line.Substring(firstColon + 1, secondColon - firstColon - 1);
+                                    string valStr = line.Substring(secondColon + 1).Trim();
+                                    bool isApplied = valStr.Equals("True", StringComparison.OrdinalIgnoreCase);
                                     if (onTweakAudited != null)
                                         onTweakAudited(id, isApplied);
                                 }
                             }
                         }
-                        proc.WaitForExit();
                     }
                 }
                 catch (Exception ex)
@@ -278,7 +292,15 @@ namespace AnxiouslyOptimized.Services
 
                     using (var proc = Process.Start(psi))
                     {
-                        proc.WaitForExit(8000);
+                        // H-6 fix: enforce the 8s timeout with an explicit kill - proc.WaitForExit(8000)
+                        // returns false on timeout but the process keeps running and leaks handles
+                        bool completed = proc.WaitForExit(8000);
+                        if (!completed)
+                        {
+                            try { proc.Kill(); } catch { }
+                            log(string.Format("  [TIMEOUT] {0}: PowerShell script exceeded 8s and was terminated.", tweak.title));
+                            return false;
+                        }
                         if (proc.ExitCode == 0)
                         {
                             log(string.Format("  [OK] {0} ({1} completed via PowerShell)", tweak.title, action));

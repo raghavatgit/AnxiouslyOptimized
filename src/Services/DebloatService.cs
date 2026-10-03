@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using AnxiouslyOptimized.Models;
@@ -12,6 +13,40 @@ namespace AnxiouslyOptimized.Services
     {
         private static JavaScriptSerializer _serializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
 
+        /// <summary>L-8: Reads Assets/debloat_blacklist.json from embedded resources and merges
+        /// its entries into the provided catalog. Entries already present in the hardcoded catalog
+        /// are not overwritten so C# defaults take precedence.</summary>
+        private static void MergeEmbeddedBlacklist(Dictionary<string, Tuple<string, string, bool>> catalog)
+        {
+            try
+            {
+                var asm = Assembly.GetExecutingAssembly();
+                // Embedded resource name: AnxiouslyOptimized.Assets.debloat_blacklist.json
+                string resourceName = asm.GetName().Name + ".Assets.debloat_blacklist.json";
+                using (var stream = asm.GetManifestResourceStream(resourceName))
+                {
+                    if (stream == null) return;
+                    using (var reader = new StreamReader(stream))
+                    {
+                        string json = reader.ReadToEnd();
+                        var entries = _serializer.Deserialize<List<Dictionary<string, object>>>(json);
+                        if (entries == null) return;
+                        foreach (var entry in entries)
+                        {
+                            string name = entry.ContainsKey("name") ? entry["name"] as string : null;
+                            string displayName = entry.ContainsKey("displayName") ? entry["displayName"] as string : name;
+                            string description = entry.ContainsKey("description") ? entry["description"] as string : string.Empty;
+                            if (string.IsNullOrEmpty(name)) continue;
+                            // Only add if not already in the hardcoded catalog
+                            if (!catalog.ContainsKey(name))
+                                catalog[name] = Tuple.Create(displayName ?? name, description, true);
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
         public static async Task<List<BloatPackage>> ScanInstalledBloatAsync(Action<string> log)
         {
             return await Task.Run(() =>
@@ -19,7 +54,7 @@ namespace AnxiouslyOptimized.Services
                 log("Scanning installed Windows Universal Apps and telemetry components...");
                 var list = new List<BloatPackage>();
 
-                // Known Safe Bloatware Catalog
+                // Hardcoded baseline catalog; extended at runtime by Assets/debloat_blacklist.json (L-8)
                 var catalog = new Dictionary<string, Tuple<string, string, bool>>(StringComparer.OrdinalIgnoreCase)
                 {
                     { "Microsoft.BingWeather", Tuple.Create("Bing Weather", "MSN Weather app and live tile components", true) },
@@ -40,6 +75,9 @@ namespace AnxiouslyOptimized.Services
                     { "Microsoft.XboxGamingOverlay", Tuple.Create("Xbox Game Bar", "In-game overlay and recording suite", false) }
                 };
 
+                // L-8: Merge all entries from embedded debloat_blacklist.json on top of hardcoded catalog
+                MergeEmbeddedBlacklist(catalog);
+
                 try
                 {
                     var psi = new ProcessStartInfo
@@ -55,12 +93,24 @@ namespace AnxiouslyOptimized.Services
                     {
                         string line;
                         var installedSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                        while ((line = proc.StandardOutput.ReadLine()) != null)
+
+                        // H-7 fix: Get-AppxPackage -AllUsers can hang indefinitely on domain/WMI-broken machines
+                        // Use async read + timed exit to prevent freezing the Task thread
+                        var outputTask = proc.StandardOutput.ReadToEndAsync();
+                        bool finished = proc.WaitForExit(30000);
+                        if (!finished)
                         {
-                            if (!string.IsNullOrWhiteSpace(line))
-                                installedSet.Add(line.Trim());
+                            try { proc.Kill(); } catch { }
+                            log("[WARN] Debloat scan timed out after 30s. Results may be incomplete.");
                         }
-                        proc.WaitForExit();
+
+                        string allOutput = outputTask.IsCompleted ? outputTask.Result : string.Empty;
+                        foreach (var rawLine in allOutput.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            line = rawLine.Trim();
+                            if (!string.IsNullOrWhiteSpace(line))
+                                installedSet.Add(line);
+                        }
 
                         foreach (var kvp in catalog)
                         {
