@@ -1,0 +1,9 @@
+<!-- feat(ui): build high-contrast dark mode preset selector for competitive play -->
+<UserControl x:Class="AnxiouslyOptimized.Visualizer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#000000">
+    <Grid>
+        <TextBlock Text="Build high-contrast dark mode preset selector for competitive play" Foreground="#FFFFFF" />
+    </Grid>
+</UserControl>
