@@ -1,0 +1,9 @@
+<!-- feat(ui): design Direct2D microsecond frame time jitter histogram view -->
+<UserControl x:Class="AnxiouslyOptimized.Visualizer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#000000">
+    <Grid>
+        <TextBlock Text="Design direct2d microsecond frame time jitter histogram view" Foreground="#FFFFFF" />
+    </Grid>
+</UserControl>
