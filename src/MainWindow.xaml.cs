@@ -2428,9 +2428,14 @@ namespace AnxiouslyOptimized
 
             if (!string.IsNullOrEmpty(tweak.description))
             {
+                string desc = tweak.description.Trim();
+                int dotIdx = desc.IndexOf('.');
+                if (dotIdx > 0 && dotIdx < desc.Length - 1)
+                    desc = desc.Substring(0, dotIdx + 1);
+
                 var txtDesc = new TextBlock
                 {
-                    Text = tweak.description,
+                    Text = desc,
                     FontSize = 11,
                     TextWrapping = TextWrapping.Wrap,
                     Margin = new Thickness(0, 2, 0, 0),
@@ -3560,7 +3565,7 @@ namespace AnxiouslyOptimized
                 if (BtnPurgeCaches != null)
                 {
                     BtnPurgeCaches.IsEnabled = true;
-                    BtnPurgeCaches.Content = "PURGE SELECTED CACHES";
+                    BtnPurgeCaches.Content = "PURGE CACHES";
                 }
             }
         }
@@ -3635,7 +3640,7 @@ namespace AnxiouslyOptimized
                 if (BtnPingRiotServers != null)
                 {
                     BtnPingRiotServers.IsEnabled = true;
-                    BtnPingRiotServers.Content = "TEST RIOT SERVERS";
+                    BtnPingRiotServers.Content = "PING SERVERS";
                 }
             }
         }

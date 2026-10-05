@@ -702,8 +702,7 @@
                                           Fill="#00F5D4" Width="15" Height="15" Stretch="Uniform" Margin="3,0,10,0" VerticalAlignment="Center"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="Quick Boost" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                        <TextBlock Text="1-click speed profiles" FontSize="10" Foreground="#64748B"/>
-                                    </StackPanel>
+                                                                            </StackPanel>
                                     <Rectangle Name="NavIndicatorQuickBoost" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
                                 </Grid>
                             </Button>
@@ -726,8 +725,7 @@
                                     </Canvas>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="System Tweaks" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                        <TextBlock Text="Speed, privacy &amp; internet" FontSize="9" Foreground="#64748B"/>
-                                    </StackPanel>
+                                                                            </StackPanel>
                                     <Rectangle Name="NavIndicatorTweaks" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
                                 </Grid>
                             </Button>
@@ -744,8 +742,7 @@
                                           Stroke="#F87171" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent" Width="15" Height="15" Stretch="Uniform" Margin="3,0,10,0" VerticalAlignment="Center"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="App Cleaner" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                        <TextBlock Text="Remove unnecessary junk" FontSize="10" Foreground="#64748B"/>
-                                    </StackPanel>
+                                                                            </StackPanel>
                                     <Rectangle Name="NavIndicatorDebloat" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
                                 </Grid>
                             </Button>
@@ -762,8 +759,7 @@
                                           Stroke="#38BDF8" StrokeThickness="1.6" StrokeLineJoin="Round" Fill="Transparent" Width="15" Height="15" Stretch="Uniform" Margin="3,0,10,0" VerticalAlignment="Center"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="System Health" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                        <TextBlock Text="RAM, disk &amp; repair" FontSize="9" Foreground="#64748B"/>
-                                    </StackPanel>
+                                                                            </StackPanel>
                                     <Rectangle Name="NavIndicatorHealth" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
                                 </Grid>
                             </Button>
@@ -780,8 +776,7 @@
                                           Stroke="#F59E0B" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent" Width="16" Height="16" Stretch="Uniform" Margin="3,0,10,0" VerticalAlignment="Center"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="Free Fire &amp; Emulators" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                        <TextBlock Text="BlueStacks &amp; MSI Player" FontSize="9" Foreground="#64748B"/>
-                                    </StackPanel>
+                                                                            </StackPanel>
                                     <Rectangle Name="NavIndicatorEmulators" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
                                 </Grid>
                             </Button>
@@ -885,12 +880,7 @@
 
                                         <!-- Right: Value Props + Scan My PC Button -->
                                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                            <StackPanel VerticalAlignment="Center" Margin="0,0,18,0">
-                                                <TextBlock Text="CLEANER" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
-                                                <TextBlock Text="FASTER" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
-                                                <TextBlock Text="SMOOTHER" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
-                                                <TextBlock Text="YOUR WAY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
-                                            </StackPanel>
+                                            
 
                                             <!-- Scan My PC Primary CTA (Reticle Focus Viewfinder Icon) -->
                                             <Button Name="BtnOverviewScan" Style="{StaticResource ButtonScanCTA}">
@@ -951,7 +941,7 @@
 
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
-                                                    <TextBlock Text="Fix Broken Windows Files" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="System Files" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
                                                     <TextBlock Text="Scan and repair corrupted or missing system files with fresh Microsoft copies." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
@@ -987,7 +977,7 @@
 
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
-                                                    <TextBlock Text="Deep Windows Repair" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Component Store" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
                                                     <TextBlock Text="Clean Microsoft files and fix stubborn Windows errors that normal repairs miss." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
@@ -1019,7 +1009,7 @@
 
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
-                                                    <TextBlock Text="Clean Old Windows Updates" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Update Cleanup" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
                                                     <TextBlock Text="Remove old update files and installation junk to free up valuable disk space." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
@@ -1071,7 +1061,7 @@
 
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
-                                                    <TextBlock Text="Free Up Trapped Memory" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Memory Trimmer" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
                                                     <TextBlock Text="Release unused RAM and clear memory caches for a smoother experience." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
@@ -1103,7 +1093,7 @@
 
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
-                                                    <TextBlock Text="Turn Off Sleep File" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Hibernation File" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
                                                     <TextBlock Text="Disable hibernation to get 16-32 GB of free drive space instantly." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
@@ -1135,7 +1125,7 @@
 
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
-                                                    <TextBlock Text="Clean Temp &amp; Game Caches" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Cache Cleaner" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
                                                     <TextBlock Text="Remove temporary files and game caches to fix stutters and free up space." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
@@ -1437,7 +1427,7 @@
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                <TextBlock Text="SYSTEM TWEAKS &amp; OPTIMIZATIONS" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
+                                                <TextBlock Text="SYSTEM OPTIMIZER" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
                                                 <TextBlock Text="Select individual settings to fine-tune your speed, privacy, and gaming experience." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                             </StackPanel>
                                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
@@ -1498,7 +1488,7 @@
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                <TextBlock Text="SAFE APP CLEANER (DEBLOATER)" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
+                                                <TextBlock Text="APP CLEANER &amp; DEBLOAT" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
                                                 <TextBlock Text="Remove pre-installed junk, advertising apps, and bloatware without breaking Windows." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                             </StackPanel>
                                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
@@ -1546,7 +1536,7 @@
                                                     <DropShadowEffect BlurRadius="20" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.45"/>
                                                 </Border.Effect>
                                                 <StackPanel>
-                                                    <TextBlock Text="SYSTEM HEALTH &amp; DRIVE REPAIR" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
+                                                    <TextBlock Text="SYSTEM HEALTH" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
                                                     <TextBlock Text="Official Windows repair utilities to clean component stores, verify system files, and free disk space." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                                 </StackPanel>
                                             </Border>

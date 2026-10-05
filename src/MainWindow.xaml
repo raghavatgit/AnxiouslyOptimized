@@ -713,8 +713,7 @@
                                           Stroke="#00F5D4" StrokeThickness="1.6" Fill="Transparent" Width="16" Height="16" Stretch="Uniform" Margin="2,0,10,0" VerticalAlignment="Center"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="Overview" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                        <TextBlock Text="All tools at a glance" FontSize="11" Foreground="#64748B"/>
-                                    </StackPanel>
+                                                                            </StackPanel>
                                     <Rectangle Name="NavIndicatorOverview" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Visible"/>
                                 </Grid>
                             </Button>
@@ -731,8 +730,7 @@
                                           Fill="#00F5D4" Width="15" Height="15" Stretch="Uniform" Margin="3,0,10,0" VerticalAlignment="Center"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="Quick Boost" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                        <TextBlock Text="1-click speed profiles" FontSize="10" Foreground="#64748B"/>
-                                    </StackPanel>
+                                                                            </StackPanel>
                                     <Rectangle Name="NavIndicatorQuickBoost" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
                                 </Grid>
                             </Button>
@@ -754,9 +752,8 @@
                                         <Ellipse Canvas.Left="5" Canvas.Top="10" Width="4" Height="4" Fill="#060B12" Stroke="#38BDF8" StrokeThickness="1.5"/>
                                     </Canvas>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <TextBlock Text="System Tweaks" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                        <TextBlock Text="Speed, privacy &amp; internet" FontSize="9" Foreground="#64748B"/>
-                                    </StackPanel>
+                                        <TextBlock Text="Optimizer" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                                            </StackPanel>
                                     <Rectangle Name="NavIndicatorTweaks" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
                                 </Grid>
                             </Button>
@@ -772,9 +769,8 @@
                                     <Path Grid.Column="0" Data="M 3 6 H 17 M 8 6 V 4 C 8 3.4 8.4 3 9 3 H 11 C 11.6 3 12 3.4 12 4 V 6 M 5 6 L 6 17 C 6 18.1 6.9 19 8 19 H 12 C 13.1 19 14 18.1 14 17 L 15 6 M 8 9 V 15 M 12 9 V 15" 
                                           Stroke="#F87171" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent" Width="15" Height="15" Stretch="Uniform" Margin="3,0,10,0" VerticalAlignment="Center"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <TextBlock Text="App Cleaner" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                        <TextBlock Text="Remove unnecessary junk" FontSize="10" Foreground="#64748B"/>
-                                    </StackPanel>
+                                        <TextBlock Text="Debloat" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                                            </StackPanel>
                                     <Rectangle Name="NavIndicatorDebloat" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
                                 </Grid>
                             </Button>
@@ -791,8 +787,7 @@
                                           Stroke="#38BDF8" StrokeThickness="1.6" StrokeLineJoin="Round" Fill="Transparent" Width="15" Height="15" Stretch="Uniform" Margin="3,0,10,0" VerticalAlignment="Center"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="System Health" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                        <TextBlock Text="RAM, disk &amp; repair" FontSize="9" Foreground="#64748B"/>
-                                    </StackPanel>
+                                                                            </StackPanel>
                                     <Rectangle Name="NavIndicatorHealth" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
                                 </Grid>
                             </Button>
@@ -808,9 +803,8 @@
                                     <Path Grid.Column="0" Data="M 6 6 H 18 C 20.2 6 22 7.8 22 10 V 14 C 22 16.2 20.4 18 18.3 18.4 L 16 16 H 8 L 5.7 18.4 C 3.6 18 2 16.2 2 14 V 10 C 2 7.8 3.8 6 6 6 Z M 6 11 H 9 M 7.5 9.5 V 12.5 M 15.5 10.5 H 15.6 M 17.5 11.5 H 17.6 M 15.5 12.5 H 15.6 M 13.5 11.5 H 13.6" 
                                           Stroke="#F59E0B" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent" Width="16" Height="16" Stretch="Uniform" Margin="3,0,10,0" VerticalAlignment="Center"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <TextBlock Text="Free Fire &amp; Emulators" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                        <TextBlock Text="BlueStacks &amp; MSI Player" FontSize="9" Foreground="#64748B"/>
-                                    </StackPanel>
+                                        <TextBlock Text="Emulators" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                                            </StackPanel>
                                     <Rectangle Name="NavIndicatorEmulators" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
                                 </Grid>
                             </Button>
@@ -826,9 +820,8 @@
                                     <Path Grid.Column="0" Data="M 3 5 L 8.5 20 H 11.5 L 17 5 H 14 L 10 16 L 6 5 Z" 
                                           Fill="#FF4655" Width="15" Height="15" Stretch="Uniform" Margin="3,0,10,0" VerticalAlignment="Center"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <TextBlock Text="Valorant Optimizer" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                        <TextBlock Text="FPS &amp; Vanguard-safe tuning" FontSize="9" Foreground="#64748B"/>
-                                    </StackPanel>
+                                        <TextBlock Text="Valorant" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                                            </StackPanel>
                                     <Rectangle Name="NavIndicatorValorant" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="#FF4655" Margin="0,0,-6,0" Visibility="Collapsed"/>
                                 </Grid>
                             </Button>
@@ -927,17 +920,12 @@
                                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                             <TextBlock Name="TxtGreetingTime" Text="GOOD AFTERNOON" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
                                             <TextBlock Text="Your PC is ready." FontSize="29" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,3,0,3"/>
-                                            <TextBlock Text="Fast, clean, and focused." FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            <TextBlock Text="All optimizations and diagnostics ready." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                         </StackPanel>
 
                                         <!-- Right: Value Props + Scan My PC Button -->
                                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                            <StackPanel VerticalAlignment="Center" Margin="0,0,18,0">
-                                                <TextBlock Text="CLEANER" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
-                                                <TextBlock Text="FASTER" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
-                                                <TextBlock Text="SMOOTHER" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
-                                                <TextBlock Text="YOUR WAY" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
-                                            </StackPanel>
+                                            
 
                                             <!-- Scan My PC Primary CTA (Reticle Focus Viewfinder Icon) -->
                                             <Button Name="BtnOverviewScan" Style="{StaticResource ButtonScanCTA}">
@@ -998,12 +986,12 @@
 
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
-                                                    <TextBlock Text="Fix Broken Windows Files" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
-                                                    <TextBlock Text="Scan and repair corrupted system files." FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                    <TextBlock Text="System Files" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Verify and repair system files." FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
                                                 <!-- Action Button -->
-                                                <Button Name="BtnOverviewSFC" Grid.Row="2" Content="Check &amp; Repair" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
+                                                <Button Name="BtnOverviewSFC" Grid.Row="2" Content="Scan &amp; Repair" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
                                             </Grid>
                                         </Border>
 
@@ -1034,12 +1022,12 @@
 
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
-                                                    <TextBlock Text="Deep Windows Repair" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
-                                                    <TextBlock Text="Repair component store via Windows Update." FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                    <TextBlock Text="Component Store" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Repair Windows component image." FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
                                                 <!-- Action Button -->
-                                                <Button Name="BtnOverviewDISM" Grid.Row="2" Content="Run Deep Repair" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
+                                                <Button Name="BtnOverviewDISM" Grid.Row="2" Content="Repair Image" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
                                             </Grid>
                                         </Border>
 
@@ -1066,12 +1054,12 @@
 
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
-                                                    <TextBlock Text="Clean Old Windows Updates" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
-                                                    <TextBlock Text="Clean superseded Windows update files." FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                    <TextBlock Text="Update Cleanup" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Purge old update packages." FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
                                                 <!-- Action Button -->
-                                                <Button Name="BtnOverviewCleanup" Grid.Row="2" Content="Clean Up" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
+                                                <Button Name="BtnOverviewCleanup" Grid.Row="2" Content="Clean Updates" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
                                             </Grid>
                                         </Border>
 
@@ -1118,12 +1106,12 @@
 
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
-                                                    <TextBlock Text="Free Up Trapped Memory" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
-                                                    <TextBlock Text="Clear standby list and release memory." FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                    <TextBlock Text="Memory Trimmer" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Flush standby memory cache." FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
                                                 <!-- Action Button -->
-                                                <Button Name="BtnOverviewRAM" Grid.Row="2" Content="Free Up Memory" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
+                                                <Button Name="BtnOverviewRAM" Grid.Row="2" Content="Trim Memory" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
                                             </Grid>
                                         </Border>
 
@@ -1150,12 +1138,12 @@
 
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
-                                                    <TextBlock Text="Turn Off Sleep File" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
-                                                    <TextBlock Text="Disable hibernation to reclaim disk space." FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                    <TextBlock Text="Hibernation File" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Toggle hiberfil.sys storage." FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
                                                 <!-- Action Button -->
-                                                <Button Name="BtnOverviewHiber" Grid.Row="2" Content="Turn Off" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
+                                                <Button Name="BtnOverviewHiber" Grid.Row="2" Content="Toggle File" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
                                             </Grid>
                                         </Border>
 
@@ -1182,12 +1170,12 @@
 
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
-                                                    <TextBlock Text="Clean Temp &amp; Game Caches" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
-                                                    <TextBlock Text="Clean temporary files and DirectX shaders." FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                    <TextBlock Text="Cache Cleaner" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Clear shader and temp caches." FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
                                                 <!-- Action Button -->
-                                                <Button Name="BtnOverviewCache" Grid.Row="2" Content="Clean Now" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
+                                                <Button Name="BtnOverviewCache" Grid.Row="2" Content="Clean Caches" Style="{StaticResource ButtonCardAction}" Margin="0,10,0,0"/>
                                             </Grid>
                                         </Border>
                                     </Grid>
@@ -1215,7 +1203,7 @@
                                                 </Viewbox>
                                                 <StackPanel VerticalAlignment="Center">
                                                     <TextBlock Text="System Overview" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                                    <TextBlock Text="Live system resource usage" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" Margin="0,2,0,0"/>
+                                                    
                                                 </StackPanel>
                                             </StackPanel>
 
@@ -1295,7 +1283,7 @@
                                                                     </Ellipse.Effect>
                                                                 </Ellipse>
                                                             </StackPanel>
-                                                            <TextBlock Text="Live console &amp; audit" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,1,0,0"/>
+                                                            
                                                         </StackPanel>
                                                         <!-- Subtle Expand Chevron -->
                                                         <Path Data="M 1 1 L 4 4 L 7 1" Stroke="{DynamicResource TextMutedBrush}" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="8" Height="5" Margin="4,0,2,0" VerticalAlignment="Center"/>
@@ -1334,8 +1322,7 @@
                                                     </Grid.ColumnDefinitions>
                                                     <StackPanel Grid.Column="0">
                                                         <TextBlock Text="QUICK PROFILES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
-                                                        <TextBlock Text="Instant Workload Presets" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,2,0,2"/>
-                                                        <TextBlock Text="Auto-restore point created before applying." FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                        <TextBlock Text="One-click optimization presets." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
                                                     </StackPanel>
                                                     <Button Name="BtnScanSystem" Grid.Column="1" Content="Scan PC State" Style="{StaticResource ButtonSecondary}" VerticalAlignment="Center"/>
                                                 </Grid>
@@ -1362,9 +1349,8 @@
                                                                 <Path Data="M 13 2 L 4 14 H 11 L 9 22 L 20 10 H 13 Z" Fill="#FFFFFF" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                             </Border>
                                                             <TextBlock Text="Everyday PC Boost" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                                            <TextBlock Text="Recommended for all PCs" FontSize="10" FontWeight="SemiBold" Foreground="#60A5FA" Margin="0,2,0,8"/>
-                                                        </StackPanel>
-                                                        <TextBlock Grid.Row="1" Text="Disable telemetry, taskbar bloat, and context menu delay." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="18"/>
+                                                            </StackPanel>
+                                                        <TextBlock Grid.Row="1" Text="Telemetry, taskbar bloat, and UI delays." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
                                                         <Button Name="BtnApplyPresetSafe" Grid.Row="2" Content="Boost My PC" Style="{StaticResource ButtonBlue}" Margin="0,14,0,0"/>
                                                     </Grid>
                                                 </Border>
@@ -1382,9 +1368,8 @@
                                                                 <Path Data="M 6 6 H 18 C 20.2 6 22 7.8 22 10 V 14 C 22 16.2 20.4 18 18.3 18.4 L 16 16 H 8 L 5.7 18.4 C 3.6 18 2 16.2 2 14 V 10 C 2 7.8 3.8 6 6 6 Z M 6 11 H 9 M 7.5 9.5 V 12.5 M 15.5 10.5 H 15.6 M 17.5 11.5 H 17.6 M 15.5 12.5 H 15.6 M 13.5 11.5 H 13.6" Stroke="#FFFFFF" StrokeThickness="1.5" Fill="Transparent" Width="18" Height="18" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                             </Border>
                                                             <TextBlock Text="Gaming Rig Boost" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                                            <TextBlock Text="Maximum game smoothness" FontSize="10" FontWeight="SemiBold" Foreground="#34D399" Margin="0,2,0,8"/>
-                                                        </StackPanel>
-                                                        <TextBlock Grid.Row="1" Text="Ultimate power plan, DVR disable, and raw mouse aim." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="18"/>
+                                                            </StackPanel>
+                                                        <TextBlock Grid.Row="1" Text="Power plan, GPU priority, and timer resolution." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
                                                         <Button Name="BtnApplyPresetGaming" Grid.Row="2" Content="Boost Gaming" Style="{StaticResource ButtonPrimary}" Margin="0,14,0,0"/>
                                                     </Grid>
                                                 </Border>
@@ -1402,9 +1387,8 @@
                                                                 <Path Data="M 5 4 C 5 2.9 5.9 2 7 2 H 17 C 18.1 2 19 2.9 19 4 V 20 C 19 21.1 18.1 22 17 22 H 7 C 5.9 22 5 21.1 5 20 Z M 10 19 H 14" Stroke="#FFFFFF" StrokeThickness="1.5" StrokeStartLineCap="Round" Fill="Transparent" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                             </Border>
                                                             <TextBlock Text="Android Emulator Pro" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                                            <TextBlock Text="BlueStacks &amp; MSI Player" FontSize="10" FontWeight="SemiBold" Foreground="#A78BFA" Margin="0,2,0,8"/>
-                                                        </StackPanel>
-                                                        <TextBlock Grid.Row="1" Text="Dedicated GPU lock, ROG profile, and low-latency network." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="18"/>
+                                                            </StackPanel>
+                                                        <TextBlock Grid.Row="1" Text="Dedicated GPU lock, ROG profile, and low-ping network." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
                                                         <Button Name="BtnApplyPresetEmulator" Grid.Row="2" Content="Boost Emulator" Style="{StaticResource ButtonPurple}" Margin="0,14,0,0"/>
                                                     </Grid>
                                                 </Border>
@@ -1426,7 +1410,7 @@
                                                     </Border>
                                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                         <TextBlock Text="FREE FIRE HYPER-BOOST" FontSize="13" FontWeight="Bold" Foreground="#F97316"/>
-                                                        <TextBlock Text="240 FPS unlock, GPU priority, and low ping." FontSize="11" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,2,0,0"/>
+                                                        <TextBlock Text="240 FPS unlock and high-priority packet queue." FontSize="11" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,2,0,0"/>
                                                     </StackPanel>
                                                     <Button Name="BtnMasterFreeFire" Grid.Column="2" Content="Apply Free Fire Boost" Style="{StaticResource ButtonFlame}" VerticalAlignment="Center"/>
                                                 </Grid>
@@ -1444,7 +1428,7 @@
                                                     </Grid.ColumnDefinitions>
                                                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                                         <TextBlock Text="SYSTEM RESTORE" FontSize="12" FontWeight="Bold" Foreground="#EF4444"/>
-                                                        <TextBlock Text="Reset all optimizations to Windows defaults." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                        <TextBlock Text="Revert all settings to Windows defaults." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                                     </StackPanel>
                                                     <Button Name="BtnRevertAll" Grid.Column="1" Content="Undo All Changes" Style="{StaticResource ButtonDanger}" VerticalAlignment="Center"/>
                                                 </Grid>
@@ -1543,8 +1527,8 @@
                                             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                                                 <Border Width="7" Height="7" CornerRadius="3.5" Background="#00F5D4" Margin="0,0,8,0" VerticalAlignment="Center"/>
                                                 <TextBlock Name="TxtTweakSelectedCount" Text="0 selected" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
-                                                <TextBlock Text="•" FontSize="11" Foreground="#3F3F46" Margin="8,0,8,0" VerticalAlignment="Center"/>
-                                                <TextBlock Name="TxtTweakReadinessInfo" Text="Automatic restore point before applying" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+                                                <TextBlock Text="&#x2022;" FontSize="11" Foreground="#3F3F46" Margin="8,0,8,0" VerticalAlignment="Center"/>
+                                                <TextBlock Name="TxtTweakReadinessInfo" Text="Automatic restore point enabled" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
                                             </StackPanel>
                                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                                 <Button Name="BtnRevertSelectedTweaks" Content="Revert Selected" Style="{StaticResource ButtonDanger}" Margin="0,0,10,0" Padding="14,7"/>
@@ -1586,7 +1570,7 @@
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                                 <TextBlock Text="APP CLEANER &amp; DEBLOAT" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
-                                                <TextBlock Text="Remove pre-installed bloatware safely." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                
                                             </StackPanel>
                                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                                 <Button Name="BtnScanBloat" Content="Scan Unwanted Apps" Style="{StaticResource ButtonSecondary}" Margin="0,0,8,0"/>
@@ -1607,7 +1591,7 @@
                                         <Border.Effect>
                                             <DropShadowEffect BlurRadius="12" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.35"/>
                                         </Border.Effect>
-                                        <TextBlock Text="&#x2713; Critical system components, Microsoft Store, and Windows Update are protected." FontSize="10" FontWeight="SemiBold" Foreground="#10B981" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="&#x2713; Protected: Microsoft Store, Calculator, Windows Update." FontSize="10" FontWeight="SemiBold" Foreground="#10B981" HorizontalAlignment="Center"/>
                                     </Border>
                                 </Grid>
                             </TabItem>
@@ -1633,8 +1617,8 @@
                                                     <DropShadowEffect BlurRadius="20" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.45"/>
                                                 </Border.Effect>
                                                 <StackPanel>
-                                                    <TextBlock Text="SYSTEM HEALTH &amp; DRIVE REPAIR" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
-                                                    <TextBlock Text="Verify system files and clean component stores." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                    <TextBlock Text="SYSTEM HEALTH" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
+                                                    
                                                 </StackPanel>
                                             </Border>
 
@@ -1663,12 +1647,12 @@
                                                         </Border>
                                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                             <StackPanel Orientation="Horizontal">
-                                                                <TextBlock Text="DEEP SYSTEM CLEANER" FontSize="14" FontWeight="Bold" Foreground="#F59E0B"/>
+                                                                <TextBlock Text="DRIVE CLEANER" FontSize="14" FontWeight="Bold" Foreground="#F59E0B"/>
                                                                 <Border Name="BadgeCleanerStatus" CornerRadius="6" Background="#18130B" BorderBrush="#45270A" BorderThickness="1" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
                                                                     <TextBlock Name="TxtCleanerStatusBadge" Text="READY TO SCAN" FontSize="10" FontWeight="Bold" Foreground="#F59E0B"/>
                                                                 </Border>
                                                             </StackPanel>
-                                                            <TextBlock Text="Purge shader caches, browser temporary data, and memory dumps." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                                            <TextBlock Text="Purge shader caches, browser temporary files, and dumps." FontSize="11" Foreground="#8A99AD" Margin="0,2,0,0"/>
                                                         </StackPanel>
                                                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                                                             <Button Name="BtnScanJunk" Content="SCAN JUNK" Style="{StaticResource ButtonSecondary}" Padding="14,8" Margin="0,0,8,0"/>
@@ -1729,10 +1713,10 @@
                                                             <RowDefinition Height="Auto"/>
                                                         </Grid.RowDefinitions>
                                                         <StackPanel Grid.Row="0">
-                                                            <TextBlock Text="Verify System Integrity (SFC)" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                                            <TextBlock Text="Verify and repair protected system files." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                                            <TextBlock Text="SFC Scan" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Scan and repair system files." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
                                                         </StackPanel>
-                                                        <Button Name="BtnRunSFC" Grid.Row="1" Content="Run SFC Scan" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                        <Button Name="BtnRunSFC" Grid.Row="1" Content="Scan" Style="{StaticResource ButtonSecondary}" Margin="0,8,0,0"/>
                                                     </Grid>
                                                 </Border>
 
@@ -1744,10 +1728,10 @@
                                                             <RowDefinition Height="Auto"/>
                                                         </Grid.RowDefinitions>
                                                         <StackPanel Grid.Row="0">
-                                                            <TextBlock Text="Deep Component Store Repair (DISM)" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                                            <TextBlock Text="Repair Windows image via component store." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                                            <TextBlock Text="DISM Repair" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Repair component store image." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
                                                         </StackPanel>
-                                                        <Button Name="BtnRunDISM" Grid.Row="1" Content="Run DISM Repair" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                        <Button Name="BtnRunDISM" Grid.Row="1" Content="Repair" Style="{StaticResource ButtonSecondary}" Margin="0,8,0,0"/>
                                                     </Grid>
                                                 </Border>
 
@@ -1759,10 +1743,10 @@
                                                             <RowDefinition Height="Auto"/>
                                                         </Grid.RowDefinitions>
                                                         <StackPanel Grid.Row="0">
-                                                            <TextBlock Text="Clean Windows Update Components" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                                            <TextBlock Text="Reclaim disk space from old update files." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                                            <TextBlock Text="Update Cleanup" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Purge superseded update files." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
                                                         </StackPanel>
-                                                        <Button Name="BtnRunComponentCleanup" Grid.Row="1" Content="Clean Update Store" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                        <Button Name="BtnRunComponentCleanup" Grid.Row="1" Content="Clean" Style="{StaticResource ButtonSecondary}" Margin="0,8,0,0"/>
                                                     </Grid>
                                                 </Border>
 
@@ -1774,10 +1758,10 @@
                                                             <RowDefinition Height="Auto"/>
                                                         </Grid.RowDefinitions>
                                                         <StackPanel Grid.Row="0">
-                                                            <TextBlock Text="Flush Trapped Memory (RAM Cache)" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                                            <TextBlock Text="Clear standby list and release memory." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                                            <TextBlock Text="Memory Flush" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Flush standby memory cache." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
                                                         </StackPanel>
-                                                        <Button Name="BtnFlushRAM" Grid.Row="1" Content="Free Memory Now" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                        <Button Name="BtnFlushRAM" Grid.Row="1" Content="Flush" Style="{StaticResource ButtonSecondary}" Margin="0,8,0,0"/>
                                                     </Grid>
                                                 </Border>
 
@@ -1789,10 +1773,10 @@
                                                             <RowDefinition Height="Auto"/>
                                                         </Grid.RowDefinitions>
                                                         <StackPanel Grid.Row="0">
-                                                            <TextBlock Text="Toggle Sleep File (Reclaim 16-32 GB)" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                                            <TextBlock Text="Disable hibernation to reclaim drive space." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                                            <TextBlock Text="Hibernation File" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Toggle hiberfil.sys storage." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
                                                         </StackPanel>
-                                                        <Button Name="BtnToggleHibernation" Grid.Row="1" Content="Toggle Sleep File" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                        <Button Name="BtnToggleHibernation" Grid.Row="1" Content="Toggle" Style="{StaticResource ButtonSecondary}" Margin="0,8,0,0"/>
                                                     </Grid>
                                                 </Border>
 
@@ -1804,10 +1788,10 @@
                                                             <RowDefinition Height="Auto"/>
                                                         </Grid.RowDefinitions>
                                                         <StackPanel Grid.Row="0">
-                                                            <TextBlock Text="Purge Shader Caches &amp; Temp Files" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                                            <TextBlock Text="Clean DirectX/NVIDIA shaders and temp files." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                                            <TextBlock Text="Shader Caches" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Purge DirectX and GPU shaders." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,0" TextWrapping="Wrap"/>
                                                         </StackPanel>
-                                                        <Button Name="BtnCleanCaches" Grid.Row="1" Content="Clean Caches Now" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                        <Button Name="BtnCleanCaches" Grid.Row="1" Content="Purge" Style="{StaticResource ButtonSecondary}" Margin="0,8,0,0"/>
                                                     </Grid>
                                                 </Border>
                                             </Grid>
@@ -1837,16 +1821,16 @@
                                                         </Border>
                                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                             <StackPanel Orientation="Horizontal">
-                                                                <TextBlock Text="GAMING RUNTIMES &amp; WINGET HUB" FontSize="14" FontWeight="Bold" Foreground="#A855F7"/>
+                                                                <TextBlock Text="RUNTIME LIBRARIES" FontSize="14" FontWeight="Bold" Foreground="#A855F7"/>
                                                                 <Border Name="BadgeSoftwareStatus" CornerRadius="6" Background="#1D0E2E" BorderBrush="#581C87" BorderThickness="1" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
                                                                     <TextBlock Name="TxtSoftwareStatusBadge" Text="READY TO SCAN" FontSize="10" FontWeight="Bold" Foreground="#A855F7"/>
                                                                 </Border>
                                                             </StackPanel>
-                                                            <TextBlock Text="Install missing Visual C++, DirectX, and gaming utilities." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                                            <TextBlock Text="Visual C++ and DirectX runtime packages." FontSize="11" Foreground="#8A99AD" Margin="0,2,0,0"/>
                                                         </StackPanel>
                                                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                                            <Button Name="BtnScanSoftware" Content="CHECK RUNTIMES" Style="{StaticResource ButtonSecondary}" Padding="12,8" Margin="0,0,6,0"/>
-                                                            <Button Name="BtnInstallSelectedSoftware" Content="INSTALL SELECTED" Style="{StaticResource ButtonPurple}" Padding="14,8"/>
+                                                            <Button Name="BtnScanSoftware" Content="Scan" Style="{StaticResource ButtonSecondary}" Padding="12,8" Margin="0,0,6,0"/>
+                                                            <Button Name="BtnInstallSelectedSoftware" Content="Install" Style="{StaticResource ButtonPurple}" Padding="14,8"/>
                                                         </StackPanel>
                                                     </Grid>
 
@@ -1923,14 +1907,14 @@
                                                         </Border>
                                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                             <StackPanel Orientation="Horizontal">
-                                                                <TextBlock Text="DYNAMIC ACTIVE GAME MODE DAEMON" FontSize="14" FontWeight="Bold" Foreground="#00F5D4"/>
+                                                                <TextBlock Text="ACTIVE GAME MODE" FontSize="14" FontWeight="Bold" Foreground="#00F5D4"/>
                                                                 <Border Name="BadgeGameModeState" CornerRadius="6" Background="#121216" BorderBrush="#22222A" BorderThickness="1" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
                                                                     <TextBlock Name="TxtGameModeBadge" Text="DAEMON STANDBY" FontSize="10" FontWeight="Bold" Foreground="#71717A"/>
                                                                 </Border>
                                                             </StackPanel>
-                                                            <TextBlock Text="Real-time process monitoring, P-Core affinity, timer tuning, and power management." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                                            <TextBlock Text="Process affinity, timer resolution, and power management." FontSize="11" Foreground="#8A99AD" Margin="0,2,0,0"/>
                                                         </StackPanel>
-                                                        <Button Name="BtnToggleGameMode" Grid.Column="2" Content="START GAME MODE" Style="{StaticResource ButtonPrimary}" Padding="16,8" VerticalAlignment="Center"/>
+                                                        <Button Name="BtnToggleGameMode" Grid.Column="2" Content="START MODE" Style="{StaticResource ButtonPrimary}" Padding="14,7" VerticalAlignment="Center"/>
                                                     </Grid>
 
                                                     <!-- Live Telemetry HUD Card -->
@@ -2038,17 +2022,17 @@
                                                         </Border>
                                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                             <StackPanel Orientation="Horizontal">
-                                                                <TextBlock Text="LOW-LATENCY NETWORK &amp; DNS" FontSize="14" FontWeight="Bold" Foreground="#38BDF8"/>
+                                                                <TextBlock Text="NETWORK &amp; DNS" FontSize="14" FontWeight="Bold" Foreground="#38BDF8"/>
                                                                 <Border Name="BadgeNetworkStatus" CornerRadius="6" Background="#0C1E2E" BorderBrush="#164E63" BorderThickness="1" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
                                                                     <TextBlock Name="TxtNetworkStatusBadge" Text="READY TO BENCHMARK" FontSize="10" FontWeight="Bold" Foreground="#38BDF8"/>
                                                                 </Border>
                                                             </StackPanel>
-                                                            <TextBlock Text="Measure DNS latency and tune TCP/IP stack." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                                            <TextBlock Text="DNS latency and TCP/IP stack tuning." FontSize="11" Foreground="#8A99AD" Margin="0,2,0,0"/>
                                                         </StackPanel>
                                                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                                            <Button Name="BtnBenchmarkDns" Content="BENCHMARK DNS" Style="{StaticResource ButtonSecondary}" Padding="12,8" Margin="0,0,6,0"/>
-                                                            <Button Name="BtnApplyFastestDns" Content="APPLY FASTEST DNS" Style="{StaticResource ButtonPrimary}" Padding="14,8" Margin="0,0,6,0"/>
-                                                            <Button Name="BtnResetDns" Content="RESET DHCP" Style="{StaticResource ButtonSecondary}" Padding="10,8"/>
+                                                            <Button Name="BtnBenchmarkDns" Content="Benchmark" Style="{StaticResource ButtonSecondary}" Padding="12,7" Margin="0,0,6,0"/>
+                                                            <Button Name="BtnApplyFastestDns" Content="Apply Fastest" Style="{StaticResource ButtonPrimary}" Padding="12,7" Margin="0,0,6,0"/>
+                                                            <Button Name="BtnResetDns" Content="Reset" Style="{StaticResource ButtonSecondary}" Padding="10,7"/>
                                                         </StackPanel>
                                                     </Grid>
 
@@ -2068,7 +2052,7 @@
                                                                 <TextBlock Text="BENCHMARK &amp; PACKET STATUS" FontSize="10" FontWeight="Bold" Foreground="#64748B"/>
                                                                 <TextBlock Name="TxtDnsBenchmarkStatus" Text="Click 'BENCHMARK DNS' to measure live latency." FontSize="12" FontWeight="SemiBold" Foreground="#38BDF8" Margin="0,2,0,0"/>
                                                             </StackPanel>
-                                                            <Button Name="BtnOptimizeTcpStack" Grid.Column="2" Content="TUNE TCP STACK (NO-DELAY)" Style="{StaticResource ButtonSecondary}" Padding="12,6" VerticalAlignment="Center"/>
+                                                            <Button Name="BtnOptimizeTcpStack" Grid.Column="2" Content="Tune TCP Stack" Style="{StaticResource ButtonSecondary}" Padding="10,6" VerticalAlignment="Center"/>
                                                         </Grid>
                                                     </Border>
 
@@ -2101,7 +2085,7 @@
                                                             <TextBlock Text="Unlock 240 FPS (ASUS ROG Profile)" FontSize="13" FontWeight="Bold" Foreground="#00F5D4"/>
                                                             <TextBlock Text="Set ASUS ROG Phone profile for high frame rates." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
                                                         </StackPanel>
-                                                        <Button Name="BtnFFUnlockFPS" Grid.Row="1" Content="Unlock 240 FPS" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                        <Button Name="BtnFFUnlockFPS" Grid.Row="1" Content="Unlock" Style="{StaticResource ButtonSecondary}" Margin="0,8,0,0"/>
                                                     </Grid>
                                                 </Border>
 
@@ -2116,7 +2100,7 @@
                                                             <TextBlock Text="Force Dedicated High-Speed GPU" FontSize="13" FontWeight="Bold" Foreground="#3B82F6"/>
                                                             <TextBlock Text="Force emulator to dedicated GPU." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
                                                         </StackPanel>
-                                                        <Button Name="BtnFFGpuLock" Grid.Row="1" Content="Lock to Dedicated GPU" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                        <Button Name="BtnFFGpuLock" Grid.Row="1" Content="Lock GPU" Style="{StaticResource ButtonSecondary}" Margin="0,8,0,0"/>
                                                     </Grid>
                                                 </Border>
 
@@ -2131,7 +2115,7 @@
                                                             <TextBlock Text="Smooth Mouse Aim for Drag Headshots" FontSize="13" FontWeight="Bold" Foreground="#F59E0B"/>
                                                             <TextBlock Text="Disable mouse acceleration for raw input." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
                                                         </StackPanel>
-                                                        <Button Name="BtnFFMouseAim" Grid.Row="1" Content="Apply Smooth Aim" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                        <Button Name="BtnFFMouseAim" Grid.Row="1" Content="Apply" Style="{StaticResource ButtonSecondary}" Margin="0,8,0,0"/>
                                                     </Grid>
                                                 </Border>
 
@@ -2146,7 +2130,7 @@
                                                             <TextBlock Text="Low Ping Network (Fix Delayed Hits)" FontSize="13" FontWeight="Bold" Foreground="#10B981"/>
                                                             <TextBlock Text="Disable network throttling for gaming packets." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
                                                         </StackPanel>
-                                                        <Button Name="BtnFFLowPing" Grid.Row="1" Content="Apply Low Ping" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                        <Button Name="BtnFFLowPing" Grid.Row="1" Content="Apply" Style="{StaticResource ButtonSecondary}" Margin="0,8,0,0"/>
                                                     </Grid>
                                                 </Border>
 
@@ -2162,7 +2146,7 @@
                                                             <TextBlock Text="Emulator Speed Boost (Toggle VBS)" FontSize="13" FontWeight="Bold" Foreground="#EF4444"/>
                                                             <TextBlock Text="Enable direct hardware virtualization." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
                                                         </StackPanel>
-                                                        <Button Name="BtnToggleVBS" Grid.Row="1" Content="Toggle VBS Mode" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                        <Button Name="BtnToggleVBS" Grid.Row="1" Content="Toggle" Style="{StaticResource ButtonSecondary}" Margin="0,8,0,0"/>
                                                     </Grid>
                                                 </Border>
 
@@ -2177,7 +2161,7 @@
                                                             <TextBlock Text="Clean Emulator Logs &amp; Shader Caches" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
                                                             <TextBlock Text="Clear logs and cache to fix loading stalls." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
                                                         </StackPanel>
-                                                        <Button Name="BtnFFCleanCache" Grid.Row="1" Content="Clean Emulator Cache" Style="{StaticResource ButtonSecondary}" Margin="0,10,0,0"/>
+                                                        <Button Name="BtnFFCleanCache" Grid.Row="1" Content="Clean" Style="{StaticResource ButtonSecondary}" Margin="0,8,0,0"/>
                                                     </Grid>
                                                 </Border>
 
@@ -2302,7 +2286,7 @@
                                             </Border>
 
                                             <!-- 3. One-Click Esports Optimization Presets Header -->
-                                            <TextBlock Text="ONE-CLICK ESPORTS PERFORMANCE PRESETS" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="2,0,0,8"/>
+                                            <TextBlock Text="PERFORMANCE PRESETS" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="2,0,0,8"/>
 
                                             <Grid Margin="0,0,0,14">
                                                 <Grid.ColumnDefinitions>
@@ -2322,25 +2306,20 @@
                                                         </Grid.RowDefinitions>
                                                         <StackPanel Grid.Row="0">
                                                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                                <TextBlock Text="COMPETITIVE POTATO" FontSize="13" FontWeight="Bold" Foreground="#F97316"/>
-                                                                <Border CornerRadius="4" Background="#261006" BorderBrush="#7C2D12" BorderThickness="1" Padding="5,1" Margin="8,0,0,0">
+                                                                <TextBlock Text="POTATO" FontSize="14" FontWeight="Bold" Foreground="#F97316"/>
+                                                                <Border CornerRadius="4" Background="#261006" BorderBrush="#7C2D12" BorderThickness="1" Padding="6,1" Margin="8,0,0,0">
                                                                     <TextBlock Text="MAX FPS" FontSize="10" FontWeight="Bold" Foreground="#FB923C"/>
                                                                 </Border>
                                                             </StackPanel>
-                                                            <TextBlock Text="Maximum frames and rock-bottom latency for budget systems." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,8" TextWrapping="Wrap"/>
                                                         </StackPanel>
-                                                        <StackPanel Grid.Row="1" Margin="0,0,0,10">
-                                                            <TextBlock Text="&#x2022; 70% 3D Render Scale (Crisp HUD, Fast 3D)" FontSize="11" Foreground="#CBD5E1" Margin="0,1"/>
-                                                            <TextBlock Text="&#x2022; Minimum LOD &amp; Particle Effects" FontSize="11" Foreground="#CBD5E1" Margin="0,1"/>
-                                                            <TextBlock Text="&#x2022; VSync OFF + Letterbox Disabled" FontSize="11" Foreground="#CBD5E1" Margin="0,1"/>
-                                                            <TextBlock Text="&#x2022; P-Core Affinity Pinning (No E-Cores)" FontSize="11" Foreground="#CBD5E1" Margin="0,1"/>
-                                                            <TextBlock Text="&#x2022; TCP Nagle Disabled + High-Priority QoS" FontSize="11" Foreground="#CBD5E1" Margin="0,1"/>
-                                                            <TextBlock Text="&#x2022; Mouse Acceleration Curve Disabled" FontSize="11" Foreground="#CBD5E1" Margin="0,1"/>
+                                                        <StackPanel Grid.Row="1" Margin="0,8,0,12">
+                                                            <TextBlock Text="&#x2022; 70% 3D Render Scale" FontSize="11" Foreground="#CBD5E1" Margin="0,2"/>
+                                                            <TextBlock Text="&#x2022; Minimum LOD &amp; Particles" FontSize="11" Foreground="#CBD5E1" Margin="0,2"/>
+                                                            <TextBlock Text="&#x2022; VSync &amp; Letterbox OFF" FontSize="11" Foreground="#CBD5E1" Margin="0,2"/>
+                                                            <TextBlock Text="&#x2022; P-Core Affinity Pin" FontSize="11" Foreground="#CBD5E1" Margin="0,2"/>
+                                                            <TextBlock Text="&#x2022; Packet QoS &amp; Raw Input" FontSize="11" Foreground="#CBD5E1" Margin="0,2"/>
                                                         </StackPanel>
-                                                        <Border Grid.Row="2" CornerRadius="6" Background="#140C06" BorderBrush="#3D2109" BorderThickness="1" Padding="8,5" Margin="0,0,0,10">
-                                                            <TextBlock Text="Target: 60Hz-144Hz Budget / iGPU / Older CPUs" FontSize="10" FontWeight="SemiBold" Foreground="#F97316"/>
-                                                        </Border>
-                                                        <Button Name="BtnApplyPresetPotato" Grid.Row="3" Content="APPLY POTATO PRESET" Style="{StaticResource ButtonFlame}" Padding="0,9" HorizontalAlignment="Stretch"/>
+                                                        <Button Name="BtnApplyPresetPotato" Grid.Row="3" Content="APPLY PRESET" Style="{StaticResource ButtonFlame}" Padding="0,8" HorizontalAlignment="Stretch"/>
                                                     </Grid>
                                                 </Border>
 
@@ -2355,25 +2334,20 @@
                                                         </Grid.RowDefinitions>
                                                         <StackPanel Grid.Row="0">
                                                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                                <TextBlock Text="TOURNAMENT 240HZ" FontSize="13" FontWeight="Bold" Foreground="#00F5D4"/>
-                                                                <Border CornerRadius="4" Background="#061A14" BorderBrush="#0F5132" BorderThickness="1" Padding="5,1" Margin="8,0,0,0">
-                                                                    <TextBlock Text="PRO STANDARD" FontSize="10" FontWeight="Bold" Foreground="#10B981"/>
+                                                                <TextBlock Text="TOURNAMENT" FontSize="14" FontWeight="Bold" Foreground="#00F5D4"/>
+                                                                <Border CornerRadius="4" Background="#061A14" BorderBrush="#0F5132" BorderThickness="1" Padding="6,1" Margin="8,0,0,0">
+                                                                    <TextBlock Text="240HZ+" FontSize="10" FontWeight="Bold" Foreground="#10B981"/>
                                                                 </Border>
                                                             </StackPanel>
-                                                            <TextBlock Text="Esports clarity, frametime consistency, and zero delay." FontSize="11" Foreground="#8A99AD" Margin="0,4,0,8" TextWrapping="Wrap"/>
                                                         </StackPanel>
-                                                        <StackPanel Grid.Row="1" Margin="0,0,0,10">
-                                                            <TextBlock Text="&#x2022; 100% Native Resolution Clarity" FontSize="11" Foreground="#CBD5E1" Margin="0,1"/>
-                                                            <TextBlock Text="&#x2022; Pro Low-Spec Shadows &amp; Shaders" FontSize="11" Foreground="#CBD5E1" Margin="0,1"/>
-                                                            <TextBlock Text="&#x2022; AMD X3D CCD0 V-Cache / Intel P-Cores" FontSize="11" Foreground="#CBD5E1" Margin="0,1"/>
-                                                            <TextBlock Text="&#x2022; Fullscreen Optimizations Bypassed" FontSize="11" Foreground="#CBD5E1" Margin="0,1"/>
-                                                            <TextBlock Text="&#x2022; DSCP 46 High-Priority Gaming Packets" FontSize="11" Foreground="#CBD5E1" Margin="0,1"/>
-                                                            <TextBlock Text="&#x2022; Ultimate Power Plan Activated" FontSize="11" Foreground="#CBD5E1" Margin="0,1"/>
+                                                        <StackPanel Grid.Row="1" Margin="0,8,0,12">
+                                                            <TextBlock Text="&#x2022; 100% Native Resolution" FontSize="11" Foreground="#CBD5E1" Margin="0,2"/>
+                                                            <TextBlock Text="&#x2022; Low-Spec Shaders" FontSize="11" Foreground="#CBD5E1" Margin="0,2"/>
+                                                            <TextBlock Text="&#x2022; V-Cache / P-Core Pin" FontSize="11" Foreground="#CBD5E1" Margin="0,2"/>
+                                                            <TextBlock Text="&#x2022; Fullscreen Opt Bypass" FontSize="11" Foreground="#CBD5E1" Margin="0,2"/>
+                                                            <TextBlock Text="&#x2022; DSCP 46 Packet QoS" FontSize="11" Foreground="#CBD5E1" Margin="0,2"/>
                                                         </StackPanel>
-                                                        <Border Grid.Row="2" CornerRadius="6" Background="#061710" BorderBrush="#0D422B" BorderThickness="1" Padding="8,5" Margin="0,0,0,10">
-                                                            <TextBlock Text="Target: 144Hz / 240Hz / 360Hz Competitive Rigs" FontSize="10" FontWeight="SemiBold" Foreground="#00F5D4"/>
-                                                        </Border>
-                                                        <Button Name="BtnApplyPresetTournament" Grid.Row="3" Content="APPLY TOURNAMENT PRESET" Style="{StaticResource ButtonPrimary}" Padding="0,9" HorizontalAlignment="Stretch"/>
+                                                        <Button Name="BtnApplyPresetTournament" Grid.Row="3" Content="APPLY PRESET" Style="{StaticResource ButtonPrimary}" Padding="0,8" HorizontalAlignment="Stretch"/>
                                                     </Grid>
                                                 </Border>
 
@@ -2421,8 +2395,7 @@
                                                 <!-- Left Box: In-Game Graphics & INI Scaler -->
                                                 <Border Grid.Column="0" CornerRadius="12" Padding="16,14" BorderThickness="1" Margin="0,0,8,0" Background="{DynamicResource OverviewCardBg}" BorderBrush="{DynamicResource OverviewCardBorder}">
                                                     <StackPanel>
-                                                        <TextBlock Text="GAME CONFIG &amp; 3D RESOLUTION TUNER" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4"/>
-                                                        <TextBlock Text="Direct GameUserSettings.ini tuning with automatic .bak backup." FontSize="11" Foreground="#8A99AD" Margin="0,0,0,10"/>
+                                                        <TextBlock Text="3D RESOLUTION" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
 
                                                         <!-- Resolution Slider -->
                                                         <Grid Margin="0,0,0,8">
@@ -2451,14 +2424,13 @@
                                                 <!-- Right Box: Vanguard-Safe OS & Input Latency -->
                                                 <Border Grid.Column="1" CornerRadius="12" Padding="16,14" BorderThickness="1" Margin="8,0,0,0" Background="{DynamicResource OverviewCardBg}" BorderBrush="{DynamicResource OverviewCardBorder}">
                                                     <StackPanel>
-                                                        <TextBlock Text="VANGUARD-SAFE OS &amp; INPUT LATENCY" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4"/>
-                                                        <TextBlock Text="Registry and scheduler tuning to eliminate stutters." FontSize="11" Foreground="#8A99AD" Margin="0,0,0,10"/>
+                                                        <TextBlock Text="INPUT &amp; NETWORK LATENCY" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
 
-                                                        <CheckBox Name="ChkValorantMouse" Content="Disable Windows Mouse Acceleration (1:1 Raw Input)" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
-                                                        <CheckBox Name="ChkValorantFso" Content="Disable Fullscreen Optimizations &amp; Force DPI Scaling" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
-                                                        <CheckBox Name="ChkValorantNagle" Content="Disable TCP Nagle Algorithm &amp; Network Throttling" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
-                                                        <CheckBox Name="ChkValorantQos" Content="Apply Valorant QoS DSCP 46 Priority Packet Tag" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
-                                                        <CheckBox Name="ChkValorantUsb" Content="Disable USB Selective Suspend (Zero Mouse Dropouts)" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,10,6" Cursor="Hand"/>
+                                                        <CheckBox Name="ChkValorantMouse" Content="Disable Windows Mouse Acceleration" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
+                                                        <CheckBox Name="ChkValorantFso" Content="Disable Fullscreen Optimizations" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
+                                                        <CheckBox Name="ChkValorantNagle" Content="Disable TCP Nagle &amp; Throttling" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
+                                                        <CheckBox Name="ChkValorantQos" Content="Valorant QoS DSCP 46 Priority Tag" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
+                                                        <CheckBox Name="ChkValorantUsb" Content="Disable USB Sleep Suspend" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,10,6" Cursor="Hand"/>
 
                                                         <Button Name="BtnApplyIndividualTweaks" Content="APPLY SELECTED TWEAKS" Style="{StaticResource ButtonPrimary}" HorizontalAlignment="Stretch" Padding="0,8"/>
                                                     </StackPanel>
@@ -2486,12 +2458,12 @@
 
                                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                                <TextBlock Text="REAL-TIME THREAD AFFINITY DAEMON" FontSize="13" FontWeight="Bold" Foreground="#38BDF8"/>
+                                                                <TextBlock Text="AFFINITY DAEMON" FontSize="13" FontWeight="Bold" Foreground="#38BDF8"/>
                                                                 <Border Name="BadgeDaemonState" CornerRadius="6" Background="#121216" BorderBrush="#22222A" BorderThickness="1" Padding="8,2" Margin="10,0,0,0">
                                                                     <TextBlock Name="TxtValorantDaemonBadge" Text="DAEMON OFF" FontSize="10" FontWeight="Bold" Foreground="#71717A"/>
                                                                 </Border>
                                                             </StackPanel>
-                                                            <TextBlock Text="Dynamically locks game to P-Cores or AMD V-Cache and demotes background tasks." FontSize="11" Foreground="#8A99AD" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                                            <TextBlock Text="Locks process to high-performance cores." FontSize="11" Foreground="#8A99AD" Margin="0,2,0,0"/>
                                                         </StackPanel>
 
                                                         <Button Name="BtnToggleAffinityDaemon" Grid.Column="2" Content="START DAEMON" Style="{StaticResource ButtonSecondary}" Padding="16,8" VerticalAlignment="Center"/>
@@ -2527,14 +2499,13 @@
                                                 <!-- Cache Purge Card -->
                                                 <Border Grid.Column="0" CornerRadius="12" Padding="16,14" BorderThickness="1" Margin="0,0,8,0" Background="{DynamicResource OverviewCardBg}" BorderBrush="{DynamicResource OverviewCardBorder}">
                                                     <StackPanel>
-                                                        <TextBlock Text="VALORANT CACHE PURGE ENGINE" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4"/>
-                                                        <TextBlock Text="Purge shader pipelines, game logs, and crash dumps." FontSize="11" Foreground="#8A99AD" Margin="0,0,0,10"/>
+                                                        <TextBlock Text="CACHE PURGE" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
 
-                                                        <CheckBox Name="ChkPurgeShaders" Content="DirectX &amp; GPU Shader Caches (NVIDIA/AMD/UE4)" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
-                                                        <CheckBox Name="ChkPurgeLogs" Content="Riot Client &amp; Valorant Session Logs" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
-                                                        <CheckBox Name="ChkPurgeCrashes" Content="Stale Crash Dumps &amp; Memory Minidumps" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,12,6" Cursor="Hand"/>
+                                                        <CheckBox Name="ChkPurgeShaders" Content="DirectX &amp; GPU Shader Caches" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
+                                                        <CheckBox Name="ChkPurgeLogs" Content="Riot Client &amp; Game Logs" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
+                                                        <CheckBox Name="ChkPurgeCrashes" Content="Crash Dumps &amp; Minidumps" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,12,6" Cursor="Hand"/>
 
-                                                        <Button Name="BtnPurgeCaches" Content="PURGE SELECTED CACHES" Style="{StaticResource ButtonSecondary}" HorizontalAlignment="Stretch" Padding="0,8"/>
+                                                        <Button Name="BtnPurgeCaches" Content="PURGE CACHES" Style="{StaticResource ButtonSecondary}" HorizontalAlignment="Stretch" Padding="0,8"/>
                                                     </StackPanel>
                                                 </Border>
 
@@ -2603,7 +2574,7 @@
                                                             </Border>
                                                         </Grid>
 
-                                                        <Button Name="BtnPingRiotServers" Grid.Row="2" Content="TEST RIOT SERVERS" Style="{StaticResource ButtonSecondary}" HorizontalAlignment="Stretch" Padding="0,8"/>
+                                                        <Button Name="BtnPingRiotServers" Grid.Row="2" Content="PING SERVERS" Style="{StaticResource ButtonSecondary}" HorizontalAlignment="Stretch" Padding="0,8"/>
                                                     </Grid>
                                                 </Border>
                                             </Grid>
@@ -2633,7 +2604,7 @@
                                             </Border.Effect>
                                             <StackPanel>
                                                 <TextBlock Text="APPLICATION SETTINGS" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SectionBannerTitleBrush}"/>
-                                                <TextBlock Text="System compliance and safety preferences." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                <TextBlock  FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                             </StackPanel>
                                         </Border>
 
@@ -2646,7 +2617,7 @@
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel Grid.Column="0">
                                                     <TextBlock Text="Target Operating System Detection" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                                    <TextBlock Text="Automatically detect Windows version or force Windows 11 / Windows 10 rules." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                                                    <TextBlock Text="Detect Windows 11 or Windows 10 rules." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
                                                 </StackPanel>
                                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                                     <RadioButton Name="RdoOSAuto" Content="Auto-Detect" Foreground="{DynamicResource TextPrimaryBrush}" IsChecked="True" Margin="0,0,10,0"/>
@@ -2665,7 +2636,7 @@
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel Grid.Column="0">
                                                     <TextBlock Text="Automatic System Restore Point Creation" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                                    <TextBlock Text="Always create a restore point before running any speed profile or repair." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                                                    <TextBlock Text="Create restore point before applying profiles." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
                                                 </StackPanel>
                                                 <CheckBox Name="ChkAutoRestorePoint" Content="Enabled (Recommended)" Foreground="{DynamicResource AccentBrush}" IsChecked="True" Grid.Column="1" VerticalAlignment="Center"/>
                                             </Grid>
@@ -2680,7 +2651,7 @@
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel Grid.Column="0">
                                                     <TextBlock Text="Reset Application Preferences" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                                    <TextBlock Text="Reset all UI selections, cached statuses, and logs." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                                                    <TextBlock Text="Reset UI selections and logs." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0"/>
                                                 </StackPanel>
                                                 <Button Name="BtnResetSettings" Content="Reset Preferences" Style="{StaticResource ButtonSecondary}" Grid.Column="1" VerticalAlignment="Center"/>
                                             </Grid>
@@ -2725,8 +2696,8 @@
                                               <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                                   <Button Name="BtnRefreshBackups" Content="Refresh" Margin="0,0,8,0" Style="{StaticResource ButtonSecondary}"/>
                                                   <Button Name="BtnOpenBackupsFolder" Content="Open Folder" Margin="0,0,8,0" Style="{StaticResource ButtonSecondary}"/>
-                                                  <Button Name="BtnLaunchSystemRestore" Content="Windows Restore Wizard" Margin="0,0,8,0" Style="{StaticResource ButtonSecondary}"/>
-                                                  <Button Name="BtnCreateRestorePoint" Content="Create Backup Point" Style="{StaticResource ButtonPrimary}"/>
+                                                  <Button Name="BtnLaunchSystemRestore" Content="Restore Wizard" Margin="0,0,8,0" Style="{StaticResource ButtonSecondary}"/>
+                                                  <Button Name="BtnCreateRestorePoint" Content="Create Point" Style="{StaticResource ButtonPrimary}"/>
                                               </StackPanel>
                                           </Grid>
                                       </Border>
@@ -2764,11 +2735,11 @@
                                                                       <TextBlock Name="TxtVssBadge" Text="VSS PROTECTED" FontSize="10" FontWeight="Bold" Foreground="#10B981"/>
                                                                   </Border>
                                                               </StackPanel>
-                                                              <TextBlock Text="Every registry and configuration change is journaled for 1-click rollback." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                                              <TextBlock Text="All configuration changes are journaled for rollback." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
                                                           </StackPanel>
                                                           <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                                              <Button Name="BtnValidateVss" Content="CHECK VSS HEALTH" Style="{StaticResource ButtonSecondary}" Padding="10,6" Margin="0,0,6,0"/>
-                                                              <Button Name="BtnGenerateDesktopUndo" Content="CREATE DESKTOP UNDO (.BAT)" Style="{StaticResource ButtonPrimary}" Padding="12,6"/>
+                                                              <Button Name="BtnValidateVss" Content="Check VSS" Style="{StaticResource ButtonSecondary}" Padding="10,6" Margin="0,0,6,0"/>
+                                                              <Button Name="BtnGenerateDesktopUndo" Content="Create Desktop Undo" Style="{StaticResource ButtonPrimary}" Padding="12,6"/>
                                                           </StackPanel>
                                                       </Grid>
 
@@ -2817,7 +2788,7 @@
                                              </Grid.ColumnDefinitions>
                                              <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                                  <TextBlock Text="Emergency Factory Reset" FontSize="12" FontWeight="Bold" Foreground="#EF4444"/>
-                                                 <TextBlock Text="Revert all settings and tweaks to Windows defaults." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                 <TextBlock Text="Revert all settings to Windows defaults." FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                              </StackPanel>
                                              <Button Name="BtnUndoAllRestore" Grid.Column="1" Content="Undo Everything" Style="{StaticResource ButtonDanger}"/>
                                          </Grid>
@@ -2853,7 +2824,7 @@
                                                     <TextBlock Text="ANXIOUSLY OPTIMIZED" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
                                                     <TextBlock Text="AnxiouslyOptimized v1.1.0" FontSize="11" Foreground="#00F5D4" HorizontalAlignment="Center" Margin="0,3,0,10"/>
                                                     
-                                                    <TextBlock Text="AnxiouslyOptimized is a safe, simple, and transparent Windows optimization utility engineered for everyday users, PC gamers, and mobile emulator players." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="520" LineHeight="17" Margin="0,0,0,16"/>
+                                                    <TextBlock Text="Safe, transparent Windows optimization utility." FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Center" Margin="0,0,0,14"/>
 
                                                     <!-- Specifications Card (Translucent Frosted Glass) -->
                                                     <Border CornerRadius="10" BorderThickness="1" Padding="16,12" Width="480" Background="{DynamicResource SectionBannerBg}" BorderBrush="{DynamicResource SectionBannerBorder}">
