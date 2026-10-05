@@ -607,11 +607,11 @@
                         
                         <StackPanel VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="ANXIOUSLY OPTIMIZED" FontSize="13.5" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock Text="ANXIOUSLY OPTIMIZED" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
                             </StackPanel>
                             <!-- Edition Pill Badge (Exact Blue Pill) -->
                             <Border Name="BrdEditionBadge" CornerRadius="4" Padding="5,1" Margin="0,2,0,0" HorizontalAlignment="Left" Background="#111E32" BorderBrush="#1C3050" BorderThickness="1">
-                                <TextBlock Name="TxtEditionBadge" Text="Windows 10 Edition" FontSize="9.5" FontWeight="SemiBold" Foreground="#60A5FA"/>
+                                <TextBlock Name="TxtEditionBadge" Text="Windows 10 Edition" FontSize="10" FontWeight="SemiBold" Foreground="#60A5FA"/>
                             </Border>
                         </StackPanel>
                     </StackPanel>
@@ -683,8 +683,8 @@
                                     <Path Grid.Column="0" Data="M 3 10.5 L 12 3 L 21 10.5 V 20 C 21 20.6 20.6 21 20 21 H 15 V 14 H 9 V 21 H 4 C 3.4 21 3 20.6 3 20 Z" 
                                           Stroke="#00F5D4" StrokeThickness="1.6" Fill="Transparent" Width="16" Height="16" Stretch="Uniform" Margin="2,0,10,0" VerticalAlignment="Center"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <TextBlock Text="Overview" FontSize="13.5" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                        <TextBlock Text="All tools at a glance" FontSize="10.5" Foreground="#64748B"/>
+                                        <TextBlock Text="Overview" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                        <TextBlock Text="All tools at a glance" FontSize="10" Foreground="#64748B"/>
                                     </StackPanel>
                                     <Rectangle Name="NavIndicatorOverview" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Visible"/>
                                 </Grid>
@@ -833,7 +833,7 @@
                                     </Ellipse>
                                     <TextBlock Text="System Status" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                 </StackPanel>
-                                <TextBlock Text="Optimized &amp; Healthy" FontSize="13.5" FontWeight="Bold" Foreground="#10B981" Margin="16,0,0,2"/>
+                                <TextBlock Text="Optimized &amp; Healthy" FontSize="14" FontWeight="Bold" Foreground="#10B981" Margin="16,0,0,2"/>
                                 <TextBlock Name="TxtSystemStatusSub" Text="Last scan: Today, 12:14 PM" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Margin="16,0,0,0"/>
                             </StackPanel>
                         </Border>
@@ -878,18 +878,18 @@
 
                                         <!-- Left: Dynamic Greeting + Display Headline -->
                                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                            <TextBlock Name="TxtGreetingTime" Text="GOOD AFTERNOON" FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
+                                            <TextBlock Name="TxtGreetingTime" Text="GOOD AFTERNOON" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
                                             <TextBlock Text="Your PC is ready." FontSize="29" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,3,0,3"/>
-                                            <TextBlock Text="Keep it fast, clean and focused - with a single click." FontSize="13.5" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            <TextBlock Text="Keep it fast, clean and focused - with a single click." FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                         </StackPanel>
 
                                         <!-- Right: Value Props + Scan My PC Button -->
                                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                             <StackPanel VerticalAlignment="Center" Margin="0,0,18,0">
-                                                <TextBlock Text="CLEANER" FontSize="10.5" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
-                                                <TextBlock Text="FASTER" FontSize="10.5" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
-                                                <TextBlock Text="SMOOTHER" FontSize="10.5" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
-                                                <TextBlock Text="YOUR WAY" FontSize="10.5" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
+                                                <TextBlock Text="CLEANER" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
+                                                <TextBlock Text="FASTER" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
+                                                <TextBlock Text="SMOOTHER" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2"/>
+                                                <TextBlock Text="YOUR WAY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
                                             </StackPanel>
 
                                             <!-- Scan My PC Primary CTA (Reticle Focus Viewfinder Icon) -->
@@ -952,7 +952,7 @@
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
                                                     <TextBlock Text="Fix Broken Windows Files" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
-                                                    <TextBlock Text="Scan and repair corrupted or missing system files with fresh Microsoft copies." FontSize="12.5" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                    <TextBlock Text="Scan and repair corrupted or missing system files with fresh Microsoft copies." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
                                                 <!-- Action Button -->
@@ -988,7 +988,7 @@
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
                                                     <TextBlock Text="Deep Windows Repair" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
-                                                    <TextBlock Text="Clean Microsoft files and fix stubborn Windows errors that normal repairs miss." FontSize="12.5" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                    <TextBlock Text="Clean Microsoft files and fix stubborn Windows errors that normal repairs miss." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
                                                 <!-- Action Button -->
@@ -1020,7 +1020,7 @@
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
                                                     <TextBlock Text="Clean Old Windows Updates" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
-                                                    <TextBlock Text="Remove old update files and installation junk to free up valuable disk space." FontSize="12.5" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                    <TextBlock Text="Remove old update files and installation junk to free up valuable disk space." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
                                                 <!-- Action Button -->
@@ -1072,7 +1072,7 @@
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
                                                     <TextBlock Text="Free Up Trapped Memory" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
-                                                    <TextBlock Text="Release unused RAM and clear memory caches for a smoother experience." FontSize="12.5" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                    <TextBlock Text="Release unused RAM and clear memory caches for a smoother experience." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
                                                 <!-- Action Button -->
@@ -1104,7 +1104,7 @@
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
                                                     <TextBlock Text="Turn Off Sleep File" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
-                                                    <TextBlock Text="Disable hibernation to get 16-32 GB of free drive space instantly." FontSize="12.5" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                    <TextBlock Text="Disable hibernation to get 16-32 GB of free drive space instantly." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
                                                 <!-- Action Button -->
@@ -1136,7 +1136,7 @@
                                                 <!-- Text Content -->
                                                 <StackPanel Grid.Row="1">
                                                     <TextBlock Text="Clean Temp &amp; Game Caches" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,5"/>
-                                                    <TextBlock Text="Remove temporary files and game caches to fix stutters and free up space." FontSize="12.5" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
+                                                    <TextBlock Text="Remove temporary files and game caches to fix stutters and free up space." FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="19"/>
                                                 </StackPanel>
 
                                                 <!-- Action Button -->
@@ -1167,8 +1167,8 @@
                                                     </Canvas>
                                                 </Viewbox>
                                                 <StackPanel VerticalAlignment="Center">
-                                                    <TextBlock Text="System Overview" FontSize="14.5" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                                    <TextBlock Text="Live system resource usage" FontSize="11.5" Foreground="{DynamicResource TextMutedBrush}" Margin="0,2,0,0"/>
+                                                    <TextBlock Text="System Overview" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                    <TextBlock Text="Live system resource usage" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" Margin="0,2,0,0"/>
                                                 </StackPanel>
                                             </StackPanel>
 
@@ -1248,7 +1248,7 @@
                                                                     </Ellipse.Effect>
                                                                 </Ellipse>
                                                             </StackPanel>
-                                                            <TextBlock Text="Live console &amp; audit" FontSize="10.5" Foreground="{DynamicResource TextMutedBrush}" Margin="0,1,0,0"/>
+                                                            <TextBlock Text="Live console &amp; audit" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Margin="0,1,0,0"/>
                                                         </StackPanel>
                                                         <!-- Subtle Expand Chevron -->
                                                         <Path Data="M 1 1 L 4 4 L 7 1" Stroke="{DynamicResource TextMutedBrush}" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="8" Height="5" Margin="4,0,2,0" VerticalAlignment="Center"/>
@@ -2069,18 +2069,18 @@
                                                 <DropShadowEffect BlurRadius="8" Color="#00F5A0" Opacity="0.9" ShadowDepth="0"/>
                                             </Ellipse.Effect>
                                         </Ellipse>
-                                        <TextBlock Text="SYSTEM ACTIVITY &amp; EXECUTION LOGS" FontSize="12.5" FontWeight="Bold" Foreground="#00F5D4" VerticalAlignment="Center" Margin="0,0,14,0"/>
-                                        <TextBlock Name="TxtStatusBar" Text="Ready - All systems optimized and healthy" FontSize="11.5" FontWeight="SemiBold" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                        <TextBlock Text="SYSTEM ACTIVITY &amp; EXECUTION LOGS" FontSize="12" FontWeight="Bold" Foreground="#00F5D4" VerticalAlignment="Center" Margin="0,0,14,0"/>
+                                        <TextBlock Name="TxtStatusBar" Text="Ready - All systems optimized and healthy" FontSize="12" FontWeight="SemiBold" Foreground="#94A3B8" VerticalAlignment="Center"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                         <Button Name="BtnToggleLogs" Content="Activity Log" Visibility="Collapsed"/>
-                                        <Button Name="BtnClearLogs" Content="Clear Logs" Style="{StaticResource ButtonSecondary}" Padding="10,4" FontSize="11.5" FontWeight="SemiBold" Margin="0,0,8,0"/>
-                                        <Button Name="BtnCopyLogs" Content="Copy" Style="{StaticResource ButtonSecondary}" Padding="10,4" FontSize="11.5" FontWeight="SemiBold" Margin="0,0,8,0"/>
-                                        <Button Name="BtnCloseDrawer" Content="&#x2715; Close" Style="{StaticResource ButtonSecondary}" Padding="10,4" FontSize="11.5" FontWeight="SemiBold"/>
+                                        <Button Name="BtnClearLogs" Content="Clear Logs" Style="{StaticResource ButtonSecondary}" Padding="10,4" FontSize="12" FontWeight="SemiBold" Margin="0,0,8,0"/>
+                                        <Button Name="BtnCopyLogs" Content="Copy" Style="{StaticResource ButtonSecondary}" Padding="10,4" FontSize="12" FontWeight="SemiBold" Margin="0,0,8,0"/>
+                                        <Button Name="BtnCloseDrawer" Content="&#x2715; Close" Style="{StaticResource ButtonSecondary}" Padding="10,4" FontSize="12" FontWeight="SemiBold"/>
                                     </StackPanel>
                                 </Grid>
                                 <Border Grid.Row="1" CornerRadius="8" Background="#020204" BorderBrush="#141418" BorderThickness="1" Padding="10,8">
-                                    <TextBox Name="TxtConsoleLogs" Background="Transparent" Foreground="#00F5A0" BorderThickness="0" FontFamily="Cascadia Code, Consolas, JetBrains Mono, monospace" FontSize="12.5" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" CaretBrush="#00F5D4"/>
+                                    <TextBox Name="TxtConsoleLogs" Background="Transparent" Foreground="#00F5A0" BorderThickness="0" FontFamily="Cascadia Code, Consolas, JetBrains Mono, monospace" FontSize="12" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" CaretBrush="#00F5D4"/>
                                 </Border>
                             </Grid>
                         </Border>

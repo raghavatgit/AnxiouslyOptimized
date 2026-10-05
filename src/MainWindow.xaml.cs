@@ -89,6 +89,7 @@ namespace AnxiouslyOptimized
 
         private SystemSpecs _specs;
         private List<TweakItem> _allTweaks = new List<TweakItem>();
+        private string _activeTweakCategory = "ALL";
         private List<BloatPackage> _allBloat = new List<BloatPackage>();
         private Dictionary<string, PresetConfig> _presets = new Dictionary<string, PresetConfig>(StringComparer.OrdinalIgnoreCase);
         private DispatcherTimer _telemetryTimer;
@@ -1863,32 +1864,31 @@ namespace AnxiouslyOptimized
             if (BtnRemoveBloat != null)
                 BtnRemoveBloat.Click += async (s, e) => await RemoveBloatAsync();
 
-            // Tweak Search
+            // Tweak Search & Category Filters
             if (TxtTweakSearch != null)
             {
-                TxtTweakSearch.TextChanged += (s, e) =>
-                {
-                    string q = TxtTweakSearch.Text.Trim();
-                    if (string.IsNullOrEmpty(q))
-                    {
-                        RenderTweakCards(_allTweaks);
-                    }
-                    else
-                    {
-                        var filtered = _allTweaks.Where(t =>
-                            (t.title != null && t.title.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                            (t.category != null && t.category.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                            (t.description != null && t.description.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0));
-                        RenderTweakCards(filtered);
-                    }
-                };
+                TxtTweakSearch.TextChanged += (s, e) => ApplyTweakFilters();
             }
+
+            if (BtnFilterAll != null) BtnFilterAll.Click += (s, e) => SetActiveTweakCategory("ALL");
+            if (BtnFilterGaming != null) BtnFilterGaming.Click += (s, e) => SetActiveTweakCategory("Gaming");
+            if (BtnFilterSpeed != null) BtnFilterSpeed.Click += (s, e) => SetActiveTweakCategory("Speed");
+            if (BtnFilterPrivacy != null) BtnFilterPrivacy.Click += (s, e) => SetActiveTweakCategory("Privacy");
+            if (BtnFilterSystem != null) BtnFilterSystem.Click += (s, e) => SetActiveTweakCategory("Windows");
+            if (BtnFilterEmulator != null) BtnFilterEmulator.Click += (s, e) => SetActiveTweakCategory("Emulator");
+            UpdateTweakCategoryPillStyles();
 
             // Select / Deselect All Tweaks
             if (BtnSelectAllTweaks != null)
-                BtnSelectAllTweaks.Click += (s, e) => { foreach (var t in _allTweaks) t.IsSelected = true; };
+                BtnSelectAllTweaks.Click += (s, e) => {
+                    foreach (var t in _allTweaks) t.IsSelected = true;
+                    UpdateTweakSelectionCount();
+                };
             if (BtnDeselectAllTweaks != null)
-                BtnDeselectAllTweaks.Click += (s, e) => { foreach (var t in _allTweaks) t.IsSelected = false; };
+                BtnDeselectAllTweaks.Click += (s, e) => {
+                    foreach (var t in _allTweaks) t.IsSelected = false;
+                    UpdateTweakSelectionCount();
+                };
 
             // Apply / Revert Selected Tweaks
             if (BtnApplySelectedTweaks != null)
@@ -2182,6 +2182,80 @@ namespace AnxiouslyOptimized
             UpdateReadinessScore();
         }
 
+        private void SetActiveTweakCategory(string cat)
+        {
+            _activeTweakCategory = cat;
+            UpdateTweakCategoryPillStyles();
+            ApplyTweakFilters();
+        }
+
+        private void UpdateTweakCategoryPillStyles()
+        {
+            var map = new Dictionary<Button, string>
+            {
+                { BtnFilterAll, "ALL" },
+                { BtnFilterGaming, "Gaming" },
+                { BtnFilterSpeed, "Speed" },
+                { BtnFilterPrivacy, "Privacy" },
+                { BtnFilterSystem, "Windows" },
+                { BtnFilterEmulator, "Emulator" }
+            };
+
+            foreach (var kvp in map)
+            {
+                if (kvp.Key == null) continue;
+                bool isActive = string.Equals(_activeTweakCategory, kvp.Value, StringComparison.OrdinalIgnoreCase);
+                if (isActive)
+                {
+                    kvp.Key.Background = new SolidColorBrush(Color.FromArgb(45, 0, 245, 212));
+                    kvp.Key.BorderBrush = new SolidColorBrush(Color.FromRgb(0, 245, 212));
+                    kvp.Key.Foreground = new SolidColorBrush(Color.FromRgb(0, 245, 212));
+                }
+                else
+                {
+                    kvp.Key.Background = new SolidColorBrush(Color.FromRgb(14, 14, 18));
+                    kvp.Key.BorderBrush = new SolidColorBrush(Color.FromRgb(34, 34, 42));
+                    kvp.Key.Foreground = new SolidColorBrush(Color.FromRgb(161, 161, 170));
+                }
+            }
+        }
+
+        private void ApplyTweakFilters()
+        {
+            if (_allTweaks == null) return;
+            string q = TxtTweakSearch != null ? TxtTweakSearch.Text.Trim() : "";
+            var query = _allTweaks.AsEnumerable();
+
+            if (!string.IsNullOrEmpty(_activeTweakCategory) && !_activeTweakCategory.Equals("ALL", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.Where(t => t.category != null && t.category.IndexOf(_activeTweakCategory, StringComparison.OrdinalIgnoreCase) >= 0);
+            }
+
+            if (!string.IsNullOrEmpty(q))
+            {
+                query = query.Where(t =>
+                    (t.title != null && t.title.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                    (t.category != null && t.category.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                    (t.description != null && t.description.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0));
+            }
+
+            RenderTweakCards(query);
+        }
+
+        private void UpdateTweakSelectionCount()
+        {
+            if (_allTweaks == null) return;
+            int selected = _allTweaks.Count(t => t.IsSelected);
+            int applied = _allTweaks.Count(t => t.IsApplied);
+            int total = _allTweaks.Count;
+
+            if (TxtTweakSelectedCount != null)
+                TxtTweakSelectedCount.Text = string.Format("{0} of {1} selected", selected, total);
+
+            if (TxtOptimizerStatusSummary != null)
+                TxtOptimizerStatusSummary.Text = string.Format("{0} of {1} applied ({2}%)", applied, total, total > 0 ? (applied * 100 / total) : 0);
+        }
+
         private void RenderTweakCards(IEnumerable<TweakItem> tweaks)
         {
             if (PnlTweaksContainer == null) return;
@@ -2191,16 +2265,45 @@ namespace AnxiouslyOptimized
 
             foreach (var g in groups)
             {
-                // Category Header
+                var categoryGrid = new Grid { Margin = new Thickness(2, 12, 0, 8) };
+                categoryGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                categoryGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                categoryGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+                var bar = new Border
+                {
+                    Width = 3,
+                    Height = 12,
+                    CornerRadius = new CornerRadius(1.5),
+                    Margin = new Thickness(0, 0, 8, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                bar.SetResourceReference(Border.BackgroundProperty, "AccentBrush");
+                Grid.SetColumn(bar, 0);
+
                 var header = new TextBlock
                 {
-                    Text = g.Key.ToUpper(),
+                    Text = string.Format("{0} ({1})", g.Key.ToUpper(), g.Count()),
                     FontSize = 11,
                     FontWeight = FontWeights.Bold,
-                    Margin = new Thickness(2, 14, 0, 6)
+                    VerticalAlignment = VerticalAlignment.Center
                 };
-                header.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
-                PnlTweaksContainer.Children.Add(header);
+                header.SetResourceReference(TextBlock.ForegroundProperty, "TextPrimaryBrush");
+                Grid.SetColumn(header, 1);
+
+                var divider = new Border
+                {
+                    Height = 1,
+                    Background = new SolidColorBrush(Color.FromRgb(28, 28, 34)),
+                    Margin = new Thickness(12, 0, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                Grid.SetColumn(divider, 2);
+
+                categoryGrid.Children.Add(bar);
+                categoryGrid.Children.Add(header);
+                categoryGrid.Children.Add(divider);
+                PnlTweaksContainer.Children.Add(categoryGrid);
 
                 foreach (var tw in g)
                 {
@@ -2208,6 +2311,7 @@ namespace AnxiouslyOptimized
                     PnlTweaksContainer.Children.Add(card);
                 }
             }
+            UpdateTweakSelectionCount();
         }
 
         private Border CreateTweakCard(TweakItem tweak)
@@ -2216,64 +2320,138 @@ namespace AnxiouslyOptimized
             {
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(8),
-                Margin = new Thickness(0, 0, 0, 7),
-                Padding = new Thickness(14, 11, 14, 11)
+                Margin = new Thickness(0, 0, 0, 6),
+                Padding = new Thickness(12, 10, 12, 10),
+                Cursor = Cursors.Hand
             };
             card.SetResourceReference(Border.BackgroundProperty, "TweakCardBg");
             card.SetResourceReference(Border.BorderBrushProperty, "TweakCardBorder");
 
             var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-            // Checkbox and Title/Description Stack
+            // 1. Checkbox
             var chk = new CheckBox
             {
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0, 0, 12, 0),
+                Cursor = Cursors.Hand
             };
             chk.SetBinding(CheckBox.IsCheckedProperty, new System.Windows.Data.Binding("IsSelected")
             {
                 Source = tweak,
                 Mode = System.Windows.Data.BindingMode.TwoWay
             });
+            Grid.SetColumn(chk, 0);
 
-            var spText = new StackPanel { Margin = new Thickness(8, 0, 0, 0) };
+            // 2. Content Stack (Title, Tags, Description)
+            var spContent = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+
+            var headerLine = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
 
             var txtTitle = new TextBlock
             {
                 Text = tweak.title,
-                FontSize = 13,
-                FontWeight = FontWeights.SemiBold
+                FontSize = 12,
+                FontWeight = FontWeights.SemiBold,
+                VerticalAlignment = VerticalAlignment.Center
             };
             txtTitle.SetResourceReference(TextBlock.ForegroundProperty, "TextPrimaryBrush");
+            headerLine.Children.Add(txtTitle);
 
-            var txtDesc = new TextBlock
+            if (!string.IsNullOrEmpty(tweak.category))
             {
-                Text = tweak.description,
-                FontSize = 11,
-                TextWrapping = TextWrapping.Wrap,
-                Margin = new Thickness(0, 3, 0, 0)
-            };
-            txtDesc.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
+                var catPill = new Border
+                {
+                    CornerRadius = new CornerRadius(4),
+                    Background = new SolidColorBrush(Color.FromRgb(18, 18, 22)),
+                    BorderBrush = new SolidColorBrush(Color.FromRgb(34, 34, 42)),
+                    BorderThickness = new Thickness(1),
+                    Padding = new Thickness(6, 1, 6, 1),
+                    Margin = new Thickness(8, 0, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                var catText = new TextBlock
+                {
+                    Text = tweak.category.ToUpper(),
+                    FontSize = 9,
+                    FontWeight = FontWeights.Bold,
+                    Foreground = new SolidColorBrush(Color.FromRgb(161, 161, 170))
+                };
+                catPill.Child = catText;
+                headerLine.Children.Add(catPill);
+            }
 
-            spText.Children.Add(txtTitle);
-            spText.Children.Add(txtDesc);
+            if (!string.IsNullOrEmpty(tweak.impact))
+            {
+                var impactPill = new Border
+                {
+                    CornerRadius = new CornerRadius(4),
+                    Padding = new Thickness(6, 1, 6, 1),
+                    Margin = new Thickness(6, 0, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    BorderThickness = new Thickness(1)
+                };
+                var impactText = new TextBlock
+                {
+                    Text = tweak.impact.ToUpper(),
+                    FontSize = 9,
+                    FontWeight = FontWeights.Bold
+                };
 
-            var spLeft = new StackPanel { Orientation = Orientation.Horizontal };
-            spLeft.Children.Add(chk);
-            spLeft.Children.Add(spText);
-            Grid.SetColumn(spLeft, 0);
+                if (string.Equals(tweak.impact, "high", StringComparison.OrdinalIgnoreCase))
+                {
+                    impactPill.Background = new SolidColorBrush(Color.FromArgb(35, 245, 158, 11));
+                    impactPill.BorderBrush = new SolidColorBrush(Color.FromArgb(90, 245, 158, 11));
+                    impactText.Foreground = new SolidColorBrush(Color.FromRgb(245, 158, 11));
+                }
+                else if (string.Equals(tweak.impact, "safe", StringComparison.OrdinalIgnoreCase) || string.Equals(tweak.impact, "recommended", StringComparison.OrdinalIgnoreCase))
+                {
+                    impactPill.Background = new SolidColorBrush(Color.FromArgb(35, 16, 185, 129));
+                    impactPill.BorderBrush = new SolidColorBrush(Color.FromArgb(90, 16, 185, 129));
+                    impactText.Foreground = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+                }
+                else
+                {
+                    impactPill.Background = new SolidColorBrush(Color.FromArgb(35, 0, 245, 212));
+                    impactPill.BorderBrush = new SolidColorBrush(Color.FromArgb(90, 0, 245, 212));
+                    impactText.Foreground = new SolidColorBrush(Color.FromRgb(0, 245, 212));
+                }
 
-            // Status Badge
+                impactPill.Child = impactText;
+                headerLine.Children.Add(impactPill);
+            }
+
+            spContent.Children.Add(headerLine);
+
+            if (!string.IsNullOrEmpty(tweak.description))
+            {
+                var txtDesc = new TextBlock
+                {
+                    Text = tweak.description,
+                    FontSize = 11,
+                    TextWrapping = TextWrapping.Wrap,
+                    Margin = new Thickness(0, 2, 0, 0),
+                    LineHeight = 15
+                };
+                txtDesc.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
+                spContent.Children.Add(txtDesc);
+            }
+
+            Grid.SetColumn(spContent, 1);
+
+            // 3. Status Badge
             var badgeBorder = new Border
             {
-                CornerRadius = new CornerRadius(4),
+                CornerRadius = new CornerRadius(5),
                 Padding = new Thickness(8, 3, 8, 3),
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(12, 0, 0, 0)
             };
             var badgeText = new TextBlock
             {
-                Text = tweak.StatusBadgeText,
                 FontSize = 10,
                 FontWeight = FontWeights.Bold
             };
@@ -2292,7 +2470,7 @@ namespace AnxiouslyOptimized
                     badgeBorder.SetResourceReference(Border.BackgroundProperty, "BadgeStandardBg");
                     badgeBorder.SetResourceReference(Border.BorderBrushProperty, "BadgeStandardBorder");
                     badgeText.SetResourceReference(TextBlock.ForegroundProperty, "BadgeStandardFg");
-                    badgeText.Text = "STANDARD";
+                    badgeText.Text = "DEFAULT";
                 }
             };
             updateBadgeColors();
@@ -2304,15 +2482,57 @@ namespace AnxiouslyOptimized
             };
 
             badgeBorder.Child = badgeText;
-            Grid.SetColumn(badgeBorder, 1);
+            Grid.SetColumn(badgeBorder, 2);
 
-            grid.Children.Add(spLeft);
+            grid.Children.Add(chk);
+            grid.Children.Add(spContent);
             grid.Children.Add(badgeBorder);
             card.Child = grid;
 
+            // Card selection visual state
+            Action updateCardSelectionBorder = () =>
+            {
+                if (tweak.IsSelected)
+                {
+                    card.BorderBrush = new SolidColorBrush(Color.FromArgb(140, 0, 245, 212));
+                    card.Background = new SolidColorBrush(Color.FromArgb(20, 0, 245, 212));
+                }
+                else
+                {
+                    card.SetResourceReference(Border.BackgroundProperty, "TweakCardBg");
+                    card.SetResourceReference(Border.BorderBrushProperty, "TweakCardBorder");
+                }
+            };
+            updateCardSelectionBorder();
+
+            tweak.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == "IsSelected")
+                {
+                    updateCardSelectionBorder();
+                    UpdateTweakSelectionCount();
+                }
+            };
+
+            // Toggle on row click (ignore if source is CheckBox directly)
+            card.MouseLeftButtonUp += (s, e) =>
+            {
+                var dep = e.OriginalSource as DependencyObject;
+                if (dep != null && FindVisualParent<CheckBox>(dep) != null) return;
+                tweak.IsSelected = !tweak.IsSelected;
+            };
+
             // Hover effects
-            card.MouseEnter += (s, e) => card.SetResourceReference(Border.BackgroundProperty, "TweakCardHoverBg");
-            card.MouseLeave += (s, e) => card.SetResourceReference(Border.BackgroundProperty, "TweakCardBg");
+            card.MouseEnter += (s, e) =>
+            {
+                if (!tweak.IsSelected)
+                    card.SetResourceReference(Border.BackgroundProperty, "TweakCardHoverBg");
+            };
+            card.MouseLeave += (s, e) =>
+            {
+                if (!tweak.IsSelected)
+                    card.SetResourceReference(Border.BackgroundProperty, "TweakCardBg");
+            };
 
             return card;
         }
@@ -2376,6 +2596,17 @@ namespace AnxiouslyOptimized
 
             UpdateReadinessScore();
             Log(string.Format("Profile '{0}' applied successfully.", title));
+        }
+
+                private static T FindVisualParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            while (child != null)
+            {
+                var parent = child as T;
+                if (parent != null) return parent;
+                child = VisualTreeHelper.GetParent(child);
+            }
+            return null;
         }
 
         private async Task ApplySelectedTweaksAsync(bool apply)
@@ -2445,8 +2676,9 @@ namespace AnxiouslyOptimized
                     {
                         BorderThickness = new Thickness(1),
                         CornerRadius = new CornerRadius(8),
-                        Margin = new Thickness(0, 0, 0, 7),
-                        Padding = new Thickness(14, 11, 14, 11)
+                        Margin = new Thickness(0, 0, 0, 6),
+                        Padding = new Thickness(12, 10, 12, 10),
+                        Cursor = Cursors.Hand
                     };
                     card.SetResourceReference(Border.BackgroundProperty, "TweakCardBg");
                     card.SetResourceReference(Border.BorderBrushProperty, "TweakCardBorder");
@@ -2456,7 +2688,8 @@ namespace AnxiouslyOptimized
                     {
                         Content = pkg.DisplayName + " (" + pkg.PackageName + ")",
                         IsChecked = pkg.IsSelected,
-                        FontWeight = FontWeights.SemiBold
+                        FontWeight = FontWeights.SemiBold,
+                        Cursor = Cursors.Hand
                     };
                     chk.SetResourceReference(CheckBox.ForegroundProperty, "TextPrimaryBrush");
                     chk.Checked += (s, e) => pkg.IsSelected = true;
@@ -2466,13 +2699,24 @@ namespace AnxiouslyOptimized
                     {
                         Text = pkg.Description,
                         FontSize = 11,
-                        Margin = new Thickness(24, 3, 0, 0)
+                        Margin = new Thickness(24, 2, 0, 0)
                     };
                     txt.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
 
                     sp.Children.Add(chk);
                     sp.Children.Add(txt);
                     card.Child = sp;
+
+                    card.MouseLeftButtonUp += (s, e) =>
+                    {
+                        var dep = e.OriginalSource as DependencyObject;
+                        if (dep != null && FindVisualParent<CheckBox>(dep) != null) return;
+                        chk.IsChecked = !(chk.IsChecked == true);
+                    };
+
+                    card.MouseEnter += (s, e) => card.SetResourceReference(Border.BackgroundProperty, "TweakCardHoverBg");
+                    card.MouseLeave += (s, e) => card.SetResourceReference(Border.BackgroundProperty, "TweakCardBg");
+
                     PnlBloatContainer.Children.Add(card);
                 }
             }
