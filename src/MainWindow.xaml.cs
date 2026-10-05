@@ -100,6 +100,10 @@ namespace AnxiouslyOptimized
         private List<DnsProviderItem> _dnsProviders = new List<DnsProviderItem>();
         private List<SoftwarePackageItem> _softwarePackages = new List<SoftwarePackageItem>();
         private List<TransactionJournal> _transactionJournals = new List<TransactionJournal>();
+        private ValorantTopology _valorantTopology;
+        private string _valorantRegBackupPath;
+        private string _valorantFileBackupPath;
+        private bool _isValorantDaemonRunning = false;
 
         public MainWindow()
         {
@@ -111,6 +115,7 @@ namespace AnxiouslyOptimized
             InitializeOverviewBentoCards();
             InitializeQuickBoostActions();
             InitializeFreeFireActions();
+            InitializeValorantActions();
             InitializeActiveGameModeDaemon();
             InitializeDeepCleaner();
             InitializeNetworkEngine();
@@ -282,9 +287,10 @@ namespace AnxiouslyOptimized
                 NavBtnDebloat,      // 3
                 NavBtnHealth,       // 4
                 NavBtnEmulators,    // 5
-                NavBtnSettings,     // 6
-                NavBtnBackups,      // 7
-                NavBtnAbout         // 8
+                NavBtnValorant,     // 6
+                NavBtnSettings,     // 7
+                NavBtnBackups,      // 8
+                NavBtnAbout         // 9
             };
 
             _navIndicators = new FrameworkElement[]
@@ -295,6 +301,7 @@ namespace AnxiouslyOptimized
                 NavIndicatorDebloat,
                 NavIndicatorHealth,
                 NavIndicatorEmulators,
+                NavIndicatorValorant,
                 null,
                 null,
                 null
@@ -341,7 +348,11 @@ namespace AnxiouslyOptimized
                 }
             }
 
-            if (index == 7)
+            if (index == 6)
+            {
+                Dispatcher.BeginInvoke(new Action(async () => await RefreshValorantStatusAsync()));
+            }
+            else if (index == 8)
             {
                 Dispatcher.BeginInvoke(new Action(async () => await LoadAndRenderBackupsListAsync()));
             }
@@ -2701,6 +2712,662 @@ namespace AnxiouslyOptimized
             catch (Exception ex)
             {
                 Log("Error rendering backup points: " + ex.Message);
+            }
+        }
+        #endregion
+
+        #region Valorant Optimizer (Esports Engine)
+        private List<ValorantRegBackup> _valorantRegBackups = new List<ValorantRegBackup>();
+        private List<ValorantFileBackup> _valorantFileBackups = new List<ValorantFileBackup>();
+
+        private void InitializeValorantActions()
+        {
+            if (BtnValorantRefresh != null)
+                BtnValorantRefresh.Click += async (s, e) => await RefreshValorantStatusAsync();
+
+            if (BtnValorantRevert != null)
+                BtnValorantRevert.Click += async (s, e) => await RevertValorantTweaksAsync();
+
+            if (BtnApplyPresetPotato != null)
+                BtnApplyPresetPotato.Click += async (s, e) => await ApplyValorantPresetAsync("potato");
+
+            if (BtnApplyPresetTournament != null)
+                BtnApplyPresetTournament.Click += async (s, e) => await ApplyValorantPresetAsync("tournament");
+
+            if (BtnApplyPresetLaptop != null)
+                BtnApplyPresetLaptop.Click += async (s, e) => await ApplyValorantPresetAsync("laptop");
+
+            if (SldValorantResolution != null)
+            {
+                SldValorantResolution.ValueChanged += (s, e) =>
+                {
+                    if (TxtValorantResolutionValue != null)
+                        TxtValorantResolutionValue.Text = string.Format("{0}%", (int)SldValorantResolution.Value);
+                };
+            }
+
+            if (BtnApplyResolution != null)
+                BtnApplyResolution.Click += async (s, e) => await ApplyValorantResolutionAsync();
+
+            if (BtnToggleLowSpec != null)
+                BtnToggleLowSpec.Click += async (s, e) => await ToggleValorantLowSpecAsync();
+
+            if (BtnRestoreConfig != null)
+                BtnRestoreConfig.Click += async (s, e) => await RestoreValorantConfigAsync();
+
+            if (BtnApplyIndividualTweaks != null)
+                BtnApplyIndividualTweaks.Click += async (s, e) => await ApplyIndividualValorantTweaksAsync();
+
+            if (BtnToggleAffinityDaemon != null)
+                BtnToggleAffinityDaemon.Click += (s, e) => ToggleValorantAffinityDaemon();
+
+            if (BtnPurgeCaches != null)
+                BtnPurgeCaches.Click += async (s, e) => await PurgeValorantCachesAsync();
+
+            if (BtnPingRiotServers != null)
+                BtnPingRiotServers.Click += async (s, e) => await PingRiotServersAsync();
+        }
+
+        private async Task RefreshValorantStatusAsync()
+        {
+            try
+            {
+                if (BtnValorantRefresh != null)
+                {
+                    BtnValorantRefresh.IsEnabled = false;
+                    BtnValorantRefresh.Content = "Scanning...";
+                }
+
+                await Task.Run(() =>
+                {
+                    _valorantTopology = ValorantService.DetectTopology(Log);
+                });
+
+                if (_valorantTopology == null) return;
+
+                Dispatcher.Invoke(() =>
+                {
+                    // Game Status & Badge
+                    if (_valorantTopology.InstallStatus == ValorantInstallStatus.Running)
+                    {
+                        if (TxtValorantLiveState != null) TxtValorantLiveState.Text = "RUNNING";
+                        if (BadgeValorantLiveState != null)
+                        {
+                            BadgeValorantLiveState.Background = new SolidColorBrush(Color.FromArgb(30, 16, 185, 129));
+                            BadgeValorantLiveState.BorderBrush = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+                        }
+                    }
+                    else if (_valorantTopology.InstallStatus == ValorantInstallStatus.Installed)
+                    {
+                        if (TxtValorantLiveState != null) TxtValorantLiveState.Text = "READY";
+                        if (BadgeValorantLiveState != null)
+                        {
+                            BadgeValorantLiveState.Background = new SolidColorBrush(Color.FromArgb(30, 6, 182, 212));
+                            BadgeValorantLiveState.BorderBrush = new SolidColorBrush(Color.FromRgb(6, 182, 212));
+                        }
+                    }
+                    else
+                    {
+                        if (TxtValorantLiveState != null) TxtValorantLiveState.Text = "NOT FOUND";
+                        if (BadgeValorantLiveState != null)
+                        {
+                            BadgeValorantLiveState.Background = new SolidColorBrush(Color.FromArgb(30, 239, 68, 68));
+                            BadgeValorantLiveState.BorderBrush = new SolidColorBrush(Color.FromRgb(239, 68, 68));
+                        }
+                    }
+
+                    // Install status text
+                    if (TxtValorantInstallStatus != null)
+                    {
+                        if (!string.IsNullOrEmpty(_valorantTopology.InstallPath))
+                        {
+                            TxtValorantInstallStatus.Text = string.Format("Detected: {0}", _valorantTopology.InstallPath);
+                            TxtValorantInstallStatus.Foreground = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+                        }
+                        else
+                        {
+                            TxtValorantInstallStatus.Text = "Riot Client / Valorant directory not located";
+                            TxtValorantInstallStatus.Foreground = new SolidColorBrush(Color.FromRgb(239, 68, 68));
+                        }
+                    }
+
+                    // CPU Topology
+                    if (TxtValorantCpuTopology != null)
+                    {
+                        string archStr = _valorantTopology.CpuArchitecture.ToString();
+                        if (_valorantTopology.CpuArchitecture == CpuArch.IntelHybrid)
+                            archStr = string.Format("Intel 12th-14th Gen ({0} P-Cores, {1} E-Cores)", _valorantTopology.PCoreCount, _valorantTopology.ECoreCount);
+                        else if (_valorantTopology.CpuArchitecture == CpuArch.AmdX3dDualCcd)
+                            archStr = "AMD Ryzen X3D (V-Cache CCD0 Prioritized)";
+                        else if (_valorantTopology.CpuArchitecture == CpuArch.AmdStandard)
+                            archStr = "AMD Ryzen Standard Architecture";
+                        else if (_valorantTopology.CpuArchitecture == CpuArch.IntelStandard)
+                            archStr = "Intel Core Desktop Architecture";
+
+                        string cpuName = !string.IsNullOrEmpty(_valorantTopology.CpuName) ? _valorantTopology.CpuName : "x64 Processor";
+                        TxtValorantCpuTopology.Text = string.Format("{0} ({1})", cpuName, archStr);
+                    }
+
+                    // GPU Engine
+                    if (TxtValorantGpuEngine != null)
+                    {
+                        string vendor = _valorantTopology.IsNvidiaGpu ? "NVIDIA (Reflex Low-Latency Supported)"
+                            : _valorantTopology.IsAmdGpu ? "AMD Radeon (Anti-Lag Supported)"
+                            : _valorantTopology.IsIntegratedGpu ? "Integrated Graphics (Aggressive Tuning Recommended)"
+                            : "Direct3D 11 Adapter";
+                        string gpuName = !string.IsNullOrEmpty(_valorantTopology.GpuName) ? _valorantTopology.GpuName : "Discrete GPU";
+                        TxtValorantGpuEngine.Text = string.Format("{0} • {1}", gpuName, vendor);
+                    }
+
+                    // Config status
+                    if (TxtValorantConfigStatus != null)
+                    {
+                        if (!string.IsNullOrEmpty(_valorantTopology.ActiveConfigPath))
+                        {
+                            TxtValorantConfigStatus.Text = _valorantTopology.ConfigBackupExists
+                                ? "Profile Active (Safe Backup Found)"
+                                : "Profile Active (No Backup Yet)";
+                            TxtValorantConfigStatus.Foreground = _valorantTopology.ConfigBackupExists
+                                ? new SolidColorBrush(Color.FromRgb(16, 185, 129))
+                                : new SolidColorBrush(Color.FromRgb(245, 158, 11));
+                        }
+                        else
+                        {
+                            TxtValorantConfigStatus.Text = "No Config Found (Launch Game Once)";
+                            TxtValorantConfigStatus.Foreground = new SolidColorBrush(Color.FromRgb(148, 163, 184));
+                        }
+                    }
+
+                    // Caches
+                    long totalCache = _valorantTopology.ShaderCacheSizeBytes + _valorantTopology.LogCacheSizeBytes + _valorantTopology.CrashDumpSizeBytes;
+                    if (TxtValorantCachesSize != null)
+                    {
+                        TxtValorantCachesSize.Text = string.Format("{0:F1} MB (Shaders: {1:F0} MB, Logs: {2:F0} MB, Crashes: {3:F0} MB)",
+                            totalCache / (1024.0 * 1024.0),
+                            _valorantTopology.ShaderCacheSizeBytes / (1024.0 * 1024.0),
+                            _valorantTopology.LogCacheSizeBytes / (1024.0 * 1024.0),
+                            _valorantTopology.CrashDumpSizeBytes / (1024.0 * 1024.0));
+                    }
+
+                    // Resolution Slider
+                    if (SldValorantResolution != null && _valorantTopology.ResolutionQuality >= 50 && _valorantTopology.ResolutionQuality <= 100)
+                    {
+                        SldValorantResolution.Value = _valorantTopology.ResolutionQuality;
+                    }
+                    if (TxtValorantResolutionValue != null)
+                    {
+                        TxtValorantResolutionValue.Text = string.Format("{0}%", _valorantTopology.ResolutionQuality > 0 ? _valorantTopology.ResolutionQuality : 100);
+                    }
+
+                    // Individual Checkboxes
+                    if (ChkValorantMouse != null) ChkValorantMouse.IsChecked = _valorantTopology.MouseAccelDisabled;
+                    if (ChkValorantFso != null) ChkValorantFso.IsChecked = _valorantTopology.FsoDisabled;
+                    if (ChkValorantNagle != null) ChkValorantNagle.IsChecked = _valorantTopology.NagleDisabled;
+                    if (ChkValorantQos != null) ChkValorantQos.IsChecked = _valorantTopology.QosPolicyExists;
+                    if (ChkValorantUsb != null) ChkValorantUsb.IsChecked = _valorantTopology.UsbSuspendDisabled;
+
+                    // Affinity Mask Text
+                    if (TxtValorantDaemonMask != null)
+                    {
+                        if (_valorantTopology.CpuArchitecture == CpuArch.IntelHybrid && _valorantTopology.AffinityMaskPCoresOnly > 0)
+                        {
+                            TxtValorantDaemonMask.Text = string.Format("Target Mask: 0x{0:X} ({1} Performance Cores)", _valorantTopology.AffinityMaskPCoresOnly, _valorantTopology.PCoreCount);
+                        }
+                        else if (_valorantTopology.CpuArchitecture == CpuArch.AmdX3dDualCcd && _valorantTopology.AffinityMaskX3DCcd0 > 0)
+                        {
+                            TxtValorantDaemonMask.Text = string.Format("Target Mask: 0x{0:X} (3D V-Cache CCD0 Cores)", _valorantTopology.AffinityMaskX3DCcd0);
+                        }
+                        else
+                        {
+                            TxtValorantDaemonMask.Text = "Target Mask: All Physical Desktop Cores";
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Log("[VALORANT] Refresh status error: " + ex.Message);
+            }
+            finally
+            {
+                if (BtnValorantRefresh != null)
+                {
+                    BtnValorantRefresh.IsEnabled = true;
+                    BtnValorantRefresh.Content = "REFRESH STATUS";
+                }
+            }
+        }
+
+        private async Task ApplyValorantPresetAsync(string presetKey)
+        {
+            if (_valorantTopology == null)
+            {
+                _valorantTopology = ValorantService.DetectTopology(Log);
+            }
+
+            ValorantPreset preset;
+            string presetDisplayName;
+            switch (presetKey.ToLowerInvariant())
+            {
+                case "potato":
+                    preset = ValorantService.GetPresetCompetitivePotato(_valorantTopology);
+                    presetDisplayName = "Competitive Potato (Max FPS)";
+                    break;
+                case "laptop":
+                    preset = ValorantService.GetPresetLaptopBalanced(_valorantTopology);
+                    presetDisplayName = "Laptop / Balanced (Thermals & Battery)";
+                    break;
+                case "tournament":
+                default:
+                    preset = ValorantService.GetPresetTournament240Hz(_valorantTopology);
+                    presetDisplayName = "Tournament 240Hz+ Locked";
+                    break;
+            }
+
+            Log(string.Format("[VALORANT] Applying Preset: {0}...", presetDisplayName));
+
+            try
+            {
+                var result = await ValorantService.ApplyPresetAsync(preset, _valorantTopology, Log);
+                if (result != null)
+                {
+                    if (result.Item1 != null && result.Item1.Count > 0)
+                        _valorantRegBackups = result.Item1;
+                    if (result.Item2 != null && result.Item2.Count > 0)
+                        _valorantFileBackups = result.Item2;
+
+                    if (result.Item3)
+                    {
+                        if (BtnValorantRevert != null)
+                            BtnValorantRevert.IsEnabled = true;
+
+                        MessageBox.Show(
+                            string.Format("'{0}' successfully applied!\n\n" +
+                            "• Process & GPU priority elevated (Vanguard-safe via Windows Registry)\n" +
+                            "• Fullscreen Optimizations & GameDVR telemetry disabled\n" +
+                            "• Nagle's TCP packet buffering disabled (TcpAckFrequency=1)\n" +
+                            "• Low-Latency DSCP QoS Network Policy applied (DiffServ 46)\n" +
+                            "• USB Selective Suspend disabled for jitterless mouse input\n" +
+                            "• Resolution Scale set to {1}%\n\n" +
+                            "A safe restore point has been recorded. You can revert anytime.",
+                            presetDisplayName, preset.ResolutionQuality),
+                            "Valorant Esports Preset Applied",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                    }
+                }
+                await RefreshValorantStatusAsync();
+            }
+            catch (Exception ex)
+            {
+                Log("[VALORANT] Apply preset error: " + ex.Message);
+            }
+        }
+
+        private async Task RevertValorantTweaksAsync()
+        {
+            if ((_valorantRegBackups == null || _valorantRegBackups.Count == 0) &&
+                (_valorantFileBackups == null || _valorantFileBackups.Count == 0))
+            {
+                if (_valorantTopology != null)
+                {
+                    bool ok = await ValorantService.RestoreGameConfigAsync(_valorantTopology, Log);
+                    if (ok)
+                    {
+                        MessageBox.Show("GameUserSettings.ini was restored from previous backup snapshot.", "Config Reverted", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+                return;
+            }
+
+            var confirm = MessageBox.Show(
+                "Revert all applied Valorant optimizations, registry keys, and config files to their original states?",
+                "Confirm Valorant Revert",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (confirm != MessageBoxResult.Yes) return;
+
+            try
+            {
+                if (BtnValorantRevert != null)
+                {
+                    BtnValorantRevert.IsEnabled = false;
+                    BtnValorantRevert.Content = "Reverting...";
+                }
+
+                await ValorantService.RevertAsync(_valorantRegBackups, _valorantFileBackups, Log);
+
+                MessageBox.Show(
+                    "All Valorant settings and optimizations have been successfully reverted to their pre-tweak defaults.",
+                    "Valorant Reverted",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                await RefreshValorantStatusAsync();
+            }
+            catch (Exception ex)
+            {
+                Log("[VALORANT] Revert error: " + ex.Message);
+            }
+            finally
+            {
+                if (BtnValorantRevert != null)
+                {
+                    BtnValorantRevert.IsEnabled = false;
+                    BtnValorantRevert.Content = "REVERT TO DEFAULT";
+                }
+            }
+        }
+
+        private void ToggleValorantAffinityDaemon()
+        {
+            if (_isValorantDaemonRunning)
+            {
+                ValorantService.StopAffinityDaemon();
+                _isValorantDaemonRunning = false;
+                if (BtnToggleAffinityDaemon != null) BtnToggleAffinityDaemon.Content = "START DAEMON";
+                if (TxtValorantDaemonStatus != null) TxtValorantDaemonStatus.Text = "Daemon Stopped. Cores are scheduled by Windows default scheduler.";
+                if (TxtValorantDaemonBadge != null) TxtValorantDaemonBadge.Text = "STANDBY";
+                if (BadgeDaemonState != null)
+                {
+                    BadgeDaemonState.Background = new SolidColorBrush(Color.FromArgb(30, 148, 163, 184));
+                    BadgeDaemonState.BorderBrush = new SolidColorBrush(Color.FromRgb(148, 163, 184));
+                }
+                Log("[VALORANT] Affinity daemon stopped.");
+            }
+            else
+            {
+                if (_valorantTopology == null)
+                    _valorantTopology = ValorantService.DetectTopology(Log);
+
+                ValorantService.StartAffinityDaemon(_valorantTopology, Log);
+                _isValorantDaemonRunning = true;
+                if (BtnToggleAffinityDaemon != null) BtnToggleAffinityDaemon.Content = "STOP DAEMON";
+                if (TxtValorantDaemonStatus != null) TxtValorantDaemonStatus.Text = "Daemon Active: Monitoring process lifecycle and binding performance cores.";
+                if (TxtValorantDaemonBadge != null) TxtValorantDaemonBadge.Text = "RUNNING";
+                if (BadgeDaemonState != null)
+                {
+                    BadgeDaemonState.Background = new SolidColorBrush(Color.FromArgb(30, 16, 185, 129));
+                    BadgeDaemonState.BorderBrush = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+                }
+                Log("[VALORANT] Affinity daemon started. Will enforce core affinity automatically when Valorant opens.");
+            }
+        }
+
+        private async Task ApplyValorantResolutionAsync()
+        {
+            if (_valorantTopology == null)
+                _valorantTopology = ValorantService.DetectTopology(Log);
+
+            int val = SldValorantResolution != null ? (int)SldValorantResolution.Value : 100;
+            if (BtnApplyResolution != null)
+            {
+                BtnApplyResolution.IsEnabled = false;
+                BtnApplyResolution.Content = "Saving...";
+            }
+
+            try
+            {
+                bool ok = await ValorantService.SetResolutionQualityAsync(_valorantTopology, val, Log);
+                if (ok)
+                {
+                    MessageBox.Show(
+                        string.Format("ResolutionQuality set to {0}% in GameUserSettings.ini.\n\nA backup copy (.bak) was saved before modification.", val),
+                        "Resolution Scale Applied",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "Could not locate active GameUserSettings.ini.\nPlease run Valorant at least once so the game generates your user profile.",
+                        "Config Not Found",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("[VALORANT] Apply resolution error: " + ex.Message);
+            }
+            finally
+            {
+                if (BtnApplyResolution != null)
+                {
+                    BtnApplyResolution.IsEnabled = true;
+                    BtnApplyResolution.Content = "APPLY SCALE";
+                }
+            }
+        }
+
+        private async Task ToggleValorantLowSpecAsync()
+        {
+            if (_valorantTopology == null)
+                _valorantTopology = ValorantService.DetectTopology(Log);
+
+            try
+            {
+                bool ok = await ValorantService.SetCompetitiveLowSpecAsync(_valorantTopology, true, Log);
+                if (ok)
+                {
+                    MessageBox.Show(
+                        "All graphic quality sub-groups (sg.ShadowQuality, sg.PostProcessQuality, sg.TextureQuality, sg.EffectsQuality, sg.FoliageQuality, sg.ShadingQuality) set to 0 for minimum render overhead and maximum FPS.",
+                        "Competitive Low-Spec Config Applied",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("[VALORANT] Toggle low-spec error: " + ex.Message);
+            }
+        }
+
+        private async Task RestoreValorantConfigAsync()
+        {
+            if (_valorantTopology == null)
+                _valorantTopology = ValorantService.DetectTopology(Log);
+
+            try
+            {
+                bool ok = await ValorantService.RestoreGameConfigAsync(_valorantTopology, Log);
+                if (ok)
+                {
+                    MessageBox.Show(
+                        "GameUserSettings.ini has been restored from backup (.bak) successfully.",
+                        "Configuration Restored",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                    await RefreshValorantStatusAsync();
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "No .bak backup file was found in your Valorant Saved/Config directory.",
+                        "No Backup Found",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("[VALORANT] Restore config error: " + ex.Message);
+            }
+        }
+
+        private async Task ApplyIndividualValorantTweaksAsync()
+        {
+            if (_valorantTopology == null)
+                _valorantTopology = ValorantService.DetectTopology(Log);
+
+            if (BtnApplyIndividualTweaks != null)
+            {
+                BtnApplyIndividualTweaks.IsEnabled = false;
+                BtnApplyIndividualTweaks.Content = "Applying...";
+            }
+
+            try
+            {
+                var customPreset = new ValorantPreset
+                {
+                    Name = "Custom Individual Selection",
+                    DisableMouseAccel = ChkValorantMouse != null && ChkValorantMouse.IsChecked == true,
+                    DisableFullscreenOptimizations = ChkValorantFso != null && ChkValorantFso.IsChecked == true,
+                    DisableNagle = ChkValorantNagle != null && ChkValorantNagle.IsChecked == true,
+                    EnableDscpQos = ChkValorantQos != null && ChkValorantQos.IsChecked == true,
+                    DisableUsbSelectiveSuspend = ChkValorantUsb != null && ChkValorantUsb.IsChecked == true,
+                    ResolutionQuality = SldValorantResolution != null ? (int)SldValorantResolution.Value : 100,
+                    SetGpuHighPriority = true,
+                    SetCpuHighPriority = true
+                };
+
+                var res = await ValorantService.ApplyPresetAsync(customPreset, _valorantTopology, Log);
+                if (res != null)
+                {
+                    if (res.Item1 != null && res.Item1.Count > 0) _valorantRegBackups = res.Item1;
+                    if (res.Item2 != null && res.Item2.Count > 0) _valorantFileBackups = res.Item2;
+
+                    if (BtnValorantRevert != null) BtnValorantRevert.IsEnabled = true;
+
+                    MessageBox.Show(
+                        "Selected competitive latency optimizations successfully applied to Windows Registry and Network Stack.",
+                        "Individual Tweaks Applied",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+                await RefreshValorantStatusAsync();
+            }
+            catch (Exception ex)
+            {
+                Log("[VALORANT] Apply individual tweaks error: " + ex.Message);
+            }
+            finally
+            {
+                if (BtnApplyIndividualTweaks != null)
+                {
+                    BtnApplyIndividualTweaks.IsEnabled = true;
+                    BtnApplyIndividualTweaks.Content = "APPLY SELECTED TWEAKS";
+                }
+            }
+        }
+
+        private async Task PurgeValorantCachesAsync()
+        {
+            bool shaders = ChkPurgeShaders != null && ChkPurgeShaders.IsChecked == true;
+            bool logs = ChkPurgeLogs != null && ChkPurgeLogs.IsChecked == true;
+            bool crashes = ChkPurgeCrashes != null && ChkPurgeCrashes.IsChecked == true;
+
+            if (!shaders && !logs && !crashes)
+            {
+                MessageBox.Show("Please select at least one cache category to purge.", "No Items Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (BtnPurgeCaches != null)
+            {
+                BtnPurgeCaches.IsEnabled = false;
+                BtnPurgeCaches.Content = "Purging...";
+            }
+
+            try
+            {
+                long freed = await ValorantService.PurgeCachesAsync(shaders, logs, crashes, Log);
+                double freedMb = freed / (1024.0 * 1024.0);
+                MessageBox.Show(
+                    string.Format("Successfully purged {0:F1} MB of cached shader binaries, debug logs, and crash reports.\n\nStale shader stutters during teamfights are now cleared.", freedMb),
+                    "Cache Purged",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                await RefreshValorantStatusAsync();
+            }
+            catch (Exception ex)
+            {
+                Log("[VALORANT] Cache purge error: " + ex.Message);
+            }
+            finally
+            {
+                if (BtnPurgeCaches != null)
+                {
+                    BtnPurgeCaches.IsEnabled = true;
+                    BtnPurgeCaches.Content = "PURGE SELECTED CACHES";
+                }
+            }
+        }
+
+        private async Task PingRiotServersAsync()
+        {
+            if (BtnPingRiotServers != null)
+            {
+                BtnPingRiotServers.IsEnabled = false;
+                BtnPingRiotServers.Content = "Pinging...";
+            }
+
+            try
+            {
+                Log("[VALORANT] Pinging Riot Games global matchmaking clusters...");
+                var results = await ValorantService.PingRiotRegionsAsync(Log);
+
+                Action<TextBlock, Border, long> updatePingCard = (tb, bdr, ping) =>
+                {
+                    if (tb == null) return;
+                    if (ping > 0)
+                    {
+                        tb.Text = string.Format("{0} ms", ping);
+                        if (ping < 45)
+                        {
+                            tb.Foreground = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+                            if (bdr != null) bdr.BorderBrush = new SolidColorBrush(Color.FromArgb(80, 16, 185, 129));
+                        }
+                        else if (ping < 90)
+                        {
+                            tb.Foreground = new SolidColorBrush(Color.FromRgb(6, 182, 212));
+                            if (bdr != null) bdr.BorderBrush = new SolidColorBrush(Color.FromArgb(80, 6, 182, 212));
+                        }
+                        else if (ping < 150)
+                        {
+                            tb.Foreground = new SolidColorBrush(Color.FromRgb(245, 158, 11));
+                            if (bdr != null) bdr.BorderBrush = new SolidColorBrush(Color.FromArgb(80, 245, 158, 11));
+                        }
+                        else
+                        {
+                            tb.Foreground = new SolidColorBrush(Color.FromRgb(239, 68, 68));
+                            if (bdr != null) bdr.BorderBrush = new SolidColorBrush(Color.FromArgb(80, 239, 68, 68));
+                        }
+                    }
+                    else
+                    {
+                        tb.Text = "TIMEOUT";
+                        tb.Foreground = new SolidColorBrush(Color.FromRgb(148, 163, 184));
+                    }
+                };
+
+                foreach (var kvp in results)
+                {
+                    if (kvp.Key.IndexOf("NA", StringComparison.OrdinalIgnoreCase) >= 0)
+                        updatePingCard(TxtPingNA, BrdPingNA, kvp.Value);
+                    else if (kvp.Key.IndexOf("EU", StringComparison.OrdinalIgnoreCase) >= 0)
+                        updatePingCard(TxtPingEU, BrdPingEU, kvp.Value);
+                    else if (kvp.Key.IndexOf("AP", StringComparison.OrdinalIgnoreCase) >= 0)
+                        updatePingCard(TxtPingAP, BrdPingAP, kvp.Value);
+                    else if (kvp.Key.IndexOf("KR", StringComparison.OrdinalIgnoreCase) >= 0)
+                        updatePingCard(TxtPingKR, BrdPingKR, kvp.Value);
+                    else if (kvp.Key.IndexOf("BR", StringComparison.OrdinalIgnoreCase) >= 0)
+                        updatePingCard(TxtPingBR, BrdPingBR, kvp.Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("[VALORANT] Ping benchmark error: " + ex.Message);
+            }
+            finally
+            {
+                if (BtnPingRiotServers != null)
+                {
+                    BtnPingRiotServers.IsEnabled = true;
+                    BtnPingRiotServers.Content = "TEST RIOT SERVERS";
+                }
             }
         }
         #endregion

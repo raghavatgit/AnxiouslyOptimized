@@ -785,6 +785,24 @@
                                     <Rectangle Name="NavIndicatorEmulators" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="{DynamicResource AccentBrush}" Margin="0,0,-6,0" Visibility="Collapsed"/>
                                 </Grid>
                             </Button>
+
+                            <!-- Nav 6: Valorant (V Logo Sublogo) -->
+                            <Button Name="NavBtnValorant" Style="{StaticResource SidebarNavButton}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Path Grid.Column="0" Data="M 3 5 L 8.5 20 H 11.5 L 17 5 H 14 L 10 16 L 6 5 Z" 
+                                          Fill="#FF4655" Width="15" Height="15" Stretch="Uniform" Margin="3,0,10,0" VerticalAlignment="Center"/>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="Valorant Optimizer" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                        <TextBlock Text="FPS &amp; Vanguard-safe tuning" FontSize="9" Foreground="#64748B"/>
+                                    </StackPanel>
+                                    <Rectangle Name="NavIndicatorValorant" Grid.Column="2" Width="3" Height="24" RadiusX="1.5" RadiusY="1.5" Fill="#FF4655" Margin="0,0,-6,0" Visibility="Collapsed"/>
+                                </Grid>
+                            </Button>
                         </StackPanel>
 
                         <!-- Spacer -->
@@ -2115,7 +2133,418 @@
                             </TabItem>
 
                             <!-- ============================================== -->
-                            <!-- TAB 6: SETTINGS                                -->
+                            <!-- TAB 6: VALORANT OPTIMIZER                      -->
+                            <!-- ============================================== -->
+                            <TabItem Header="Valorant">
+                                <Grid>
+                                    <Grid.Triggers>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard Storyboard="{StaticResource TabEntranceAnim}"/>
+                                        </EventTrigger>
+                                    </Grid.Triggers>
+                                    <Grid.RenderTransform>
+                                        <TranslateTransform Y="0"/>
+                                    </Grid.RenderTransform>
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                        <StackPanel Margin="0,4,0,14">
+                                            <!-- 1. Valorant Master Header Card -->
+                                            <Border CornerRadius="14" Padding="18,16" BorderThickness="1" Margin="0,0,0,14" Background="{DynamicResource OverviewCardBg}" BorderBrush="#FF4655">
+                                                <Border.Effect>
+                                                    <DropShadowEffect BlurRadius="24" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.6"/>
+                                                </Border.Effect>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- Left: Valorant Logo Icon Frame -->
+                                                    <Border Grid.Column="0" Width="44" Height="44" CornerRadius="12" Background="#1A0D10" BorderBrush="#FF4655" BorderThickness="1.5" Margin="0,0,14,0">
+                                                        <Path Data="M 6 7 L 14 25 H 18 L 26 7 H 22 L 16 20 L 10 7 Z" Fill="#FF4655" Width="20" Height="20" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+
+                                                    <!-- Center: Title & Vanguard Guarantee -->
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <TextBlock Text="VALORANT COMPETITIVE ENGINE" FontSize="14" FontWeight="Bold" Foreground="#FF4655"/>
+                                                            <Border Name="BadgeValorantVanguard" CornerRadius="6" Background="#061A14" BorderBrush="#0F5132" BorderThickness="1" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                                                                <TextBlock Text="&#x2713; 100% VANGUARD COMPLIANT" FontSize="9.5" FontWeight="Bold" Foreground="#10B981"/>
+                                                            </Border>
+                                                            <Border Name="BadgeValorantLiveState" CornerRadius="6" Background="#121216" BorderBrush="#22222A" BorderThickness="1" Padding="8,2" Margin="8,0,0,0" VerticalAlignment="Center">
+                                                                <TextBlock Name="TxtValorantLiveState" Text="STANDBY" FontSize="9.5" FontWeight="Bold" Foreground="#71717A"/>
+                                                            </Border>
+                                                        </StackPanel>
+                                                        <TextBlock Text="Hardware-tailored CPU affinity, zero-delay network DSCP prioritization, clean INI render scaling, and safe OS optimization without process tampering." FontSize="11" Foreground="#8A99AD" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                                    </StackPanel>
+
+                                                    <!-- Right: Action Buttons -->
+                                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <Button Name="BtnValorantRefresh" Content="REFRESH SCAN" Style="{StaticResource ButtonSecondary}" Padding="13,8" Margin="0,0,8,0"/>
+                                                        <Button Name="BtnValorantRevert" Content="REVERT TWEAKS" Style="{StaticResource ButtonDanger}" Padding="13,8"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- 2. Topology & Detection HUD -->
+                                            <Border CornerRadius="12" Padding="16,12" BorderThickness="1" Margin="0,0,0,14" Background="{DynamicResource SectionBannerBg}" BorderBrush="{DynamicResource SectionBannerBorder}">
+                                                <Border.Effect>
+                                                    <DropShadowEffect BlurRadius="20" ShadowDepth="2" Direction="270" Color="#000000" Opacity="0.45"/>
+                                                </Border.Effect>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="1.3*"/>
+                                                        <ColumnDefinition Width="1.6*"/>
+                                                        <ColumnDefinition Width="1.3*"/>
+                                                        <ColumnDefinition Width="1.3*"/>
+                                                        <ColumnDefinition Width="1.1*"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- Game Status -->
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Text="GAME STATUS" FontSize="9.5" FontWeight="Bold" Foreground="#64748B"/>
+                                                        <TextBlock Name="TxtValorantInstallStatus" Text="Scanning..." FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,2,0,0"/>
+                                                    </StackPanel>
+
+                                                    <!-- CPU Architecture & Affinity -->
+                                                    <StackPanel Grid.Column="1">
+                                                        <TextBlock Text="CPU TOPOLOGY &amp; SCHEDULING" FontSize="9.5" FontWeight="Bold" Foreground="#64748B"/>
+                                                        <TextBlock Name="TxtValorantCpuTopology" Text="Detecting cores..." FontSize="11.5" FontWeight="SemiBold" Foreground="#38BDF8" Margin="0,2,0,0"/>
+                                                    </StackPanel>
+
+                                                    <!-- GPU Engine -->
+                                                    <StackPanel Grid.Column="2">
+                                                        <TextBlock Text="GPU &amp; DISPLAY ENGINE" FontSize="9.5" FontWeight="Bold" Foreground="#64748B"/>
+                                                        <TextBlock Name="TxtValorantGpuEngine" Text="Detecting GPU..." FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,2,0,0"/>
+                                                    </StackPanel>
+
+                                                    <!-- Config & Resolution Status -->
+                                                    <StackPanel Grid.Column="3">
+                                                        <TextBlock Text="CONFIG PROFILE" FontSize="9.5" FontWeight="Bold" Foreground="#64748B"/>
+                                                        <TextBlock Name="TxtValorantConfigStatus" Text="Looking for GameUserSettings..." FontSize="11.5" FontWeight="SemiBold" Foreground="#00F5D4" Margin="0,2,0,0"/>
+                                                    </StackPanel>
+
+                                                    <!-- Accumulated Cache Size -->
+                                                    <StackPanel Grid.Column="4">
+                                                        <TextBlock Text="CACHES FOUND" FontSize="9.5" FontWeight="Bold" Foreground="#64748B"/>
+                                                        <TextBlock Name="TxtValorantCachesSize" Text="0 MB" FontSize="11.5" FontWeight="SemiBold" Foreground="#F59E0B" Margin="0,2,0,0"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- 3. One-Click Esports Optimization Presets Header -->
+                                            <TextBlock Text="ONE-CLICK ESPORTS PERFORMANCE PRESETS" FontSize="12.5" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="2,0,0,8"/>
+
+                                            <Grid Margin="0,0,0,14">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Preset 1: Competitive Potato -->
+                                                <Border Grid.Column="0" CornerRadius="12" Padding="14,14" BorderThickness="1" Margin="0,0,8,0" Background="{DynamicResource OverviewCardBg}" BorderBrush="#EA580C">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                <TextBlock Text="COMPETITIVE POTATO" FontSize="12.5" FontWeight="Bold" Foreground="#F97316"/>
+                                                                <Border CornerRadius="4" Background="#261006" BorderBrush="#7C2D12" BorderThickness="1" Padding="5,1" Margin="8,0,0,0">
+                                                                    <TextBlock Text="MAX FPS" FontSize="8.5" FontWeight="Bold" Foreground="#FB923C"/>
+                                                                </Border>
+                                                            </StackPanel>
+                                                            <TextBlock Text="Maximum frames and rock-bottom input latency for budget systems or high-refresh monitors." FontSize="10.5" Foreground="#8A99AD" Margin="0,4,0,8" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                                                            <TextBlock Text="• 70% 3D Render Scale (Crisp HUD, Fast 3D)" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                            <TextBlock Text="• Minimum LOD &amp; Particle Effects" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                            <TextBlock Text="• VSync OFF + Letterbox Disabled" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                            <TextBlock Text="• P-Core Affinity Pinning (No E-Cores)" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                            <TextBlock Text="• TCP Nagle Disabled + High-Priority QoS" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                            <TextBlock Text="• Mouse Acceleration Curve Disabled" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                        </StackPanel>
+                                                        <Border Grid.Row="2" CornerRadius="6" Background="#140C06" BorderBrush="#3D2109" BorderThickness="1" Padding="8,5" Margin="0,0,0,10">
+                                                            <TextBlock Text="Target: 60Hz-144Hz Budget / iGPU / Older CPUs" FontSize="9.5" FontWeight="SemiBold" Foreground="#F97316"/>
+                                                        </Border>
+                                                        <Button Name="BtnApplyPresetPotato" Grid.Row="3" Content="APPLY POTATO PRESET" Style="{StaticResource ButtonFlame}" Padding="0,9" HorizontalAlignment="Stretch"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Preset 2: Tournament 240Hz -->
+                                                <Border Grid.Column="1" CornerRadius="12" Padding="14,14" BorderThickness="1" Margin="4,0,4,0" Background="{DynamicResource OverviewCardBg}" BorderBrush="#00F5D4">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                <TextBlock Text="TOURNAMENT 240HZ" FontSize="12.5" FontWeight="Bold" Foreground="#00F5D4"/>
+                                                                <Border CornerRadius="4" Background="#061A14" BorderBrush="#0F5132" BorderThickness="1" Padding="5,1" Margin="8,0,0,0">
+                                                                    <TextBlock Text="PRO STANDARD" FontSize="8.5" FontWeight="Bold" Foreground="#10B981"/>
+                                                                </Border>
+                                                            </StackPanel>
+                                                            <TextBlock Text="Native 1080p esports clarity with zero-frametime jitter, optimal cache affinity, and zero delay." FontSize="10.5" Foreground="#8A99AD" Margin="0,4,0,8" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                                                            <TextBlock Text="• 100% Native Resolution Clarity" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                            <TextBlock Text="• Pro Low-Spec Shadows &amp; Shaders" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                            <TextBlock Text="• AMD X3D CCD0 V-Cache / Intel P-Cores" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                            <TextBlock Text="• Fullscreen Optimizations Bypassed" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                            <TextBlock Text="• DSCP 46 High-Priority Gaming Packets" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                            <TextBlock Text="• Ultimate Power Plan Activated" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                        </StackPanel>
+                                                        <Border Grid.Row="2" CornerRadius="6" Background="#061710" BorderBrush="#0D422B" BorderThickness="1" Padding="8,5" Margin="0,0,0,10">
+                                                            <TextBlock Text="Target: 144Hz / 240Hz / 360Hz Competitive Rigs" FontSize="9.5" FontWeight="SemiBold" Foreground="#00F5D4"/>
+                                                        </Border>
+                                                        <Button Name="BtnApplyPresetTournament" Grid.Row="3" Content="APPLY TOURNAMENT PRESET" Style="{StaticResource ButtonPrimary}" Padding="0,9" HorizontalAlignment="Stretch"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Preset 3: Laptop Balanced -->
+                                                <Border Grid.Column="2" CornerRadius="12" Padding="14,14" BorderThickness="1" Margin="8,0,0,0" Background="{DynamicResource OverviewCardBg}" BorderBrush="#38BDF8">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0">
+                                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                <TextBlock Text="LAPTOP BALANCED" FontSize="12.5" FontWeight="Bold" Foreground="#38BDF8"/>
+                                                                <Border CornerRadius="4" Background="#0C1E2E" BorderBrush="#164E63" BorderThickness="1" Padding="5,1" Margin="8,0,0,0">
+                                                                    <TextBlock Text="THERMAL SAFE" FontSize="8.5" FontWeight="Bold" Foreground="#38BDF8"/>
+                                                                </Border>
+                                                            </StackPanel>
+                                                            <TextBlock Text="High sustained FPS tuned specifically to prevent laptop CPU/GPU thermal throttling." FontSize="10.5" Foreground="#8A99AD" Margin="0,4,0,8" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                                                            <TextBlock Text="• 85% Resolution (Sweet spot FPS/clarity)" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                            <TextBlock Text="• Low-Spec Config for Low Heat Generation" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                            <TextBlock Text="• Preserves OEM Battery/Fan Control" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                            <TextBlock Text="• Full Network &amp; Mouse Raw Input Tuning" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                            <TextBlock Text="• No Aggressive Power Plan Overrides" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                            <TextBlock Text="• Cool &amp; Stable Framerates in Long Matches" FontSize="10.5" Foreground="#CBD5E1" Margin="0,1"/>
+                                                        </StackPanel>
+                                                        <Border Grid.Row="2" CornerRadius="6" Background="#0A1826" BorderBrush="#1B3855" BorderThickness="1" Padding="8,5" Margin="0,0,0,10">
+                                                            <TextBlock Text="Target: Gaming Laptops &amp; Compact Form Factors" FontSize="9.5" FontWeight="SemiBold" Foreground="#38BDF8"/>
+                                                        </Border>
+                                                        <Button Name="BtnApplyPresetLaptop" Grid.Row="3" Content="APPLY LAPTOP PRESET" Style="{StaticResource ButtonBlue}" Padding="0,9" HorizontalAlignment="Stretch"/>
+                                                    </Grid>
+                                                </Border>
+                                            </Grid>
+
+                                            <!-- 4. Granular Customizer Grid -->
+                                            <Grid Margin="0,0,0,14">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Left Box: In-Game Graphics & INI Scaler -->
+                                                <Border Grid.Column="0" CornerRadius="12" Padding="16,14" BorderThickness="1" Margin="0,0,8,0" Background="{DynamicResource OverviewCardBg}" BorderBrush="{DynamicResource OverviewCardBorder}">
+                                                    <StackPanel>
+                                                        <TextBlock Text="GAME CONFIG &amp; 3D RESOLUTION TUNER" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4"/>
+                                                        <TextBlock Text="Modifies GameUserSettings.ini directly with automatic .bak preservation." FontSize="10.5" Foreground="#8A99AD" Margin="0,0,0,10"/>
+
+                                                        <!-- Resolution Slider -->
+                                                        <Grid Margin="0,0,0,8">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Text="3D Resolution Quality" FontSize="11" FontWeight="SemiBold" Foreground="#CBD5E1"/>
+                                                            <TextBlock Name="TxtValorantResolutionValue" Grid.Column="1" Text="100%" FontSize="11" FontWeight="Bold" Foreground="#00F5D4"/>
+                                                        </Grid>
+                                                        <Slider Name="SldValorantResolution" Minimum="50" Maximum="100" Value="100" TickFrequency="5" IsSnapToTickEnabled="True" Margin="0,0,0,10" Cursor="Hand"/>
+
+                                                        <Grid Margin="0,0,0,10">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <Button Name="BtnApplyResolution" Grid.Column="0" Content="SET RESOLUTION" Style="{StaticResource ButtonSecondary}" Margin="0,0,4,0" Padding="0,7"/>
+                                                            <Button Name="BtnToggleLowSpec" Grid.Column="1" Content="APPLY LOW-SPEC INI" Style="{StaticResource ButtonSecondary}" Margin="4,0,0,0" Padding="0,7"/>
+                                                        </Grid>
+
+                                                        <Button Name="BtnRestoreConfig" Content="RESTORE BACKUP CONFIG (.BAK)" Style="{StaticResource ButtonSecondary}" HorizontalAlignment="Stretch" Padding="0,7"/>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <!-- Right Box: Vanguard-Safe OS & Input Latency -->
+                                                <Border Grid.Column="1" CornerRadius="12" Padding="16,14" BorderThickness="1" Margin="8,0,0,0" Background="{DynamicResource OverviewCardBg}" BorderBrush="{DynamicResource OverviewCardBorder}">
+                                                    <StackPanel>
+                                                        <TextBlock Text="VANGUARD-SAFE OS &amp; INPUT LATENCY" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4"/>
+                                                        <TextBlock Text="Fine-tuned registry and scheduler policies to eliminate micro-stutters." FontSize="10.5" Foreground="#8A99AD" Margin="0,0,0,10"/>
+
+                                                        <CheckBox Name="ChkValorantMouse" Content="Disable Windows Mouse Acceleration (1:1 Raw Input)" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
+                                                        <CheckBox Name="ChkValorantFso" Content="Disable Fullscreen Optimizations &amp; Force DPI Scaling" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
+                                                        <CheckBox Name="ChkValorantNagle" Content="Disable TCP Nagle Algorithm &amp; Network Throttling" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
+                                                        <CheckBox Name="ChkValorantQos" Content="Apply Valorant QoS DSCP 46 Priority Packet Tag" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
+                                                        <CheckBox Name="ChkValorantUsb" Content="Disable USB Selective Suspend (Zero Mouse Dropouts)" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,10,6" Cursor="Hand"/>
+
+                                                        <Button Name="BtnApplyIndividualTweaks" Content="APPLY SELECTED SYSTEM TWEAKS" Style="{StaticResource ButtonPrimary}" HorizontalAlignment="Stretch" Padding="0,8"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </Grid>
+
+                                            <!-- 5. Real-Time Affinity Daemon Card -->
+                                            <Border CornerRadius="12" Padding="16,14" BorderThickness="1" Margin="0,0,0,14" Background="{DynamicResource OverviewCardBg}" BorderBrush="#38BDF8">
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+
+                                                    <Grid Grid.Row="0">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <Border Grid.Column="0" Width="36" Height="36" CornerRadius="10" Background="#0C1E2E" BorderBrush="#38BDF8" BorderThickness="1" Margin="0,0,12,0">
+                                                            <Path Data="M 4 4 H 20 V 20 H 4 Z M 8 8 H 16 V 16 H 8 Z" Stroke="#38BDF8" StrokeThickness="1.5" Fill="Transparent" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+
+                                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                <TextBlock Text="REAL-TIME THREAD AFFINITY DAEMON" FontSize="12.5" FontWeight="Bold" Foreground="#38BDF8"/>
+                                                                <Border Name="BadgeDaemonState" CornerRadius="6" Background="#121216" BorderBrush="#22222A" BorderThickness="1" Padding="8,2" Margin="10,0,0,0">
+                                                                    <TextBlock Name="TxtValorantDaemonBadge" Text="DAEMON OFF" FontSize="9.5" FontWeight="Bold" Foreground="#71717A"/>
+                                                                </Border>
+                                                            </StackPanel>
+                                                            <TextBlock Text="Watches for VALORANT-Win64-Shipping.exe and dynamically locks it to Performance Cores (avoiding E-Cores) or AMD CCD0 V-Cache. Demotes Riot background processes." FontSize="10.5" Foreground="#8A99AD" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+
+                                                        <Button Name="BtnToggleAffinityDaemon" Grid.Column="2" Content="START AFFINITY DAEMON" Style="{StaticResource ButtonSecondary}" Padding="16,8" VerticalAlignment="Center"/>
+                                                    </Grid>
+
+                                                    <!-- Daemon Telemetry Status -->
+                                                    <Border Grid.Row="1" CornerRadius="8" Padding="12,8" Background="#060608" BorderBrush="#16161C" BorderThickness="1" Margin="0,10,0,0">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <StackPanel Grid.Column="0">
+                                                                <TextBlock Text="DAEMON STATUS" FontSize="9" FontWeight="Bold" Foreground="#64748B"/>
+                                                                <TextBlock Name="TxtValorantDaemonStatus" Text="Standby — click 'START AFFINITY DAEMON' to activate" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,2,0,0"/>
+                                                            </StackPanel>
+                                                            <StackPanel Grid.Column="1">
+                                                                <TextBlock Text="COMPUTED AFFINITY MASK" FontSize="9" FontWeight="Bold" Foreground="#64748B"/>
+                                                                <TextBlock Name="TxtValorantDaemonMask" Text="Detecting topology mask..." FontSize="11" FontWeight="SemiBold" Foreground="#38BDF8" Margin="0,2,0,0"/>
+                                                            </StackPanel>
+                                                        </Grid>
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- 6. Cache Purge & Riot Datacenter Ping Split Row -->
+                                            <Grid Margin="0,0,0,10">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Cache Purge Card -->
+                                                <Border Grid.Column="0" CornerRadius="12" Padding="16,14" BorderThickness="1" Margin="0,0,8,0" Background="{DynamicResource OverviewCardBg}" BorderBrush="{DynamicResource OverviewCardBorder}">
+                                                    <StackPanel>
+                                                        <TextBlock Text="VALORANT CACHE PURGE ENGINE" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,4"/>
+                                                        <TextBlock Text="Clears corrupt shader pipelines, huge game logs, and stale crash dumps." FontSize="10.5" Foreground="#8A99AD" Margin="0,0,0,10"/>
+
+                                                        <CheckBox Name="ChkPurgeShaders" Content="DirectX &amp; GPU Shader Caches (NVIDIA/AMD/UE4)" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
+                                                        <CheckBox Name="ChkPurgeLogs" Content="Riot Client &amp; Valorant Session Logs" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,0,6" Cursor="Hand"/>
+                                                        <CheckBox Name="ChkPurgeCrashes" Content="Stale Crash Dumps &amp; Memory Minidumps" IsChecked="True" Foreground="#CBD5E1" FontSize="11" Margin="0,0,12,6" Cursor="Hand"/>
+
+                                                        <Button Name="BtnPurgeCaches" Content="PURGE SELECTED CACHES" Style="{StaticResource ButtonSecondary}" HorizontalAlignment="Stretch" Padding="0,8"/>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <!-- Riot Global Datacenter Ping Engine -->
+                                                <Border Grid.Column="1" CornerRadius="12" Padding="16,14" BorderThickness="1" Margin="8,0,0,0" Background="{DynamicResource OverviewCardBg}" BorderBrush="{DynamicResource OverviewCardBorder}">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+
+                                                        <StackPanel Grid.Row="0" Margin="0,0,0,8">
+                                                            <TextBlock Text="RIOT DATACENTER PING BENCHMARK" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="Live round-trip ICMP probe to Riot Games official server clusters." FontSize="10.5" Foreground="#8A99AD" Margin="0,2,0,0"/>
+                                                        </StackPanel>
+
+                                                        <!-- 5 Region Pings Horizontal / Grid -->
+                                                        <Grid Grid.Row="1" Margin="0,0,0,10">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <!-- NA -->
+                                                            <Border Name="BrdPingNA" Grid.Column="0" CornerRadius="8" Padding="6,6" Margin="0,0,3,0" Background="#08080B" BorderBrush="#1C1C24" BorderThickness="1">
+                                                                <StackPanel HorizontalAlignment="Center">
+                                                                    <TextBlock Text="NA" FontSize="9.5" FontWeight="Bold" Foreground="#64748B" HorizontalAlignment="Center"/>
+                                                                    <TextBlock Name="TxtPingNA" Text="-- ms" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                                                </StackPanel>
+                                                            </Border>
+
+                                                            <!-- EU -->
+                                                            <Border Name="BrdPingEU" Grid.Column="1" CornerRadius="8" Padding="6,6" Margin="3,0,3,0" Background="#08080B" BorderBrush="#1C1C24" BorderThickness="1">
+                                                                <StackPanel HorizontalAlignment="Center">
+                                                                    <TextBlock Text="EU" FontSize="9.5" FontWeight="Bold" Foreground="#64748B" HorizontalAlignment="Center"/>
+                                                                    <TextBlock Name="TxtPingEU" Text="-- ms" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                                                </StackPanel>
+                                                            </Border>
+
+                                                            <!-- AP -->
+                                                            <Border Name="BrdPingAP" Grid.Column="2" CornerRadius="8" Padding="6,6" Margin="3,0,3,0" Background="#08080B" BorderBrush="#1C1C24" BorderThickness="1">
+                                                                <StackPanel HorizontalAlignment="Center">
+                                                                    <TextBlock Text="AP" FontSize="9.5" FontWeight="Bold" Foreground="#64748B" HorizontalAlignment="Center"/>
+                                                                    <TextBlock Name="TxtPingAP" Text="-- ms" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                                                </StackPanel>
+                                                            </Border>
+
+                                                            <!-- KR -->
+                                                            <Border Name="BrdPingKR" Grid.Column="3" CornerRadius="8" Padding="6,6" Margin="3,0,3,0" Background="#08080B" BorderBrush="#1C1C24" BorderThickness="1">
+                                                                <StackPanel HorizontalAlignment="Center">
+                                                                    <TextBlock Text="KR" FontSize="9.5" FontWeight="Bold" Foreground="#64748B" HorizontalAlignment="Center"/>
+                                                                    <TextBlock Name="TxtPingKR" Text="-- ms" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                                                </StackPanel>
+                                                            </Border>
+
+                                                            <!-- BR -->
+                                                            <Border Name="BrdPingBR" Grid.Column="4" CornerRadius="8" Padding="6,6" Margin="3,0,0,0" Background="#08080B" BorderBrush="#1C1C24" BorderThickness="1">
+                                                                <StackPanel HorizontalAlignment="Center">
+                                                                    <TextBlock Text="BR" FontSize="9.5" FontWeight="Bold" Foreground="#64748B" HorizontalAlignment="Center"/>
+                                                                    <TextBlock Name="TxtPingBR" Text="-- ms" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                                                </StackPanel>
+                                                            </Border>
+                                                        </Grid>
+
+                                                        <Button Name="BtnPingRiotServers" Grid.Row="2" Content="TEST RIOT SERVERS" Style="{StaticResource ButtonSecondary}" HorizontalAlignment="Stretch" Padding="0,8"/>
+                                                    </Grid>
+                                                </Border>
+                                            </Grid>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Grid>
+                            </TabItem>
+
+                            <!-- ============================================== -->
+                            <!-- TAB 7: SETTINGS                                -->
                             <!-- ============================================== -->
                             <TabItem Header="Settings">
                                 <Grid>

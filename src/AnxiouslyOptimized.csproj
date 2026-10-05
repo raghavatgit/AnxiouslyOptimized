@@ -79,6 +79,7 @@
     <Compile Include="Services\DeepCleanerService.cs" />
     <Compile Include="Services\NetworkService.cs" />
     <Compile Include="Services\RuntimeHubService.cs" />
+    <Compile Include="Services\ValorantService.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\tweaks_win11.json" />
