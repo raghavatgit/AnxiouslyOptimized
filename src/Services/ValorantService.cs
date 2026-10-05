@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -114,7 +114,7 @@ namespace AnxiouslyOptimized.Services
         public DateTime CreatedAt { get; set; }
     }
 
-    internal class ValorantRegBackup
+    public class ValorantRegBackup
     {
         public RegistryHive Hive { get; set; }
         public string SubKey { get; set; }
@@ -171,13 +171,17 @@ public static class ValorantService
         private static readonly string[] RiotBgProcesses = new[]
             { "RiotClientServices", "RiotClientUx", "RiotClientUxRender" };
 
-        private static string ValorantConfigBase =>
-            Path.Combine(LocalAppData, "VALORANT", "Saved", "Config");
+        private static string ValorantConfigBase
+        {
+            get { return Path.Combine(LocalAppData, "VALORANT", "Saved", "Config"); }
+        }
 
         private const string IniSubPath = @"Windows\GameUserSettings.ini";
 
-        private static string BackupDir =>
-            Path.Combine(LocalAppData, "AnxiouslyOptimized", "ValorantBackups");
+        private static string BackupDir
+        {
+            get { return Path.Combine(LocalAppData, "AnxiouslyOptimized", "ValorantBackups"); }
+        }
 
         // ================================================================
         // SECTION 1 – TOPOLOGY DETECTION
@@ -367,7 +371,7 @@ public static class ValorantService
         {
             int pl = Math.Min(pCores * 2, logical);
             long mask = ((1L << pl) - 1L) & ~1L; // skip Thread 0 (IRQ)
-            return mask == 0 ? 0b110L : mask;
+            return mask == 0 ? 6L : mask;
         }
 
         private static void DetectGpu(ValorantTopology topo, Action<string> log)
@@ -535,35 +539,74 @@ public static class ValorantService
         // SECTION 2 – PRESETS
         // ================================================================
 
-        public static ValorantPreset GetPresetCompetitivePotato(ValorantTopology t) =>
-            new ValorantPreset {
+        public static ValorantPreset GetPresetCompetitivePotato(ValorantTopology t)
+        {
+            return new ValorantPreset
+            {
                 Name = "Competitive Potato",
                 Description = "Maximum FPS. All non-essential graphics stripped. Lowest latency for 144Hz+.",
-                ResolutionQuality = t.IsLowEndGpu ? 80 : 100, DisableVsync = true,
-                ApplyCompetitiveLowSpec = true, DisableFso = true, DisableGameDvr = true,
-                SetDpiAware = true, DisableNagle = true, DisableMultimediaThrottle = true,
-                ApplyQosPolicy = true, PinCpuAffinity = !t.IsLowEndCpu, DisableMouseAccel = true,
-                DisableUsbSuspend = true, SetHighPerfPowerPlan = !t.IsLaptop, IsLaptopSafe = true };
+                ResolutionQuality = t.IsLowEndGpu ? 80 : 100,
+                DisableVsync = true,
+                ApplyCompetitiveLowSpec = true,
+                DisableFso = true,
+                DisableGameDvr = true,
+                SetDpiAware = true,
+                DisableNagle = true,
+                DisableMultimediaThrottle = true,
+                ApplyQosPolicy = true,
+                PinCpuAffinity = !t.IsLowEndCpu,
+                DisableMouseAccel = true,
+                DisableUsbSuspend = true,
+                SetHighPerfPowerPlan = !t.IsLaptop,
+                IsLaptopSafe = true
+            };
+        }
 
-        public static ValorantPreset GetPresetTournament240Hz(ValorantTopology t) =>
-            new ValorantPreset {
+        public static ValorantPreset GetPresetTournament240Hz(ValorantTopology t)
+        {
+            return new ValorantPreset
+            {
                 Name = "Tournament 240Hz+",
                 Description = "Native resolution, ultra-low latency for 240/360/540Hz displays.",
-                ResolutionQuality = 100, DisableVsync = true,
-                ApplyCompetitiveLowSpec = true, DisableFso = true, DisableGameDvr = true,
-                SetDpiAware = true, DisableNagle = true, DisableMultimediaThrottle = true,
-                ApplyQosPolicy = true, PinCpuAffinity = !t.IsLowEndCpu, DisableMouseAccel = true,
-                DisableUsbSuspend = true, SetHighPerfPowerPlan = !t.IsLaptop, IsLaptopSafe = true };
+                ResolutionQuality = 100,
+                DisableVsync = true,
+                ApplyCompetitiveLowSpec = true,
+                DisableFso = true,
+                DisableGameDvr = true,
+                SetDpiAware = true,
+                DisableNagle = true,
+                DisableMultimediaThrottle = true,
+                ApplyQosPolicy = true,
+                PinCpuAffinity = !t.IsLowEndCpu,
+                DisableMouseAccel = true,
+                DisableUsbSuspend = true,
+                SetHighPerfPowerPlan = !t.IsLaptop,
+                IsLaptopSafe = true
+            };
+        }
 
-        public static ValorantPreset GetPresetLaptopBalanced(ValorantTopology t) =>
-            new ValorantPreset {
+        public static ValorantPreset GetPresetLaptopBalanced(ValorantTopology t)
+        {
+            return new ValorantPreset
+            {
                 Name = "Laptop Balanced",
                 Description = "FPS boost for laptops. Skips battery-draining tweaks.",
-                ResolutionQuality = 85, DisableVsync = true,
-                ApplyCompetitiveLowSpec = true, DisableFso = true, DisableGameDvr = true,
-                SetDpiAware = true, DisableNagle = true, DisableMultimediaThrottle = false,
-                ApplyQosPolicy = true, PinCpuAffinity = false, DisableMouseAccel = true,
-                DisableUsbSuspend = false, SetHighPerfPowerPlan = false, IsLaptopSafe = true };
+                ResolutionQuality = 85,
+                DisableVsync = true,
+                ApplyCompetitiveLowSpec = true,
+                DisableFso = true,
+                DisableGameDvr = true,
+                SetDpiAware = true,
+                DisableNagle = true,
+                DisableMultimediaThrottle = false,
+                ApplyQosPolicy = true,
+                PinCpuAffinity = false,
+                DisableMouseAccel = true,
+                DisableUsbSuspend = false,
+                SetHighPerfPowerPlan = false,
+                IsLaptopSafe = true
+            };
+        }
 
         // ================================================================
         // SECTION 3 – APPLY PRESET
@@ -1145,12 +1188,13 @@ public static class ValorantService
                     if (n.OperationalStatus != OperationalStatus.Up) continue;
                     if (n.NetworkInterfaceType == NetworkInterfaceType.Loopback) continue;
                     if (n.NetworkInterfaceType == NetworkInterfaceType.Tunnel)   continue;
-                    if (n.GetIPProperties()?.GatewayAddresses?.Count > 0) return n.Id;
+                    var ipProps = n.GetIPProperties();
+                    if (ipProps != null && ipProps.GatewayAddresses != null && ipProps.GatewayAddresses.Count > 0) return n.Id;
                 }
                 var fb = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(
                     n => n.OperationalStatus == OperationalStatus.Up &&
                          n.NetworkInterfaceType != NetworkInterfaceType.Loopback);
-                return fb?.Id ?? "";
+                return (fb != null && fb.Id != null) ? fb.Id : "";
             }
             catch { return ""; }
         }
@@ -1197,6 +1241,6 @@ public static class ValorantService
         }
 
         private static void LogSafe(Action<string> log, string msg)
-        { try { log?.Invoke(msg); } catch { } }
+        { try { if (log != null) log(msg); } catch { } }
     }
 }

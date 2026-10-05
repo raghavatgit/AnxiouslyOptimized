@@ -101,8 +101,6 @@ namespace AnxiouslyOptimized
         private List<SoftwarePackageItem> _softwarePackages = new List<SoftwarePackageItem>();
         private List<TransactionJournal> _transactionJournals = new List<TransactionJournal>();
         private ValorantTopology _valorantTopology;
-        private string _valorantRegBackupPath;
-        private string _valorantFileBackupPath;
         private bool _isValorantDaemonRunning = false;
 
         public MainWindow()
@@ -2785,7 +2783,7 @@ namespace AnxiouslyOptimized
 
                 if (_valorantTopology == null) return;
 
-                Dispatcher.Invoke(() =>
+                Dispatcher.Invoke(new Action(() =>
                 {
                     // Game Status & Badge
                     if (_valorantTopology.InstallStatus == ValorantInstallStatus.Running)
@@ -2797,7 +2795,7 @@ namespace AnxiouslyOptimized
                             BadgeValorantLiveState.BorderBrush = new SolidColorBrush(Color.FromRgb(16, 185, 129));
                         }
                     }
-                    else if (_valorantTopology.InstallStatus == ValorantInstallStatus.Installed)
+                    else if (_valorantTopology.InstallStatus == ValorantInstallStatus.InstalledNotRunning)
                     {
                         if (TxtValorantLiveState != null) TxtValorantLiveState.Text = "READY";
                         if (BadgeValorantLiveState != null)
@@ -2837,11 +2835,11 @@ namespace AnxiouslyOptimized
                         string archStr = _valorantTopology.CpuArchitecture.ToString();
                         if (_valorantTopology.CpuArchitecture == CpuArch.IntelHybrid)
                             archStr = string.Format("Intel 12th-14th Gen ({0} P-Cores, {1} E-Cores)", _valorantTopology.PCoreCount, _valorantTopology.ECoreCount);
-                        else if (_valorantTopology.CpuArchitecture == CpuArch.AmdX3dDualCcd)
+                        else if (_valorantTopology.CpuArchitecture == CpuArch.AmdDualCcdX3D)
                             archStr = "AMD Ryzen X3D (V-Cache CCD0 Prioritized)";
-                        else if (_valorantTopology.CpuArchitecture == CpuArch.AmdStandard)
+                        else if (_valorantTopology.CpuArchitecture == CpuArch.AmdSingleCcd || _valorantTopology.CpuArchitecture == CpuArch.AmdDualCcdNormal)
                             archStr = "AMD Ryzen Standard Architecture";
-                        else if (_valorantTopology.CpuArchitecture == CpuArch.IntelStandard)
+                        else if (_valorantTopology.CpuArchitecture == CpuArch.IntelLegacy)
                             archStr = "Intel Core Desktop Architecture";
 
                         string cpuName = !string.IsNullOrEmpty(_valorantTopology.CpuName) ? _valorantTopology.CpuName : "x64 Processor";
@@ -2913,7 +2911,7 @@ namespace AnxiouslyOptimized
                         {
                             TxtValorantDaemonMask.Text = string.Format("Target Mask: 0x{0:X} ({1} Performance Cores)", _valorantTopology.AffinityMaskPCoresOnly, _valorantTopology.PCoreCount);
                         }
-                        else if (_valorantTopology.CpuArchitecture == CpuArch.AmdX3dDualCcd && _valorantTopology.AffinityMaskX3DCcd0 > 0)
+                        else if (_valorantTopology.CpuArchitecture == CpuArch.AmdDualCcdX3D && _valorantTopology.AffinityMaskX3DCcd0 > 0)
                         {
                             TxtValorantDaemonMask.Text = string.Format("Target Mask: 0x{0:X} (3D V-Cache CCD0 Cores)", _valorantTopology.AffinityMaskX3DCcd0);
                         }
@@ -2922,7 +2920,7 @@ namespace AnxiouslyOptimized
                             TxtValorantDaemonMask.Text = "Target Mask: All Physical Desktop Cores";
                         }
                     }
-                });
+                }));
             }
             catch (Exception ex)
             {
@@ -3213,13 +3211,13 @@ namespace AnxiouslyOptimized
                 {
                     Name = "Custom Individual Selection",
                     DisableMouseAccel = ChkValorantMouse != null && ChkValorantMouse.IsChecked == true,
-                    DisableFullscreenOptimizations = ChkValorantFso != null && ChkValorantFso.IsChecked == true,
+                    DisableFso = ChkValorantFso != null && ChkValorantFso.IsChecked == true,
                     DisableNagle = ChkValorantNagle != null && ChkValorantNagle.IsChecked == true,
-                    EnableDscpQos = ChkValorantQos != null && ChkValorantQos.IsChecked == true,
-                    DisableUsbSelectiveSuspend = ChkValorantUsb != null && ChkValorantUsb.IsChecked == true,
+                    ApplyQosPolicy = ChkValorantQos != null && ChkValorantQos.IsChecked == true,
+                    DisableUsbSuspend = ChkValorantUsb != null && ChkValorantUsb.IsChecked == true,
                     ResolutionQuality = SldValorantResolution != null ? (int)SldValorantResolution.Value : 100,
-                    SetGpuHighPriority = true,
-                    SetCpuHighPriority = true
+                    SetHighPerfPowerPlan = true,
+                    PinCpuAffinity = true
                 };
 
                 var res = await ValorantService.ApplyPresetAsync(customPreset, _valorantTopology, Log);

@@ -20,8 +20,13 @@ if (-not (Test-Path $targetDir)) {
     New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
 }
 
+# Ensure any existing running instance is cleanly closed to allow binary overwrite
+Get-Process -Name "AnxiouslyOptimized" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Start-Sleep -Milliseconds 300
+
 $exePath = Join-Path $targetDir "AnxiouslyOptimized.exe"
-$downloadUrl = "https://raw.githubusercontent.com/raghavatgit/AnxiouslyOptimized/main/dist/AnxiouslyOptimized.exe"
+$cacheBuster = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+$downloadUrl = "https://raw.githubusercontent.com/raghavatgit/AnxiouslyOptimized/main/dist/AnxiouslyOptimized.exe?t=$cacheBuster"
 
 # 3. Stream Executable Binary
 Write-Host "[AnxiouslyOptimized] Initializing zero-install launcher..." -ForegroundColor Cyan
