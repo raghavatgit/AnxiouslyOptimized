@@ -372,6 +372,7 @@ namespace AnxiouslyOptimized
             if (TxtHardwareStorage != null) TxtHardwareStorage.Text = _specs.StorageSummary;
             if (TxtHardwareOS != null) TxtHardwareOS.Text = _specs.OsName;
             if (TxtEditionBadge != null) TxtEditionBadge.Text = _specs.EditionBadge;
+            if (TxtSystemStatusSub != null) TxtSystemStatusSub.Text = string.Format("System scanned at {0:hh:mm tt}", DateTime.Now);
 
             if (TxtGreetingTime != null)
             {
@@ -429,98 +430,102 @@ namespace AnxiouslyOptimized
             }
             catch { }
 
+            RefreshLiveTelemetry();
+
             _telemetryTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1.5) };
-            _telemetryTimer.Tick += (s, e) =>
+            _telemetryTimer.Tick += (s, e) => RefreshLiveTelemetry();
+            _telemetryTimer.Start();
+        }
+
+        private void RefreshLiveTelemetry()
+        {
+            try
             {
-                try
+                // 1. CPU Gauge
+                if (_cpuCounter != null && TxtGaugeCPU != null)
                 {
-                    // 1. CPU Gauge
-                    if (_cpuCounter != null && TxtGaugeCPU != null)
+                    int cpuVal = Math.Max(1, (int)_cpuCounter.NextValue());
+                    TxtGaugeCPU.Text = cpuVal.ToString() + "%";
+                    if (ArcGaugeCPU != null)
                     {
-                        int cpuVal = Math.Max(1, (int)_cpuCounter.NextValue());
-                        TxtGaugeCPU.Text = cpuVal.ToString() + "%";
-                        if (ArcGaugeCPU != null)
-                        {
-                            ArcGaugeCPU.Data = CreateArcGeometry(cpuVal);
-                        }
-                    }
-
-                    // 2. RAM Gauge - Real System Memory Utilization % & Live Used / Installed GB
-                    if (TxtGaugeRAM != null)
-                    {
-                        var mem = new MEMORYSTATUSEX();
-                        if (GlobalMemoryStatusEx(mem))
-                        {
-                            int ramPct = (int)mem.dwMemoryLoad;
-                            double totalGb = mem.ullTotalPhys / (1024.0 * 1024.0 * 1024.0);
-                            double availGb = mem.ullAvailPhys / (1024.0 * 1024.0 * 1024.0);
-                            double usedGb = Math.Max(0, totalGb - availGb);
-                            double installedGb = Math.Ceiling(totalGb);
-
-                            TxtGaugeRAM.Text = ramPct.ToString() + "%";
-                            if (TxtGaugeRAMSub != null)
-                            {
-                                TxtGaugeRAMSub.Text = string.Format("{0:0.#} / {1:0} GB", usedGb, installedGb);
-                            }
-                            if (ArcGaugeRAM != null)
-                            {
-                                ArcGaugeRAM.Data = CreateArcGeometry(ramPct);
-                            }
-
-                            TxtGaugeRAM.ToolTip = string.Format(
-                                "Live System RAM: {0:0.#} GB Used / {1:0} GB Installed ({2:0.#} GB Usable)\nAvailable Free: {3:0.#} GB ({4}% Load)",
-                                usedGb, installedGb, totalGb, availGb, ramPct);
-                        }
-                    }
-
-                    // 3. SSD / Storage Gauge (C:)
-                    if (TxtGaugeDisk != null)
-                    {
-                        var driveC = new DriveInfo("C");
-                        if (driveC.IsReady)
-                        {
-                            double totalGb = driveC.TotalSize / (1024.0 * 1024.0 * 1024.0);
-                            double freeGb = driveC.AvailableFreeSpace / (1024.0 * 1024.0 * 1024.0);
-                            double usedGb = Math.Max(0, totalGb - freeGb);
-                            int usedPct = totalGb > 0 ? (int)Math.Round((usedGb / totalGb) * 100.0) : 0;
-
-                            TxtGaugeDisk.Text = usedPct.ToString() + "%";
-                            if (TxtGaugeDiskSub != null)
-                            {
-                                TxtGaugeDiskSub.Text = string.Format("{0:0} GB Free", freeGb);
-                            }
-                            if (ArcGaugeDisk != null)
-                            {
-                                ArcGaugeDisk.Data = CreateArcGeometry(Math.Max(2, usedPct));
-                            }
-
-                            string multiDriveDetails = string.Format(
-                                "SSD C: (System): {0:0.#} GB Used / {1:0.#} GB Total ({2:0.#} GB Free, {3}% Used)",
-                                usedGb, totalGb, freeGb, usedPct);
-
-                            try
-                            {
-                                var driveD = new DriveInfo("D");
-                                if (driveD.IsReady)
-                                {
-                                    double dTot = driveD.TotalSize / (1024.0 * 1024.0 * 1024.0);
-                                    double dFree = driveD.AvailableFreeSpace / (1024.0 * 1024.0 * 1024.0);
-                                    double dUsed = Math.Max(0, dTot - dFree);
-                                    int dPct = (int)Math.Round((dUsed / dTot) * 100.0);
-                                    multiDriveDetails += string.Format(
-                                        "\nDisk D: (Data): {0:0.#} GB Used / {1:0.#} GB Total ({2:0.#} GB Free, {3}% Used)",
-                                        dUsed, dTot, dFree, dPct);
-                                }
-                            }
-                            catch { }
-
-                            TxtGaugeDisk.ToolTip = multiDriveDetails;
-                        }
+                        ArcGaugeCPU.Data = CreateArcGeometry(cpuVal);
                     }
                 }
-                catch { }
-            };
-            _telemetryTimer.Start();
+
+                // 2. RAM Gauge - Real System Memory Utilization % & Live Used / Installed GB
+                if (TxtGaugeRAM != null)
+                {
+                    var mem = new MEMORYSTATUSEX();
+                    if (GlobalMemoryStatusEx(mem))
+                    {
+                        int ramPct = (int)mem.dwMemoryLoad;
+                        double totalGb = mem.ullTotalPhys / (1024.0 * 1024.0 * 1024.0);
+                        double availGb = mem.ullAvailPhys / (1024.0 * 1024.0 * 1024.0);
+                        double usedGb = Math.Max(0, totalGb - availGb);
+                        double installedGb = Math.Ceiling(totalGb);
+
+                        TxtGaugeRAM.Text = ramPct.ToString() + "%";
+                        if (TxtGaugeRAMSub != null)
+                        {
+                            TxtGaugeRAMSub.Text = string.Format("{0:0.#} / {1:0} GB", usedGb, installedGb);
+                        }
+                        if (ArcGaugeRAM != null)
+                        {
+                            ArcGaugeRAM.Data = CreateArcGeometry(ramPct);
+                        }
+
+                        TxtGaugeRAM.ToolTip = string.Format(
+                            "Live System RAM: {0:0.#} GB Used / {1:0} GB Installed ({2:0.#} GB Usable)\nAvailable Free: {3:0.#} GB ({4}% Load)",
+                            usedGb, installedGb, totalGb, availGb, ramPct);
+                    }
+                }
+
+                // 3. SSD / Storage Gauge (C:)
+                if (TxtGaugeDisk != null)
+                {
+                    var driveC = new DriveInfo("C");
+                    if (driveC.IsReady)
+                    {
+                        double totalGb = driveC.TotalSize / (1024.0 * 1024.0 * 1024.0);
+                        double freeGb = driveC.AvailableFreeSpace / (1024.0 * 1024.0 * 1024.0);
+                        double usedGb = Math.Max(0, totalGb - freeGb);
+                        int usedPct = totalGb > 0 ? (int)Math.Round((usedGb / totalGb) * 100.0) : 0;
+
+                        TxtGaugeDisk.Text = usedPct.ToString() + "%";
+                        if (TxtGaugeDiskSub != null)
+                        {
+                            TxtGaugeDiskSub.Text = string.Format("{0:0} GB Free", freeGb);
+                        }
+                        if (ArcGaugeDisk != null)
+                        {
+                            ArcGaugeDisk.Data = CreateArcGeometry(Math.Max(2, usedPct));
+                        }
+
+                        string multiDriveDetails = string.Format(
+                            "SSD C: (System): {0:0.#} GB Used / {1:0.#} GB Total ({2:0.#} GB Free, {3}% Used)",
+                            usedGb, totalGb, freeGb, usedPct);
+
+                        try
+                        {
+                            var driveD = new DriveInfo("D");
+                            if (driveD.IsReady)
+                            {
+                                double dTot = driveD.TotalSize / (1024.0 * 1024.0 * 1024.0);
+                                double dFree = driveD.AvailableFreeSpace / (1024.0 * 1024.0 * 1024.0);
+                                double dUsed = Math.Max(0, dTot - dFree);
+                                int dPct = (int)Math.Round((dUsed / dTot) * 100.0);
+                                multiDriveDetails += string.Format(
+                                    "\nDisk D: (Data): {0:0.#} GB Used / {1:0.#} GB Total ({2:0.#} GB Free, {3}% Used)",
+                                    dUsed, dTot, dFree, dPct);
+                            }
+                        }
+                        catch { }
+
+                        TxtGaugeDisk.ToolTip = multiDriveDetails;
+                    }
+                }
+            }
+            catch { }
         }
         #endregion
 
@@ -743,6 +748,35 @@ namespace AnxiouslyOptimized
         }
 
         #region Active Game Mode Daemon Actions (Feature 2)
+                private void UpdateGameModeStats()
+        {
+            try
+            {
+                double curMs = ActiveGameModeDaemon.GetCurrentTimerResolutionMs();
+                string latencyMode = curMs <= 1.05 ? "Ultra-Low Latency" : (curMs <= 2.5 ? "Low Latency" : "Standard Windows");
+                if (TxtGameModeStats != null)
+                {
+                    TxtGameModeStats.Text = string.Format("Timer: {0:0.0}ms ({1})", curMs, latencyMode);
+                    TxtGameModeStats.Foreground = curMs <= 1.05 ? Brushes.LimeGreen : (curMs <= 2.5 ? new SolidColorBrush(Color.FromRgb(0, 245, 212)) : new SolidColorBrush(Color.FromRgb(245, 158, 11)));
+                }
+            }
+            catch
+            {
+                if (TxtGameModeStats != null) TxtGameModeStats.Text = "Timer: System Dynamic";
+            }
+
+            if (TxtGameModeInterventions != null)
+            {
+                var active = new List<string>();
+                if (ChkGameModePCores != null && ChkGameModePCores.IsChecked == true) active.Add("P-Core Pinning");
+                if (ChkGameMode1msTimer != null && ChkGameMode1msTimer.IsChecked == true) active.Add("1ms Timer");
+                if (ChkGameModePriority != null && ChkGameModePriority.IsChecked == true) active.Add("High Priority");
+                if (ChkGameModePowerPlan != null && ChkGameModePowerPlan.IsChecked == true) active.Add("Ultimate Power");
+                if (ChkGameModeThrottleBg != null && ChkGameModeThrottleBg.IsChecked == true) active.Add("Background Throttling");
+                TxtGameModeInterventions.Text = active.Count > 0 ? string.Join(", ", active.ToArray()) : "Monitoring Mode (No Active Overrides)";
+            }
+        }
+
         private void InitializeActiveGameModeDaemon()
         {
             if (BtnToggleGameMode != null)
@@ -802,15 +836,17 @@ namespace AnxiouslyOptimized
 
             // Sync toggle options
             if (ChkGameModePCores != null)
-                ChkGameModePCores.Click += (s, e) => ActiveGameModeDaemon.EnablePCorePinning = ChkGameModePCores.IsChecked == true;
+                ChkGameModePCores.Click += (s, e) => { ActiveGameModeDaemon.EnablePCorePinning = ChkGameModePCores.IsChecked == true; UpdateGameModeStats(); };
             if (ChkGameModePriority != null)
-                ChkGameModePriority.Click += (s, e) => ActiveGameModeDaemon.EnableHighPriority = ChkGameModePriority.IsChecked == true;
+                ChkGameModePriority.Click += (s, e) => { ActiveGameModeDaemon.EnableHighPriority = ChkGameModePriority.IsChecked == true; UpdateGameModeStats(); };
             if (ChkGameMode1msTimer != null)
-                ChkGameMode1msTimer.Click += (s, e) => ActiveGameModeDaemon.Enable1msTimerResolution = ChkGameMode1msTimer.IsChecked == true;
+                ChkGameMode1msTimer.Click += (s, e) => { ActiveGameModeDaemon.Enable1msTimerResolution = ChkGameMode1msTimer.IsChecked == true; UpdateGameModeStats(); };
             if (ChkGameModePowerPlan != null)
-                ChkGameModePowerPlan.Click += (s, e) => ActiveGameModeDaemon.EnablePowerSchemeSwitch = ChkGameModePowerPlan.IsChecked == true;
+                ChkGameModePowerPlan.Click += (s, e) => { ActiveGameModeDaemon.EnablePowerSchemeSwitch = ChkGameModePowerPlan.IsChecked == true; UpdateGameModeStats(); };
             if (ChkGameModeThrottleBg != null)
-                ChkGameModeThrottleBg.Click += (s, e) => ActiveGameModeDaemon.EnableBackgroundThrottling = ChkGameModeThrottleBg.IsChecked == true;
+                ChkGameModeThrottleBg.Click += (s, e) => { ActiveGameModeDaemon.EnableBackgroundThrottling = ChkGameModeThrottleBg.IsChecked == true; UpdateGameModeStats(); };
+
+            UpdateGameModeStats();
 
             // Custom game addition
             if (BtnAddCustomGame != null && TxtCustomGameExe != null)
@@ -877,16 +913,7 @@ namespace AnxiouslyOptimized
                             TxtGameModeTarget.Text = ActiveGameModeDaemon.IsEnabled ? "Monitoring games & emulators..." : "No active game detected";
                             TxtGameModeTarget.SetResourceReference(TextBlock.ForegroundProperty, "TextPrimaryBrush");
                         }
-                        if (TxtGameModeInterventions != null)
-                        {
-                            TxtGameModeInterventions.Text = "P-Core Pinning, 1ms Timer, High Priority, Ultimate Power";
-                            TxtGameModeInterventions.Foreground = new SolidColorBrush(Color.FromRgb(56, 189, 248));
-                        }
-                        if (TxtGameModeStats != null)
-                        {
-                            TxtGameModeStats.Text = "Timer: 15.6ms (Standard)";
-                            TxtGameModeStats.Foreground = new SolidColorBrush(Color.FromRgb(245, 158, 11));
-                        }
+                        UpdateGameModeStats();
                         if (BadgeGameModeState != null)
                         {
                             BadgeGameModeState.Background = new SolidColorBrush(Color.FromRgb(18, 18, 22));

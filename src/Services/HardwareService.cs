@@ -95,7 +95,7 @@ namespace AnxiouslyOptimized.Services
 
                 double installedGb = totalPhysBytes > 0 
                     ? totalPhysBytes / (1024.0 * 1024.0 * 1024.0) 
-                    : (usableGb > 0 ? Math.Ceiling(usableGb) : 24.0);
+                    : (usableGb > 0 ? Math.Ceiling(usableGb) : 0.0);
 
                 string ddrLabel = "";
                 if (smbiosType == 34) ddrLabel = "DDR5";
@@ -103,7 +103,7 @@ namespace AnxiouslyOptimized.Services
                 else if (smbiosType == 24) ddrLabel = "DDR3";
 
                 string configLabel = "";
-                if (stickCount > 1)
+                if (stickCount > 1 && installedGb > 0)
                 {
                     double perStickGb = Math.Round(installedGb / stickCount);
                     configLabel = string.Format("{0}x{1:0}GB", stickCount, perStickGb);
@@ -117,18 +117,45 @@ namespace AnxiouslyOptimized.Services
                 else if (!string.IsNullOrEmpty(ddrLabel))
                     moduleDetails = string.Format("({0} {1})", ddrLabel, speedLabel).Replace("  ", " ").Trim();
 
-                if (usableGb > 0 && Math.Abs(installedGb - usableGb) > 0.2)
+                if (installedGb > 0)
                 {
-                    specs.RamSummary = string.Format("{0:0.#} GB {1} | {2:0.#} GB Usable", installedGb, moduleDetails, usableGb).Replace("  ", " ").Trim();
+                    if (usableGb > 0 && Math.Abs(installedGb - usableGb) > 0.2)
+                    {
+                        specs.RamSummary = string.Format("{0:0.#} GB {1} | {2:0.#} GB Usable", installedGb, moduleDetails, usableGb).Replace("  ", " ").Trim();
+                    }
+                    else
+                    {
+                        specs.RamSummary = string.Format("{0:0.#} GB RAM {1}", installedGb, moduleDetails).Replace("  ", " ").Trim();
+                    }
+                }
+                else if (usableGb > 0)
+                {
+                    specs.RamSummary = string.Format("{0:0.#} GB System RAM", Math.Ceiling(usableGb));
                 }
                 else
                 {
-                    specs.RamSummary = string.Format("{0:0.#} GB RAM {1}", installedGb, moduleDetails).Replace("  ", " ").Trim();
+                    specs.RamSummary = "System RAM";
                 }
             }
             catch
             {
-                specs.RamSummary = "24.0 GB System RAM";
+                try
+                {
+                    var mem = new MEMORYSTATUSEX();
+                    if (GlobalMemoryStatusEx(mem) && mem.ullTotalPhys > 0)
+                    {
+                        double gb = mem.ullTotalPhys / (1024.0 * 1024.0 * 1024.0);
+                        specs.RamSummary = string.Format("{0:0.#} GB System RAM", Math.Ceiling(gb));
+                    }
+                    else
+                    {
+                        specs.RamSummary = "System RAM";
+                    }
+                }
+                catch
+                {
+                    specs.RamSummary = "System RAM";
+                }
             }
 
             // 3. GPU via Display Adapters Registry
@@ -278,7 +305,25 @@ namespace AnxiouslyOptimized.Services
             }
             catch
             {
-                specs.StorageSummary = "1.0 TB NVMe High-Speed SSD";
+                try
+                {
+                    var driveC = new System.IO.DriveInfo("C");
+                    if (driveC.IsReady)
+                    {
+                        double totGb = driveC.TotalSize / (1024.0 * 1024.0 * 1024.0);
+                        double freeGb = driveC.AvailableFreeSpace / (1024.0 * 1024.0 * 1024.0);
+                        string capLabel = totGb >= 950 ? string.Format("{0:0.#} TB", totGb / 1000.0) : string.Format("{0:0} GB", totGb);
+                        specs.StorageSummary = string.Format("{0} System Drive ({1:0} GB Free)", capLabel, freeGb);
+                    }
+                    else
+                    {
+                        specs.StorageSummary = "System Storage Drive";
+                    }
+                }
+                catch
+                {
+                    specs.StorageSummary = "System Storage Drive";
+                }
             }
 
             return specs;

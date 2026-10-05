@@ -22,6 +22,23 @@ namespace AnxiouslyOptimized.Services
     public static class ActiveGameModeDaemon
     {
         #region Win32 Native Interop
+        [DllImport("ntdll.dll", SetLastError = true)]
+        private static extern int NtQueryTimerResolution(out uint minRes, out uint maxRes, out uint curRes);
+
+        public static double GetCurrentTimerResolutionMs()
+        {
+            try
+            {
+                uint minRes, maxRes, curRes;
+                if (NtQueryTimerResolution(out minRes, out maxRes, out curRes) == 0 && curRes > 0)
+                {
+                    return curRes / 10000.0;
+                }
+            }
+            catch { }
+            return 15.625;
+        }
+
         [DllImport("winmm.dll", EntryPoint = "timeBeginPeriod", SetLastError = true)]
         private static extern uint TimeBeginPeriod(uint uMilliseconds);
 
