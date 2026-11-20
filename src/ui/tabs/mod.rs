@@ -1,0 +1,11 @@
+pub mod dashboard;
+pub mod debloat;
+pub mod gaming;
+pub mod health;
+pub mod network;
+pub mod quick_boost;
+pub mod safety;
+pub mod settings;
+pub mod specs;
+pub mod tweaks;
+pub mod uninstaller;

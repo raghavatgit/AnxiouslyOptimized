@@ -1,50 +1,51 @@
 # ==============================================================================
-# AnxiouslyOptimized - Zero-Install Web Launcher
-# Author: Raghav Goyal (raghavatgit)
+# Optimizer by Raghav - Verified Web Bootstrapper
+# Author: Raghav Goyal
 # ==============================================================================
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13
 
+$RepoSlug = "raghavatgit/AnxiouslyOptimized"
+$Branch = "main"
+
 # 1. Administrator Elevation Check
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
-    Write-Host "[AnxiouslyOptimized] Requesting Administrator privileges..." -ForegroundColor Cyan
-    $launchCmd = "irm https://raw.githubusercontent.com/raghavatgit/AnxiouslyOptimized/main/run.ps1 | iex"
+    Write-Host "[Optimizer by Raghav] Requesting Administrator privileges..." -ForegroundColor Cyan
+    $launchCmd = "irm https://raw.githubusercontent.com/$RepoSlug/$Branch/run.ps1 | iex"
     Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"$launchCmd`"" -Verb RunAs
     exit
 }
 
 # 2. Setup Staging Directory
-$targetDir = Join-Path $env:TEMP "AnxiouslyOptimized"
+$targetDir = Join-Path $env:TEMP "OptimizerByRaghav"
 if (-not (Test-Path $targetDir)) {
     New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
 }
 
-# Ensure any existing running instance is cleanly closed to allow binary overwrite
-Get-Process -Name "AnxiouslyOptimized" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Get-Process -Name "OptimizerByRaghav" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 Start-Sleep -Milliseconds 300
 
-$exePath = Join-Path $targetDir "AnxiouslyOptimized.exe"
+$exePath = Join-Path $targetDir "OptimizerByRaghav.exe"
+$shaPath = Join-Path $targetDir "OptimizerByRaghav.sha256"
 $cacheBuster = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
-$downloadUrl = "https://raw.githubusercontent.com/raghavatgit/AnxiouslyOptimized/main/dist/AnxiouslyOptimized.exe?t=$cacheBuster"
+$exeUrl = "https://raw.githubusercontent.com/$RepoSlug/$Branch/dist/OptimizerByRaghav.exe?t=$cacheBuster"
+$shaUrl = "https://raw.githubusercontent.com/$RepoSlug/$Branch/dist/OptimizerByRaghav.sha256?t=$cacheBuster"
 
-# 3. Stream Executable Binary
-Write-Host "[AnxiouslyOptimized] Initializing zero-install launcher..." -ForegroundColor Cyan
-Write-Host "[AnxiouslyOptimized] Downloading standalone Direct3D binary..." -ForegroundColor Gray
+Write-Host "[Optimizer by Raghav] Downloading native Rust executable + SHA256 checksum..." -ForegroundColor Cyan
 
-try {
-    $wc = New-Object System.Net.WebClient
-    $wc.Headers.Add("User-Agent", "AnxiouslyOptimized-WebLauncher")
-    $wc.DownloadFile($downloadUrl, $exePath)
-} catch {
-    Write-Host "[AnxiouslyOptimized] Primary download failed. Retrying with Invoke-WebRequest..." -ForegroundColor Yellow
-    Invoke-WebRequest -Uri $downloadUrl -OutFile $exePath -UseBasicParsing
+Invoke-WebRequest -Uri $exeUrl -OutFile $exePath -UseBasicParsing
+Invoke-WebRequest -Uri $shaUrl -OutFile $shaPath -UseBasicParsing
+
+# 3. Verify SHA256 Integrity
+$expected = ((Get-Content $shaPath -Raw).Trim() -split '\s+')[0].ToLowerInvariant()
+$actual = (Get-FileHash -Path $exePath -Algorithm SHA256).Hash.ToLowerInvariant()
+
+if ([string]::IsNullOrWhiteSpace($expected) -or ($expected -ne $actual)) {
+    Remove-Item $exePath -Force -ErrorAction SilentlyContinue
+    Write-Host "[Optimizer by Raghav] ERROR: SHA256 verification failed! Expected '$expected', got '$actual'." -ForegroundColor Red
+    exit 1
 }
 
-# 4. Verify Integrity and Launch
-if ((Test-Path $exePath) -and ((Get-Item $exePath).Length -gt 100000)) {
-    Write-Host "[AnxiouslyOptimized] Launching native application..." -ForegroundColor Green
-    Start-Process -FilePath $exePath -WorkingDirectory $targetDir -Verb RunAs
-} else {
-    Write-Host "[AnxiouslyOptimized] Error: Binary download failed or corrupt." -ForegroundColor Red
-}
+Write-Host "[Optimizer by Raghav] SHA256 verified ($actual). Launching..." -ForegroundColor Green
+Start-Process -FilePath $exePath -WorkingDirectory $targetDir -Verb RunAs
