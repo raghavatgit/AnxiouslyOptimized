@@ -25,8 +25,8 @@ fn main() {
         res.set("CompanyName", "Raghav Goyal");
         res.set("LegalCopyright", "Copyright (C) 2026 Raghav Goyal");
         res.set("OriginalFilename", "OptimizerByRaghav.exe");
-        res.set("ProductVersion", "2.1.0.0");
-        res.set("FileVersion", "2.1.0.0");
+        res.set("ProductVersion", "2.2.0.0");
+        res.set("FileVersion", "2.2.0.0");
 
         if let Err(e) = res.compile() {
             panic!("Failed to compile Windows resources: {e}");

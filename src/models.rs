@@ -267,6 +267,7 @@ pub enum TweakRisk {
     Advanced,
 }
 
+#[allow(dead_code)]
 impl TweakRisk {
     pub fn label(self) -> &'static str {
         match self {
@@ -705,11 +706,19 @@ impl Default for UpdateStatus {
     }
 }
 
+fn default_ui_scale() -> f32 {
+    1.0
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppSettings {
     pub auto_restore_point_before_preset: bool,
     pub temp_cleaner_min_age_hours: u64,
     pub show_console_drawer: bool,
+    #[serde(default = "default_ui_scale")]
+    pub ui_scale: f32,
+    #[serde(default)]
+    pub sidebar_collapsed: bool,
     #[serde(default)]
     pub mem_reduct: MemReductConfig,
 }
@@ -720,6 +729,8 @@ impl Default for AppSettings {
             auto_restore_point_before_preset: true,
             temp_cleaner_min_age_hours: 24,
             show_console_drawer: false,
+            ui_scale: 1.0,
+            sidebar_collapsed: false,
             mem_reduct: MemReductConfig::default(),
         }
     }

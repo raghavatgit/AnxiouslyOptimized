@@ -12,6 +12,7 @@ use crate::models::{
     SystemReport, ToastKind, ToastMessage, TransactionJournal, TweakCategory, TweakViewItem,
     UpdateStatus, ValorantPresetKind, ValorantTopology, VssHealth,
 };
+use crate::ui::components::NavIcon;
 use std::collections::VecDeque;
 use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
@@ -19,72 +20,83 @@ use std::sync::Arc;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TabId {
     Dashboard,
-    Specs,
     QuickBoost,
     Tweaks,
     Health,
     Uninstaller,
-    Debloat,
-    Network,
     Gaming,
+    Network,
     Safety,
+    Specs,
     Settings,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CleanSubView {
+    Memory,
+    Storage,
+    Repair,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AppsSubView {
+    Installed,
+    Debloat,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GamingSubView {
+    Engine,
+    Valorant,
+    Emulators,
 }
 
 impl TabId {
     pub const ALL: &'static [TabId] = &[
         TabId::Dashboard,
-        TabId::Specs,
         TabId::QuickBoost,
         TabId::Tweaks,
         TabId::Health,
         TabId::Uninstaller,
-        TabId::Debloat,
-        TabId::Network,
         TabId::Gaming,
+        TabId::Network,
         TabId::Safety,
+        TabId::Specs,
         TabId::Settings,
     ];
 
     pub fn label(self) -> &'static str {
         match self {
-            Self::Dashboard => "Dashboard",
-            Self::Specs => "System Specs",
-            Self::QuickBoost => "Quick Boost",
-            Self::Tweaks => "Win11 & Tweaks",
-            Self::Health => "Mem Reduct & Cleaner",
-            Self::Uninstaller => "Geek Uninstaller",
-            Self::Debloat => "UWP Debloat",
+            Self::Dashboard => "Home",
+            Self::QuickBoost => "Boost",
+            Self::Tweaks => "Tweaks",
+            Self::Health => "Clean",
+            Self::Uninstaller => "Apps",
+            Self::Gaming => "Gaming",
             Self::Network => "Network",
-            Self::Gaming => "Gaming & Emulators",
-            Self::Safety => "Safety Center",
-            Self::Settings => "Settings & Updates",
+            Self::Safety => "Safety",
+            Self::Specs => "Hardware",
+            Self::Settings => "Settings",
         }
     }
 
-    pub fn tag(self) -> &'static str {
+    pub fn icon(self) -> NavIcon {
         match self {
-            Self::Dashboard => "01",
-            Self::Specs => "02",
-            Self::QuickBoost => "03",
-            Self::Tweaks => "04",
-            Self::Health => "05",
-            Self::Uninstaller => "06",
-            Self::Debloat => "07",
-            Self::Network => "08",
-            Self::Gaming => "09",
-            Self::Safety => "10",
-            Self::Settings => "11",
+            Self::Dashboard => NavIcon::Home,
+            Self::QuickBoost => NavIcon::Boost,
+            Self::Tweaks => NavIcon::Tweaks,
+            Self::Health => NavIcon::Clean,
+            Self::Uninstaller => NavIcon::Apps,
+            Self::Gaming => NavIcon::Gaming,
+            Self::Network => NavIcon::Network,
+            Self::Safety => NavIcon::Safety,
+            Self::Specs => NavIcon::Specs,
+            Self::Settings => NavIcon::Settings,
         }
     }
 
-    pub fn section_heading_before(self) -> Option<&'static str> {
-        match self {
-            Self::Dashboard => Some("OVERVIEW"),
-            Self::QuickBoost => Some("OPTIMIZE & CLEAN"),
-            Self::Network => Some("GAMING & SAFETY"),
-            _ => None,
-        }
+    pub fn divider_before(self) -> bool {
+        matches!(self, Self::Gaming | Self::Safety)
     }
 }
 
@@ -96,6 +108,7 @@ pub struct ConfirmRequest {
     pub action: Box<AppAction>,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub enum AppAction {
     SwitchTab(TabId),
@@ -165,6 +178,7 @@ pub enum AppAction {
     InstallAppToSystem,
     UninstallAppFromSystem,
     SaveSettings,
+    SetUiScale(f32),
     OpenFolder(String),
     RequestConfirm(ConfirmRequest),
     ClearConsoleLogs,
@@ -172,6 +186,13 @@ pub enum AppAction {
 
 pub struct UiState {
     pub active_tab: TabId,
+    pub clean_subview: CleanSubView,
+    pub apps_subview: AppsSubView,
+    pub gaming_subview: GamingSubView,
+
+    pub show_command_palette: bool,
+    pub command_query: String,
+
     pub is_elevated: bool,
     pub is_installed_on_pc: bool,
     pub update_status: UpdateStatus,
@@ -248,7 +269,7 @@ impl UiState {
             kind,
             created_at_secs: ctx_time,
         });
-        if self.toasts.len() > 5 {
+        if self.toasts.len() > 4 {
             self.toasts.remove(0);
         }
     }

@@ -14,6 +14,7 @@ use windows::Win32::System::ProcessStatus::{GetPerformanceInfo, PERFORMANCE_INFO
 use windows::Win32::System::SystemInformation::{GlobalMemoryStatusEx, MEMORYSTATUSEX};
 use windows::Win32::System::Threading::{GetCurrentProcess, OpenProcessToken};
 
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct StandbyPurgeResult {
     pub avail_before_bytes: u64,
@@ -27,6 +28,7 @@ pub struct StandbyPurgeResult {
     pub nt_status: i32,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct HibernationStatus {
     pub enabled: bool,

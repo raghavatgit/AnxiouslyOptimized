@@ -201,8 +201,9 @@ fn main() {
     let icon_rgba = load_app_icon();
     let mut viewport = egui::ViewportBuilder::default()
         .with_title(format!("Optimizer by Raghav v{APP_VERSION}"))
-        .with_inner_size([1260.0, 820.0])
-        .with_min_inner_size([1000.0, 660.0]);
+        .with_decorations(false)
+        .with_inner_size([1240.0, 800.0])
+        .with_min_inner_size([880.0, 580.0]);
 
     if let Some((ref rgba, w, h)) = icon_rgba {
         viewport = viewport.with_icon(std::sync::Arc::new(egui::IconData {

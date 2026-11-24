@@ -13,9 +13,10 @@ use crate::models::{
     UpdateCheckResult, UpdateStatus, ValorantTopology, VssHealth,
 };
 use crate::ui::components::{
-    brand_wordmark, danger_button, emerald_button, primary_button, status_badge, subtle_button,
+    danger_button, emerald_button, icon_button, paint_icon, search_bar, status_badge,
+    subtle_button, NavIcon,
 };
-use crate::ui::{tabs, theme, AppAction, TabId, UiState};
+use crate::ui::{tabs, theme, AppAction, AppsSubView, CleanSubView, GamingSubView, TabId, UiState};
 use chrono::Local;
 use egui::{Color32, CornerRadius, Margin, Pos2, Rect, RichText, Stroke, Vec2};
 use std::collections::VecDeque;
@@ -123,6 +124,7 @@ impl OptimizerApp {
         });
 
         let settings = load_settings();
+        theme::apply_scale_metrics(&cc.egui_ctx, settings.ui_scale);
         let is_elevated = is_process_elevated();
         let is_installed_on_pc = installer::is_app_installed();
         let shared_logs = Arc::new(std::sync::Mutex::new(Vec::new()));
@@ -200,6 +202,11 @@ impl OptimizerApp {
 
         let state = UiState {
             active_tab: TabId::Dashboard,
+            clean_subview: CleanSubView::Memory,
+            apps_subview: AppsSubView::Installed,
+            gaming_subview: GamingSubView::Engine,
+            show_command_palette: false,
+            command_query: String::new(),
             is_elevated,
             is_installed_on_pc,
             update_status: UpdateStatus::Idle,
@@ -830,6 +837,12 @@ impl OptimizerApp {
                 Ok(()) => self.state.push_toast(now, ToastKind::Success, "Settings saved"),
                 Err(e) => self.state.push_toast(now, ToastKind::Error, e),
             },
+            AppAction::SetUiScale(scale) => {
+                let clamped = scale.clamp(0.85, 1.35);
+                self.state.settings.ui_scale = clamped;
+                theme::apply_scale_metrics(ctx, clamped);
+                let _ = save_settings(&self.state.settings);
+            }
             AppAction::ExportSpecsMarkdown => {
                 let md = self.state.system_report.to_markdown_summary();
                 let dir = std::env::var_os("USERPROFILE")
@@ -2005,6 +2018,76 @@ impl OptimizerApp {
     }
 }
 
+impl OptimizerApp {
+    fn render_resize_borders(ctx: &egui::Context) {
+        let is_max = ctx.input(|i| i.viewport().maximized.unwrap_or(false));
+        if is_max {
+            return;
+        }
+        let screen = ctx.screen_rect();
+        let t = 5.0;
+        let edges = [
+            (
+                "rz_n",
+                Rect::from_min_max(screen.min, Pos2::new(screen.max.x, screen.min.y + t)),
+                egui::CursorIcon::ResizeNorth,
+                egui::ResizeDirection::North,
+            ),
+            (
+                "rz_s",
+                Rect::from_min_max(Pos2::new(screen.min.x, screen.max.y - t), screen.max),
+                egui::CursorIcon::ResizeSouth,
+                egui::ResizeDirection::South,
+            ),
+            (
+                "rz_w",
+                Rect::from_min_max(screen.min, Pos2::new(screen.min.x + t, screen.max.y)),
+                egui::CursorIcon::ResizeWest,
+                egui::ResizeDirection::West,
+            ),
+            (
+                "rz_e",
+                Rect::from_min_max(Pos2::new(screen.max.x - t, screen.min.y), screen.max),
+                egui::CursorIcon::ResizeEast,
+                egui::ResizeDirection::East,
+            ),
+            (
+                "rz_se",
+                Rect::from_min_max(
+                    Pos2::new(screen.max.x - 10.0, screen.max.y - 10.0),
+                    screen.max,
+                ),
+                egui::CursorIcon::ResizeSouthEast,
+                egui::ResizeDirection::SouthEast,
+            ),
+            (
+                "rz_sw",
+                Rect::from_min_max(
+                    Pos2::new(screen.min.x, screen.max.y - 10.0),
+                    Pos2::new(screen.min.x + 10.0, screen.max.y),
+                ),
+                egui::CursorIcon::ResizeSouthWest,
+                egui::ResizeDirection::SouthWest,
+            ),
+        ];
+
+        for (id, rect, cursor, dir) in edges {
+            egui::Area::new(egui::Id::new(id))
+                .fixed_pos(rect.min)
+                .order(egui::Order::Foreground)
+                .show(ctx, |ui| {
+                    let (_, resp) = ui.allocate_exact_size(rect.size(), egui::Sense::drag());
+                    if resp.hovered() {
+                        ctx.set_cursor_icon(cursor);
+                    }
+                    if resp.drag_started() {
+                        ctx.send_viewport_cmd(egui::ViewportCommand::BeginResize(dir));
+                    }
+                });
+        }
+    }
+}
+
 impl eframe::App for OptimizerApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.process_bg_messages(ctx);
@@ -2018,14 +2101,26 @@ impl eframe::App for OptimizerApp {
         }
 
         let now = ctx.input(|i| i.time);
-        self.state.toasts.retain(|t| now - t.created_at_secs < 5.5);
+        self.state.toasts.retain(|t| now - t.created_at_secs < 4.5);
 
         let mut actions: Vec<AppAction> = Vec::new();
 
-        // Global Hotkeys (Ctrl+R = Mem Reduct, F5 = Refresh, Ctrl+1..9 = Tab jump)
+        // Global Hotkeys (Ctrl+K = Command Palette, Ctrl+R = Mem Reduct, F5 = Refresh, Ctrl+1..9 = Tabs, Ctrl+/- = UI Scale)
         ctx.input(|i| {
+            if i.modifiers.ctrl && i.key_pressed(egui::Key::K) {
+                self.state.show_command_palette = !self.state.show_command_palette;
+            }
+            if i.key_pressed(egui::Key::Escape) && self.state.show_command_palette {
+                self.state.show_command_palette = false;
+            }
             if i.modifiers.ctrl && i.key_pressed(egui::Key::R) {
                 actions.push(AppAction::RunMemReductClean);
+            }
+            if i.modifiers.ctrl && (i.key_pressed(egui::Key::Equals) || i.key_pressed(egui::Key::Plus)) {
+                actions.push(AppAction::SetUiScale(self.state.settings.ui_scale + 0.05));
+            }
+            if i.modifiers.ctrl && i.key_pressed(egui::Key::Minus) {
+                actions.push(AppAction::SetUiScale(self.state.settings.ui_scale - 0.05));
             }
             if i.key_pressed(egui::Key::F5) {
                 if self.state.active_tab == TabId::Uninstaller {
@@ -2037,14 +2132,15 @@ impl eframe::App for OptimizerApp {
             if i.modifiers.ctrl {
                 let key_tabs = [
                     (egui::Key::Num1, TabId::Dashboard),
-                    (egui::Key::Num2, TabId::Specs),
-                    (egui::Key::Num3, TabId::QuickBoost),
-                    (egui::Key::Num4, TabId::Tweaks),
-                    (egui::Key::Num5, TabId::Health),
-                    (egui::Key::Num6, TabId::Uninstaller),
-                    (egui::Key::Num7, TabId::Debloat),
-                    (egui::Key::Num8, TabId::Network),
-                    (egui::Key::Num9, TabId::Gaming),
+                    (egui::Key::Num2, TabId::QuickBoost),
+                    (egui::Key::Num3, TabId::Tweaks),
+                    (egui::Key::Num4, TabId::Health),
+                    (egui::Key::Num5, TabId::Uninstaller),
+                    (egui::Key::Num6, TabId::Gaming),
+                    (egui::Key::Num7, TabId::Network),
+                    (egui::Key::Num8, TabId::Safety),
+                    (egui::Key::Num9, TabId::Specs),
+                    (egui::Key::Num0, TabId::Settings),
                 ];
                 for (k, t) in key_tabs {
                     if i.key_pressed(k) {
@@ -2054,123 +2150,390 @@ impl eframe::App for OptimizerApp {
             }
         });
 
-        // ==================== LEFT SIDEBAR ====================
-        egui::SidePanel::left("nav_sidebar")
-            .exact_width(224.0)
-            .resizable(false)
+        Self::render_resize_borders(ctx);
+
+        // ==================== CUSTOM BORDERLESS TOP TITLE & COMMAND BAR ====================
+        egui::TopBottomPanel::top("futuristic_titlebar")
+            .exact_height(44.0)
             .frame(
                 egui::Frame::new()
-                    .fill(theme::BG_SIDEBAR)
-                    .stroke(Stroke::new(1.0_f32, theme::BORDER_SUBTLE))
-                    .inner_margin(Margin::symmetric(12, 14)),
+                    .fill(theme::BG_VOID)
+                    .stroke(Stroke::new(1.0_f32, theme::BORDER_HAIRLINE))
+                    .inner_margin(Margin::symmetric(12, 6)),
             )
             .show(ctx, |ui| {
-                ui.horizontal(|ui| {
+                let bar_rect = ui.max_rect();
+                ui.horizontal_centered(|ui| {
+                    // Sidebar collapse toggle
+                    if icon_button(
+                        ui,
+                        NavIcon::SidebarToggle,
+                        "Toggle Compact Rail",
+                        self.state.settings.sidebar_collapsed,
+                    )
+                    .clicked()
+                    {
+                        self.state.settings.sidebar_collapsed =
+                            !self.state.settings.sidebar_collapsed;
+                        let _ = save_settings(&self.state.settings);
+                    }
+
                     if let Some(tex) = &self.state.logo_tex {
                         ui.add(
                             egui::Image::new(tex)
-                                .fit_to_exact_size(egui::vec2(36.0, 36.0))
-                                .corner_radius(CornerRadius::same(8)),
+                                .fit_to_exact_size(egui::vec2(24.0, 24.0))
+                                .corner_radius(CornerRadius::same(6)),
                         );
                     }
-                    ui.add_space(4.0);
-                    brand_wordmark(ui, false);
+                    ui.horizontal(|ui| {
+                        ui.spacing_mut().item_spacing.x = 5.0;
+                        ui.label(
+                            RichText::new("Optimizer")
+                                .size(15.0)
+                                .strong()
+                                .color(theme::TEXT_PRIMARY),
+                        );
+                        ui.label(
+                            RichText::new("by Raghav")
+                                .size(10.5)
+                                .color(theme::ACCENT_CYAN),
+                        );
+                    });
+
+                    ui.add_space(10.0);
+
+                    // Command Search Pill (Ctrl+K)
+                    let cmd_btn = egui::Button::new(
+                        RichText::new("  Search tweaks, apps & actions...      Ctrl+K  ")
+                            .size(11.8)
+                            .color(theme::TEXT_MUTED),
+                    )
+                    .fill(theme::BG_SURFACE)
+                    .stroke(Stroke::new(1.0_f32, theme::BORDER_HAIRLINE))
+                    .corner_radius(CornerRadius::same(14))
+                    .min_size(Vec2::new(250.0, 27.0));
+                    if ui.add(cmd_btn).clicked() {
+                        self.state.show_command_palette = true;
+                    }
+
+                    if let Some(busy) = &self.state.busy_task {
+                        ui.add_space(6.0);
+                        ui.spinner();
+                        ui.add(
+                            egui::Label::new(
+                                RichText::new(busy).size(11.5).color(theme::ACCENT_CYAN),
+                            )
+                            .truncate(),
+                        );
+                    }
+
+                    // Right-side Quick Controls + Native Window Buttons
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        ui.spacing_mut().item_spacing.x = 6.0;
+
+                        // Close Button
+                        let close_resp = ui.add(
+                            egui::Button::new(
+                                RichText::new("✕").size(13.0).color(theme::TEXT_SECONDARY),
+                            )
+                            .fill(Color32::TRANSPARENT)
+                            .stroke(Stroke::NONE)
+                            .corner_radius(CornerRadius::same(6))
+                            .min_size(Vec2::new(30.0, 26.0)),
+                        );
+                        if close_resp.hovered() {
+                            ui.painter().rect_filled(
+                                close_resp.rect,
+                                CornerRadius::same(6),
+                                theme::ACCENT_ROSE,
+                            );
+                            ui.painter().text(
+                                close_resp.rect.center(),
+                                egui::Align2::CENTER_CENTER,
+                                "✕",
+                                egui::FontId::proportional(13.0),
+                                Color32::WHITE,
+                            );
+                        }
+                        if close_resp.clicked() {
+                            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+                        }
+
+                        // Maximize / Restore Button
+                        let is_max = ctx.input(|i| i.viewport().maximized.unwrap_or(false));
+                        if ui
+                            .add(
+                                egui::Button::new(
+                                    RichText::new(if is_max { "❐" } else { "□" })
+                                        .size(12.5)
+                                        .color(theme::TEXT_SECONDARY),
+                                )
+                                .fill(Color32::TRANSPARENT)
+                                .stroke(Stroke::NONE)
+                                .corner_radius(CornerRadius::same(6))
+                                .min_size(Vec2::new(30.0, 26.0)),
+                            )
+                            .clicked()
+                        {
+                            ctx.send_viewport_cmd(egui::ViewportCommand::Maximized(!is_max));
+                        }
+
+                        // Minimize Button
+                        if ui
+                            .add(
+                                egui::Button::new(
+                                    RichText::new("—").size(12.0).color(theme::TEXT_SECONDARY),
+                                )
+                                .fill(Color32::TRANSPARENT)
+                                .stroke(Stroke::NONE)
+                                .corner_radius(CornerRadius::same(6))
+                                .min_size(Vec2::new(30.0, 26.0)),
+                            )
+                            .clicked()
+                        {
+                            ctx.send_viewport_cmd(egui::ViewportCommand::Minimized(true));
+                        }
+
+                        ui.separator();
+
+                        // Console Drawer Icon Toggle
+                        if icon_button(
+                            ui,
+                            NavIcon::Terminal,
+                            &format!("Activity Log ({})", self.state.last_log_count),
+                            self.state.settings.show_console_drawer,
+                        )
+                        .clicked()
+                        {
+                            self.state.settings.show_console_drawer =
+                                !self.state.settings.show_console_drawer;
+                            actions.push(AppAction::SaveSettings);
+                        }
+
+                        // Update Button (Minimalist Icon / Pill)
+                        match &self.state.update_status {
+                            UpdateStatus::Available(info) => {
+                                if emerald_button(ui, &format!("v{} Ready", info.latest_version))
+                                    .clicked()
+                                {
+                                    self.state.show_update_modal = true;
+                                }
+                            }
+                            UpdateStatus::Checking => {
+                                ui.spinner();
+                            }
+                            UpdateStatus::UpToDate { version } => {
+                                if icon_button(
+                                    ui,
+                                    NavIcon::Update,
+                                    &format!("Up to date (v{version}) — Click to re-check"),
+                                    false,
+                                )
+                                .clicked()
+                                {
+                                    actions.push(AppAction::CheckForUpdates);
+                                }
+                            }
+                            UpdateStatus::Idle | UpdateStatus::Error(_) => {
+                                if icon_button(
+                                    ui,
+                                    NavIcon::Update,
+                                    "Check for Updates",
+                                    false,
+                                )
+                                .clicked()
+                                {
+                                    actions.push(AppAction::CheckForUpdates);
+                                }
+                            }
+                        }
+
+                        // Instant RAM Purge Pill
+                        let ram_pill = egui::Button::new(
+                            RichText::new(format!(
+                                "⚡ RAM {}%",
+                                self.state.mem_stats.phys_load_pct
+                            ))
+                            .size(11.8)
+                            .strong()
+                            .monospace()
+                            .color(theme::ACCENT_EMERALD),
+                        )
+                        .fill(theme::ACCENT_EMERALD_DIM)
+                        .stroke(Stroke::new(
+                            1.0_f32,
+                            theme::ACCENT_EMERALD.linear_multiply(0.55),
+                        ))
+                        .corner_radius(CornerRadius::same(14))
+                        .min_size(Vec2::new(86.0, 26.0));
+                        if ui
+                            .add(ram_pill)
+                            .on_hover_text("Click to clean memory now (Ctrl+R)")
+                            .clicked()
+                        {
+                            actions.push(AppAction::RunMemReductClean);
+                        }
+
+                        // Live CPU & Timer micro-readout
+                        ui.label(
+                            RichText::new(format!(
+                                "CPU {:>2.0}%  •  {:.1}ms",
+                                self.state.live_cpu_pct,
+                                self.state.gamemode_status.current_timer_ms
+                            ))
+                            .size(11.2)
+                            .monospace()
+                            .color(theme::TEXT_MUTED),
+                        );
+                    });
                 });
-                ui.add_space(10.0);
-                ui.separator();
+
+                // Drag empty area of titlebar to move window; double-click to maximize
+                let drag_resp = ui.interact(
+                    bar_rect,
+                    egui::Id::new("titlebar_drag_zone"),
+                    egui::Sense::click_and_drag(),
+                );
+                if drag_resp.double_clicked() {
+                    let is_max = ctx.input(|i| i.viewport().maximized.unwrap_or(false));
+                    ctx.send_viewport_cmd(egui::ViewportCommand::Maximized(!is_max));
+                } else if drag_resp.drag_started_by(egui::PointerButton::Primary) {
+                    ctx.send_viewport_cmd(egui::ViewportCommand::StartDrag);
+                }
+            });
+
+        // ==================== ADAPTIVE COLLAPSIBLE NAVIGATION RAIL ====================
+        let auto_compact = ctx.screen_rect().width() < 1040.0;
+        let collapsed = self.state.settings.sidebar_collapsed || auto_compact;
+        let rail_width = if collapsed { 62.0 } else { 184.0 };
+
+        egui::SidePanel::left("nav_sidebar")
+            .exact_width(rail_width)
+            .resizable(false)
+            .frame(
+                egui::Frame::new()
+                    .fill(theme::BG_RAIL)
+                    .stroke(Stroke::new(1.0_f32, theme::BORDER_HAIRLINE))
+                    .inner_margin(Margin::symmetric(if collapsed { 8 } else { 10 }, 12)),
+            )
+            .show(ctx, |ui| {
+                ui.spacing_mut().item_spacing.y = 4.0;
 
                 for &tab in TabId::ALL {
-                    if let Some(heading) = tab.section_heading_before() {
-                        ui.add_space(6.0);
-                        ui.label(
-                            RichText::new(heading)
-                                .size(10.0)
-                                .strong()
-                                .color(theme::TEXT_MUTED),
+                    if tab.divider_before() {
+                        ui.add_space(4.0);
+                        let y = ui.cursor().top();
+                        let r = ui.available_rect_before_wrap();
+                        ui.painter().line_segment(
+                            [Pos2::new(r.left() + 6.0, y), Pos2::new(r.right() - 6.0, y)],
+                            Stroke::new(1.0_f32, theme::BORDER_HAIRLINE),
                         );
-                        ui.add_space(2.0);
+                        ui.add_space(5.0);
                     }
 
                     let selected = self.state.active_tab == tab;
-                    let fill = if selected {
-                        theme::ACCENT_COBALT_DIM
-                    } else {
-                        Color32::TRANSPARENT
-                    };
-                    let stroke = if selected {
-                        Stroke::new(1.0_f32, theme::ACCENT_COBALT)
-                    } else {
-                        Stroke::NONE
-                    };
-                    let txt_color = if selected {
+                    let row_h = 36.0;
+                    let (rect, resp) = ui.allocate_exact_size(
+                        Vec2::new(ui.available_width(), row_h),
+                        egui::Sense::click(),
+                    );
+
+                    if selected {
+                        ui.painter().rect_filled(
+                            rect,
+                            CornerRadius::same(9),
+                            theme::ACCENT_CYAN_DIM,
+                        );
+                        ui.painter().rect_stroke(
+                            rect,
+                            CornerRadius::same(9),
+                            Stroke::new(1.0_f32, theme::ACCENT_CYAN.linear_multiply(0.55)),
+                            egui::StrokeKind::Inside,
+                        );
+                        let bar = Rect::from_min_max(
+                            Pos2::new(rect.left() + 2.0, rect.top() + 8.0),
+                            Pos2::new(rect.left() + 5.0, rect.bottom() - 8.0),
+                        );
+                        ui.painter()
+                            .rect_filled(bar, CornerRadius::same(2), theme::ACCENT_CYAN);
+                    } else if resp.hovered() {
+                        ui.painter()
+                            .rect_filled(rect, CornerRadius::same(9), theme::BG_HOVER);
+                    }
+
+                    let icon_col = if selected {
+                        theme::ACCENT_CYAN
+                    } else if resp.hovered() {
                         theme::TEXT_PRIMARY
                     } else {
                         theme::TEXT_SECONDARY
                     };
-                    let btn = egui::Button::new(
-                        RichText::new(format!("  {}  {}", tab.tag(), tab.label()))
-                            .size(12.8)
-                            .strong()
-                            .color(txt_color),
-                    )
-                    .min_size(Vec2::new(ui.available_width(), 31.0))
-                    .fill(fill)
-                    .stroke(stroke)
-                    .corner_radius(CornerRadius::same(7));
 
-                    let resp = ui.add(btn);
-                    if selected {
-                        let r = resp.rect;
-                        let bar = Rect::from_min_max(
-                            Pos2::new(r.left() + 2.0, r.top() + 5.0),
-                            Pos2::new(r.left() + 5.5, r.bottom() - 5.0),
+                    if collapsed {
+                        paint_icon(ui.painter(), rect.center(), 17.0, tab.icon(), icon_col);
+                    } else {
+                        let icon_pos = Pos2::new(rect.left() + 22.0, rect.center().y);
+                        paint_icon(ui.painter(), icon_pos, 16.0, tab.icon(), icon_col);
+                        let txt_col = if selected {
+                            theme::TEXT_PRIMARY
+                        } else {
+                            theme::TEXT_SECONDARY
+                        };
+                        ui.painter().text(
+                            Pos2::new(rect.left() + 42.0, rect.center().y),
+                            egui::Align2::LEFT_CENTER,
+                            tab.label(),
+                            egui::FontId::proportional(13.2),
+                            txt_col,
                         );
-                        ui.painter()
-                            .rect_filled(bar, CornerRadius::same(2), theme::ACCENT_GOLD);
                     }
+
+                    let resp = if collapsed {
+                        resp.on_hover_text(tab.label())
+                    } else {
+                        resp
+                    };
                     if resp.clicked() {
                         actions.push(AppAction::SwitchTab(tab));
                     }
-                    ui.add_space(1.0);
                 }
 
-                ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
+                // Minimalist bottom status indicator
+                ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
                     ui.add_space(2.0);
-                    ui.horizontal(|ui| {
-                        if self.state.is_elevated {
-                            status_badge(
-                                ui,
-                                "ADMIN",
-                                theme::ACCENT_EMERALD,
-                                theme::ACCENT_EMERALD_DIM,
-                            );
+                    let dot_col = if self.state.is_elevated {
+                        theme::ACCENT_EMERALD
+                    } else {
+                        theme::ACCENT_AMBER
+                    };
+                    if collapsed {
+                        let (r, resp) =
+                            ui.allocate_exact_size(Vec2::splat(16.0), egui::Sense::hover());
+                        ui.painter().circle_filled(r.center(), 4.0, dot_col);
+                        resp.on_hover_text(if self.state.is_elevated {
+                            format!("Administrator • v{APP_VERSION}")
                         } else {
-                            status_badge(
-                                ui,
-                                "NON-ADMIN",
-                                theme::ACCENT_AMBER,
-                                theme::ACCENT_AMBER_DIM,
+                            format!("Standard User • v{APP_VERSION}")
+                        });
+                    } else {
+                        ui.horizontal(|ui| {
+                            let (r, _) =
+                                ui.allocate_exact_size(Vec2::splat(10.0), egui::Sense::hover());
+                            ui.painter().circle_filled(r.center(), 3.5, dot_col);
+                            ui.label(
+                                RichText::new(format!(
+                                    "{} • v{APP_VERSION}",
+                                    if self.state.is_elevated {
+                                        "Admin"
+                                    } else {
+                                        "User"
+                                    }
+                                ))
+                                .size(11.0)
+                                .color(theme::TEXT_MUTED),
                             );
-                        }
-                        status_badge(
-                            ui,
-                            &format!("v{APP_VERSION}"),
-                            theme::ACCENT_COBALT,
-                            theme::BG_ELEVATED,
-                        );
-                    });
-                    ui.add_space(2.0);
-                    ui.label(
-                        RichText::new(format!(
-                            "CPU {:>2.0}%  •  RAM {:>2}%  •  {:.2}ms",
-                            self.state.live_cpu_pct,
-                            self.state.mem_stats.phys_load_pct,
-                            self.state.gamemode_status.current_timer_ms
-                        ))
-                        .size(11.0)
-                        .monospace()
-                        .color(theme::TEXT_MUTED),
-                    );
+                        });
+                    }
                 });
             });
 
@@ -2178,32 +2541,32 @@ impl eframe::App for OptimizerApp {
         if self.state.settings.show_console_drawer {
             egui::TopBottomPanel::bottom("console_drawer")
                 .resizable(true)
-                .default_height(150.0)
-                .min_height(90.0)
-                .max_height(320.0)
+                .default_height(145.0)
+                .min_height(85.0)
+                .max_height(300.0)
                 .frame(
                     egui::Frame::new()
-                        .fill(theme::BG_SIDEBAR)
-                        .stroke(Stroke::new(1.0_f32, theme::BORDER_STRONG))
-                        .inner_margin(Margin::symmetric(12, 8)),
+                        .fill(theme::BG_VOID)
+                        .stroke(Stroke::new(1.0_f32, theme::BORDER_SUBTLE))
+                        .inner_margin(Margin::symmetric(14, 8)),
                 )
                 .show(ctx, |ui| {
                     ui.horizontal(|ui| {
                         ui.label(
-                            RichText::new("Activity Console (Live Operations Log)")
-                                .size(12.5)
+                            RichText::new("ACTIVITY LOG")
+                                .size(10.5)
                                 .strong()
-                                .color(theme::TEXT_PRIMARY),
+                                .color(theme::TEXT_MUTED),
                         );
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            if subtle_button(ui, "Hide").clicked() {
+                            if subtle_button(ui, "Close").clicked() {
                                 self.state.settings.show_console_drawer = false;
                                 actions.push(AppAction::SaveSettings);
                             }
                             if subtle_button(ui, "Clear").clicked() {
                                 actions.push(AppAction::ClearConsoleLogs);
                             }
-                            if subtle_button(ui, "Copy All").clicked() {
+                            if subtle_button(ui, "Copy").clicked() {
                                 let joined: String = self
                                     .state
                                     .logs_snapshot
@@ -2215,12 +2578,12 @@ impl eframe::App for OptimizerApp {
                                     .join("\n");
                                 actions.push(AppAction::CopyText {
                                     text: joined,
-                                    label: "Console log copied".to_string(),
+                                    label: "Activity log copied".to_string(),
                                 });
                             }
                         });
                     });
-                    ui.separator();
+                    ui.add_space(4.0);
                     egui::ScrollArea::vertical()
                         .id_salt("global_console_scroll")
                         .stick_to_bottom(true)
@@ -2234,7 +2597,7 @@ impl eframe::App for OptimizerApp {
                                 };
                                 ui.label(
                                     RichText::new(format!(
-                                        "[{}] {}",
+                                        "{}  {}",
                                         entry.timestamp, entry.message
                                     ))
                                     .size(11.5)
@@ -2246,108 +2609,17 @@ impl eframe::App for OptimizerApp {
                 });
         }
 
-        // ==================== CENTRAL CONTENT ====================
+        // ==================== CENTRAL CONTENT CANVAS ====================
         egui::CentralPanel::default()
             .frame(
                 egui::Frame::new()
                     .fill(theme::BG_CANVAS)
-                    .inner_margin(Margin::symmetric(18, 12)),
+                    .inner_margin(Margin::symmetric(24, 18)),
             )
             .show(ctx, |ui| {
-                // Swifter Top Action & Telemetry Header Bar
-                ui.horizontal(|ui| {
-                    if let Some(busy) = &self.state.busy_task {
-                        ui.spinner();
-                        ui.label(RichText::new(busy).size(12.5).color(theme::ACCENT_GOLD));
-                    } else if self.state.scanning_system {
-                        ui.spinner();
-                        ui.label(
-                            RichText::new("Detecting system...")
-                                .size(12.5)
-                                .color(theme::TEXT_SECONDARY),
-                        );
-                    } else {
-                        status_badge(
-                            ui,
-                            &format!(
-                                "CPU {:.0}%  |  RAM {}% ({} Free)  |  {} Programs",
-                                self.state.live_cpu_pct,
-                                self.state.mem_stats.phys_load_pct,
-                                format_bytes(self.state.mem_stats.phys_free_bytes),
-                                self.state.installed_apps.len(),
-                            ),
-                            theme::TEXT_SECONDARY,
-                            theme::BG_SURFACE,
-                        );
-                    }
-
-                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                        let c_lbl = if self.state.settings.show_console_drawer {
-                            format!("Console ({}) ▼", self.state.last_log_count)
-                        } else {
-                            format!("Console ({}) ▲", self.state.last_log_count)
-                        };
-                        if subtle_button(ui, &c_lbl).clicked() {
-                            self.state.settings.show_console_drawer =
-                                !self.state.settings.show_console_drawer;
-                            actions.push(AppAction::SaveSettings);
-                        }
-
-                        // Update Checker Button in Top Bar
-                        match &self.state.update_status {
-                            UpdateStatus::Available(info) => {
-                                if emerald_button(
-                                    ui,
-                                    &format!("⬆ Update v{} Available!", info.latest_version),
-                                )
-                                .clicked()
-                                {
-                                    self.state.show_update_modal = true;
-                                }
-                            }
-                            UpdateStatus::Checking => {
-                                let _ = subtle_button(ui, "Checking Updates...");
-                            }
-                            UpdateStatus::UpToDate { version } => {
-                                if subtle_button(ui, &format!("✓ v{version} (Latest)"))
-                                    .on_hover_text("Click to check GitHub Releases again")
-                                    .clicked()
-                                {
-                                    actions.push(AppAction::CheckForUpdates);
-                                }
-                            }
-                            UpdateStatus::Idle | UpdateStatus::Error(_) => {
-                                if primary_button(ui, "Check Updates")
-                                    .on_hover_text("Query GitHub Releases for newly released versions")
-                                    .clicked()
-                                {
-                                    actions.push(AppAction::CheckForUpdates);
-                                }
-                            }
-                        }
-
-                        if !self.state.is_installed_on_pc {
-                            if subtle_button(ui, "Install to PC")
-                                .on_hover_text(
-                                    "Install Optimizer by Raghav to Program Files with Desktop & Start Menu shortcuts",
-                                )
-                                .clicked()
-                            {
-                                actions.push(AppAction::InstallAppToSystem);
-                            }
-                        }
-
-                        if emerald_button(ui, "Mem Reduct (Ctrl+R)").clicked() {
-                            actions.push(AppAction::RunMemReductClean);
-                        }
-                    });
-                });
-                ui.add_space(6.0);
-                ui.separator();
-                ui.add_space(6.0);
-
-                if self.state.active_tab == TabId::Uninstaller {
-                    // Geek Uninstaller manages its own virtualized ScrollArea for 240 FPS scrolling
+                if self.state.active_tab == TabId::Uninstaller
+                    && self.state.apps_subview == AppsSubView::Installed
+                {
                     tabs::uninstaller::render(ui, &mut self.state, &mut actions);
                 } else {
                     egui::ScrollArea::vertical()
@@ -2357,7 +2629,6 @@ impl eframe::App for OptimizerApp {
                             TabId::Dashboard => {
                                 tabs::dashboard::render(ui, &self.state, &mut actions)
                             }
-                            TabId::Specs => tabs::specs::render(ui, &self.state, &mut actions),
                             TabId::QuickBoost => {
                                 tabs::quick_boost::render(ui, &self.state, &mut actions)
                             }
@@ -2367,25 +2638,148 @@ impl eframe::App for OptimizerApp {
                             TabId::Health => {
                                 tabs::health::render(ui, &mut self.state, &mut actions)
                             }
-                            TabId::Uninstaller => {}
-                            TabId::Debloat => {
-                                tabs::debloat::render(ui, &mut self.state, &mut actions)
-                            }
-                            TabId::Network => {
-                                tabs::network::render(ui, &mut self.state, &mut actions)
+                            TabId::Uninstaller => {
+                                tabs::uninstaller::render(ui, &mut self.state, &mut actions)
                             }
                             TabId::Gaming => {
                                 tabs::gaming::render(ui, &mut self.state, &mut actions)
                             }
+                            TabId::Network => {
+                                tabs::network::render(ui, &mut self.state, &mut actions)
+                            }
                             TabId::Safety => {
                                 tabs::safety::render(ui, &mut self.state, &mut actions)
                             }
+                            TabId::Specs => tabs::specs::render(ui, &self.state, &mut actions),
                             TabId::Settings => {
                                 tabs::settings::render(ui, &mut self.state, &mut actions)
                             }
                         });
                 }
             });
+
+        // ==================== COMMAND PALETTE OVERLAY (CTRL+K) ====================
+        if self.state.show_command_palette {
+            let screen = ctx.screen_rect();
+            egui::Area::new(egui::Id::new("cmd_palette_scrim"))
+                .fixed_pos(screen.min)
+                .order(egui::Order::Middle)
+                .show(ctx, |ui| {
+                    let resp = ui.allocate_response(screen.size(), egui::Sense::click());
+                    ui.painter().rect_filled(
+                        screen,
+                        CornerRadius::ZERO,
+                        Color32::from_rgba_unmultiplied(4, 6, 10, 180),
+                    );
+                    if resp.clicked() {
+                        self.state.show_command_palette = false;
+                    }
+                });
+
+            let mut close_palette = false;
+            egui::Window::new("Command Palette")
+                .title_bar(false)
+                .collapsible(false)
+                .resizable(false)
+                .anchor(egui::Align2::CENTER_TOP, egui::vec2(0.0, 84.0))
+                .order(egui::Order::Tooltip)
+                .fixed_size(egui::vec2(500.0, 320.0))
+                .show(ctx, |ui| {
+                    search_bar(
+                        ui,
+                        &mut self.state.command_query,
+                        "Jump to page, run optimization, or toggle tweak...",
+                        468.0,
+                    );
+                    ui.add_space(8.0);
+                    let q = self.state.command_query.trim().to_ascii_lowercase();
+                    egui::ScrollArea::vertical()
+                        .max_height(255.0)
+                        .show(ui, |ui| {
+                            let quick_cmds: &[(&str, AppAction)] = &[
+                                ("Clean Memory Now (Mem Reduct)", AppAction::RunMemReductClean),
+                                (
+                                    "Apply Extreme Win11 & eSports Preset",
+                                    AppAction::ApplyPreset(crate::models::PresetId::ExtremeWin11),
+                                ),
+                                (
+                                    "Apply Competitive Low-Latency Preset",
+                                    AppAction::ApplyPreset(
+                                        crate::models::PresetId::CompetitiveLowLatency,
+                                    ),
+                                ),
+                                ("Scan PC Junk & Caches", AppAction::ScanCleaner),
+                                ("Run DNS Latency Benchmark", AppAction::BenchmarkDns),
+                                ("Rescan System Hardware", AppAction::RescanSystem),
+                                ("Check for Software Updates", AppAction::CheckForUpdates),
+                            ];
+
+                            for (label, act) in quick_cmds {
+                                if q.is_empty() || label.to_ascii_lowercase().contains(&q) {
+                                    let btn = egui::Button::new(
+                                        RichText::new(format!("⚡  {label}"))
+                                            .size(12.8)
+                                            .color(theme::TEXT_PRIMARY),
+                                    )
+                                    .fill(theme::BG_ELEVATED)
+                                    .min_size(Vec2::new(ui.available_width(), 30.0));
+                                    if ui.add(btn).clicked() {
+                                        actions.push(act.clone());
+                                        close_palette = true;
+                                    }
+                                }
+                            }
+
+                            for &tab in TabId::ALL {
+                                let lbl = format!("Go to {}", tab.label());
+                                if q.is_empty() || lbl.to_ascii_lowercase().contains(&q) {
+                                    let btn = egui::Button::new(
+                                        RichText::new(format!("→  {lbl}"))
+                                            .size(12.5)
+                                            .color(theme::TEXT_SECONDARY),
+                                    )
+                                    .fill(Color32::TRANSPARENT)
+                                    .min_size(Vec2::new(ui.available_width(), 28.0));
+                                    if ui.add(btn).clicked() {
+                                        actions.push(AppAction::SwitchTab(tab));
+                                        close_palette = true;
+                                    }
+                                }
+                            }
+
+                            if !q.is_empty() {
+                                for t in &self.state.tweaks {
+                                    if t.title.to_ascii_lowercase().contains(&q) {
+                                        let verb = if t.is_applied { "Revert" } else { "Apply" };
+                                        let btn = egui::Button::new(
+                                            RichText::new(format!("{verb}: {}", t.title))
+                                                .size(12.5)
+                                                .color(theme::ACCENT_CYAN),
+                                        )
+                                        .fill(Color32::TRANSPARENT)
+                                        .min_size(Vec2::new(ui.available_width(), 28.0));
+                                        if ui.add(btn).clicked() {
+                                            if t.is_applied {
+                                                actions.push(AppAction::RevertSingleTweak(
+                                                    t.id.clone(),
+                                                ));
+                                            } else {
+                                                actions.push(AppAction::ApplySingleTweak(
+                                                    t.id.clone(),
+                                                ));
+                                            }
+                                            close_palette = true;
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                });
+            if close_palette {
+                self.state.show_command_palette = false;
+                self.state.command_query.clear();
+            }
+        }
 
         // ==================== UPDATE AVAILABLE MODAL ====================
         if self.state.show_update_modal {
@@ -2399,72 +2793,61 @@ impl eframe::App for OptimizerApp {
                         ui.painter().rect_filled(
                             screen,
                             CornerRadius::ZERO,
-                            Color32::from_rgba_unmultiplied(6, 9, 14, 185),
+                            Color32::from_rgba_unmultiplied(4, 6, 10, 190),
                         );
                     });
 
                 let mut close_update = false;
-                egui::Window::new(format!(
-                    "New Version Available — Optimizer by Raghav v{}",
-                    info.latest_version
-                ))
-                .collapsible(false)
-                .resizable(false)
-                .anchor(egui::Align2::CENTER_CENTER, egui::vec2(0.0, 0.0))
-                .order(egui::Order::Tooltip)
-                .fixed_size(egui::vec2(500.0, 240.0))
-                .show(ctx, |ui| {
-                    ui.horizontal(|ui| {
-                        status_badge(
-                            ui,
-                            &format!("INSTALLED: v{}", info.current_version),
-                            theme::TEXT_SECONDARY,
-                            theme::BG_ELEVATED,
-                        );
-                        status_badge(
-                            ui,
-                            &format!("NEW RELEASE: v{}", info.latest_version),
-                            theme::ACCENT_EMERALD,
-                            theme::ACCENT_EMERALD_DIM,
-                        );
-                    });
-                    ui.add_space(8.0);
-                    ui.label(
-                        RichText::new("Release Highlights:")
-                            .size(12.5)
-                            .strong()
-                            .color(theme::TEXT_PRIMARY),
-                    );
-                    egui::ScrollArea::vertical()
-                        .max_height(100.0)
-                        .show(ui, |ui| {
-                            ui.label(
-                                RichText::new(&info.release_notes)
-                                    .size(12.0)
-                                    .color(theme::TEXT_SECONDARY),
+                egui::Window::new(format!("Update v{}", info.latest_version))
+                    .collapsible(false)
+                    .resizable(false)
+                    .anchor(egui::Align2::CENTER_CENTER, egui::vec2(0.0, 0.0))
+                    .order(egui::Order::Tooltip)
+                    .fixed_size(egui::vec2(460.0, 220.0))
+                    .show(ctx, |ui| {
+                        ui.horizontal(|ui| {
+                            status_badge(
+                                ui,
+                                &format!("v{}", info.current_version),
+                                theme::TEXT_SECONDARY,
+                                theme::BG_ELEVATED,
+                            );
+                            ui.label(RichText::new("→").color(theme::TEXT_MUTED));
+                            status_badge(
+                                ui,
+                                &format!("v{}", info.latest_version),
+                                theme::ACCENT_EMERALD,
+                                theme::ACCENT_EMERALD_DIM,
                             );
                         });
-                    ui.add_space(12.0);
-                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                        if emerald_button(
-                            ui,
-                            &format!("Download & Install v{} Now", info.latest_version),
-                        )
-                        .clicked()
-                        {
-                            actions.push(AppAction::InstallUpdateNow(
-                                info.setup_download_url.clone(),
-                            ));
-                            close_update = true;
-                        }
-                        if primary_button(ui, "View on GitHub").clicked() {
-                            actions.push(AppAction::OpenUrl(info.release_url.clone()));
-                        }
-                        if subtle_button(ui, "Later").clicked() {
-                            close_update = true;
-                        }
+                        ui.add_space(8.0);
+                        egui::ScrollArea::vertical()
+                            .max_height(100.0)
+                            .show(ui, |ui| {
+                                ui.label(
+                                    RichText::new(&info.release_notes)
+                                        .size(12.2)
+                                        .color(theme::TEXT_SECONDARY),
+                                );
+                            });
+                        ui.add_space(12.0);
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                            if emerald_button(ui, &format!("Install v{}", info.latest_version))
+                                .clicked()
+                            {
+                                actions.push(AppAction::InstallUpdateNow(
+                                    info.setup_download_url.clone(),
+                                ));
+                                close_update = true;
+                            }
+                            if subtle_button(ui, "Release Notes").clicked() {
+                                actions.push(AppAction::OpenUrl(info.release_url.clone()));
+                            }
+                            if subtle_button(ui, "Later").clicked() {
+                                close_update = true;
+                            }
+                        });
                     });
-                });
                 if close_update {
                     self.state.show_update_modal = false;
                 }
@@ -2473,46 +2856,55 @@ impl eframe::App for OptimizerApp {
             }
         }
 
-        // ==================== TOAST OVERLAY (TOP-RIGHT) ====================
+        // ==================== TOAST OVERLAY (BOTTOM-RIGHT FLOATING PILLS) ====================
         if !self.state.toasts.is_empty() {
             egui::Area::new(egui::Id::new("toast_overlay"))
-                .anchor(egui::Align2::RIGHT_TOP, egui::vec2(-18.0, 48.0))
+                .anchor(egui::Align2::RIGHT_BOTTOM, egui::vec2(-20.0, -20.0))
                 .order(egui::Order::Foreground)
                 .show(ctx, |ui| {
                     ui.vertical(|ui| {
                         let mut dismiss_idx = None;
                         for (idx, t) in self.state.toasts.iter().enumerate() {
-                            let (fg, bg) = match t.kind {
-                                ToastKind::Success => {
-                                    (theme::ACCENT_EMERALD, theme::ACCENT_EMERALD_DIM)
-                                }
-                                ToastKind::Warning => {
-                                    (theme::ACCENT_AMBER, theme::ACCENT_AMBER_DIM)
-                                }
-                                ToastKind::Error => (theme::ACCENT_ROSE, theme::ACCENT_ROSE_DIM),
-                                ToastKind::Info => {
-                                    (theme::ACCENT_COBALT, theme::ACCENT_COBALT_DIM)
-                                }
+                            let accent = match t.kind {
+                                ToastKind::Success => theme::ACCENT_EMERALD,
+                                ToastKind::Warning => theme::ACCENT_AMBER,
+                                ToastKind::Error => theme::ACCENT_ROSE,
+                                ToastKind::Info => theme::ACCENT_CYAN,
                             };
                             egui::Frame::new()
-                                .fill(bg)
-                                .stroke(Stroke::new(1.0_f32, fg))
-                                .corner_radius(CornerRadius::same(7))
-                                .inner_margin(Margin::symmetric(12, 8))
+                                .fill(theme::BG_ELEVATED)
+                                .stroke(Stroke::new(1.0_f32, accent.linear_multiply(0.65)))
+                                .corner_radius(CornerRadius::same(10))
+                                .inner_margin(Margin::symmetric(14, 9))
                                 .show(ui, |ui| {
                                     ui.set_max_width(360.0);
                                     ui.horizontal(|ui| {
+                                        let (r, _) = ui.allocate_exact_size(
+                                            Vec2::splat(8.0),
+                                            egui::Sense::hover(),
+                                        );
+                                        ui.painter().circle_filled(r.center(), 3.5, accent);
                                         ui.label(
                                             RichText::new(&t.text)
-                                                .size(12.5)
+                                                .size(12.2)
                                                 .color(theme::TEXT_PRIMARY),
                                         );
-                                        if ui.small_button("×").clicked() {
+                                        if ui
+                                            .add(
+                                                egui::Button::new(
+                                                    RichText::new("×")
+                                                        .size(13.0)
+                                                        .color(theme::TEXT_MUTED),
+                                                )
+                                                .frame(false),
+                                            )
+                                            .clicked()
+                                        {
                                             dismiss_idx = Some(idx);
                                         }
                                     });
                                 });
-                            ui.add_space(4.0);
+                            ui.add_space(6.0);
                         }
                         if let Some(i) = dismiss_idx {
                             self.state.toasts.remove(i);
@@ -2532,7 +2924,7 @@ impl eframe::App for OptimizerApp {
                     ui.painter().rect_filled(
                         screen,
                         CornerRadius::ZERO,
-                        Color32::from_rgba_unmultiplied(6, 9, 14, 185),
+                        Color32::from_rgba_unmultiplied(4, 6, 10, 190),
                     );
                 });
 
@@ -2542,11 +2934,11 @@ impl eframe::App for OptimizerApp {
                 .resizable(false)
                 .anchor(egui::Align2::CENTER_CENTER, egui::vec2(0.0, 0.0))
                 .order(egui::Order::Tooltip)
-                .fixed_size(egui::vec2(480.0, 210.0))
+                .fixed_size(egui::vec2(440.0, 185.0))
                 .show(ctx, |ui| {
                     ui.label(
                         RichText::new(&req.message)
-                            .size(13.0)
+                            .size(12.8)
                             .color(theme::TEXT_SECONDARY),
                     );
                     ui.add_space(16.0);
@@ -2555,7 +2947,7 @@ impl eframe::App for OptimizerApp {
                             actions.push(*req.action);
                             close_modal = true;
                         }
-                        if primary_button(ui, "Cancel").clicked() {
+                        if subtle_button(ui, "Cancel").clicked() {
                             close_modal = true;
                         }
                     });

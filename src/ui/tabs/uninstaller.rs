@@ -1,57 +1,62 @@
 use crate::engine::format_bytes;
 use crate::models::{InstalledAppKind, LeftoverKind};
 use crate::ui::components::{
-    card_frame, danger_button, emerald_button, primary_button, section_header, status_badge,
-    subtle_button,
+    bento_frame, card_frame, danger_button, filter_chip, icon_button, search_bar, section_header,
+    segmented_tabs, status_badge, subtle_button, toggle_switch, NavIcon,
 };
-use crate::ui::{theme, AppAction, ConfirmRequest, UiState};
-use egui::RichText;
+use crate::ui::tabs::debloat;
+use crate::ui::{theme, AppAction, AppsSubView, ConfirmRequest, UiState};
+use egui::{RichText, Vec2};
 
 pub fn render(ui: &mut egui::Ui, state: &mut UiState, actions: &mut Vec<AppAction>) {
     ui.horizontal(|ui| {
+        let total_size: u64 = state
+            .installed_apps
+            .iter()
+            .map(|a| a.estimated_size_bytes)
+            .sum();
         section_header(
             ui,
-            "Geek Uninstaller & Leftover Force-Cleaner",
-            "Virtualized 240 FPS program table across Win32 (64-bit/32-bit/HKCU) & Store apps with deep leftover sweep and Force Removal.",
+            "Applications",
+            &format!("{} installed  •  {}", state.installed_apps.len(), format_bytes(total_size)),
         );
+
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-            if primary_button(ui, "Refresh Installed Programs").clicked() {
-                actions.push(AppAction::ScanInstalledApps);
-            }
-            if ui
-                .checkbox(&mut state.uninstaller_include_uwp, "Include Store / UWP Apps")
-                .changed()
-            {
-                actions.push(AppAction::ScanInstalledApps);
-            }
+            segmented_tabs(
+                ui,
+                &mut state.apps_subview,
+                &[
+                    (AppsSubView::Installed, "Installed"),
+                    (AppsSubView::Debloat, "OS Debloat"),
+                ],
+            );
         });
     });
 
-    // Leftover Deep-Clean Drawer when an app's leftovers are active
+    if state.apps_subview == AppsSubView::Debloat {
+        debloat::render(ui, state, actions);
+        return;
+    }
+
+    // ==================== LEFTOVER DEEP-SCAN PANEL ====================
     if let Some(ref app) = state.active_leftover_app {
         let app_name = app.display_name.clone();
-        let app_pub = app.publisher.clone();
-        card_frame().show(ui, |ui| {
+        bento_frame(Some(theme::ACCENT_GOLD)).show(ui, |ui| {
             ui.horizontal_wrapped(|ui| {
                 status_badge(
                     ui,
-                    "GEEK LEFTOVER & FORCE REMOVAL SCANNER",
+                    &format!("{} TRACES", state.leftover_items.len()),
                     theme::ACCENT_GOLD,
                     theme::ACCENT_AMBER_DIM,
                 );
                 ui.label(
-                    RichText::new(format!(
-                        "{} ({}) — {} leftover trace(s) found",
-                        app_name,
-                        app_pub,
-                        state.leftover_items.len()
-                    ))
-                    .size(14.0)
-                    .strong()
-                    .color(theme::TEXT_PRIMARY),
+                    RichText::new(&app_name)
+                        .size(14.0)
+                        .strong()
+                        .color(theme::TEXT_PRIMARY),
                 );
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    if subtle_button(ui, "Close Scanner").clicked() {
+                    if subtle_button(ui, "Close").clicked() {
                         actions.push(AppAction::CloseLeftoversModal);
                     }
                     let sel_cnt = state.leftover_items.iter().filter(|i| i.is_selected).count();
@@ -64,20 +69,17 @@ pub fn render(ui: &mut egui::Ui, state: &mut UiState, actions: &mut Vec<AppActio
                             .sum();
                         if danger_button(
                             ui,
-                            &format!(
-                                "Force Delete Selected ({sel_cnt} items, {})",
-                                format_bytes(total_sz)
-                            ),
+                            &format!("Force Delete ({sel_cnt} • {})", format_bytes(total_sz)),
                         )
                         .clicked()
                         {
                             actions.push(AppAction::RequestConfirm(ConfirmRequest {
-                                title: format!("Confirm Geek Force Removal: {app_name}"),
+                                title: format!("Force Delete Traces — {app_name}"),
                                 message: format!(
-                                    "Permanently delete {sel_cnt} selected leftover files, folders, and registry keys for '{app_name}' ({})?",
+                                    "Permanently delete {sel_cnt} leftover files and registry keys ({})?",
                                     format_bytes(total_sz)
                                 ),
-                                confirm_label: "Delete All Selected Leftovers".into(),
+                                confirm_label: "Delete Traces".into(),
                                 action: Box::new(AppAction::DeleteSelectedLeftovers),
                             }));
                         }
@@ -88,39 +90,35 @@ pub fn render(ui: &mut egui::Ui, state: &mut UiState, actions: &mut Vec<AppActio
             ui.add_space(6.0);
             if state.leftover_items.is_empty() {
                 ui.label(
-                    RichText::new("Zero leftover files, folders, or registry traces found for this application.")
-                        .size(12.5)
+                    RichText::new("Clean — zero leftover traces detected.")
+                        .size(12.2)
                         .color(theme::ACCENT_EMERALD),
                 );
             } else {
                 egui::ScrollArea::vertical()
                     .id_salt("geek_leftovers_scroll")
-                    .max_height(210.0)
+                    .max_height(180.0)
                     .show(ui, |ui| {
                         for item in state.leftover_items.iter_mut() {
                             ui.horizontal(|ui| {
-                                ui.checkbox(&mut item.is_selected, "");
-                                let (fg, bg) = match item.kind {
-                                    LeftoverKind::Directory => (theme::ACCENT_GOLD, theme::BG_ELEVATED),
-                                    LeftoverKind::File => (theme::ACCENT_COBALT, theme::BG_ELEVATED),
-                                    LeftoverKind::RegistryKey => (theme::ACCENT_ROSE, theme::ACCENT_ROSE_DIM),
-                                    LeftoverKind::RegistryValue => (theme::ACCENT_AMBER, theme::ACCENT_AMBER_DIM),
+                                toggle_switch(ui, &mut item.is_selected);
+                                let fg = match item.kind {
+                                    LeftoverKind::Directory => theme::ACCENT_GOLD,
+                                    LeftoverKind::File => theme::ACCENT_CYAN,
+                                    LeftoverKind::RegistryKey | LeftoverKind::RegistryValue => {
+                                        theme::ACCENT_ROSE
+                                    }
                                 };
-                                status_badge(ui, item.kind.label(), fg, bg);
-                                ui.label(
-                                    RichText::new(&item.display_path)
-                                        .size(12.0)
-                                        .monospace()
-                                        .color(theme::TEXT_PRIMARY),
+                                status_badge(ui, item.kind.label(), fg, theme::BG_VOID);
+                                ui.add(
+                                    egui::Label::new(
+                                        RichText::new(&item.display_path)
+                                            .size(11.8)
+                                            .monospace()
+                                            .color(theme::TEXT_PRIMARY),
+                                    )
+                                    .truncate(),
                                 );
-                                if item.size_bytes > 0 {
-                                    status_badge(
-                                        ui,
-                                        &format_bytes(item.size_bytes),
-                                        theme::TEXT_SECONDARY,
-                                        theme::BG_ELEVATED,
-                                    );
-                                }
                             });
                         }
                     });
@@ -129,42 +127,35 @@ pub fn render(ui: &mut egui::Ui, state: &mut UiState, actions: &mut Vec<AppActio
         ui.add_space(10.0);
     }
 
-    // Search + Filter + Sort Bar
+    // ==================== COMPACT TOOLBAR ====================
     let mut sort_toggled = false;
-    card_frame().show(ui, |ui| {
-        ui.horizontal_wrapped(|ui| {
-            ui.add_sized(
-                [250.0, 28.0],
-                egui::TextEdit::singleline(&mut state.uninstaller_search)
-                    .hint_text("Search programs by name, publisher, or version..."),
-            );
-            if !state.uninstaller_search.is_empty() && subtle_button(ui, "Clear").clicked() {
-                state.uninstaller_search.clear();
-            }
+    ui.horizontal_wrapped(|ui| {
+        search_bar(ui, &mut state.uninstaller_search, "Search apps...", 230.0);
 
-            ui.separator();
-
-            if filter_pill(ui, "All", state.uninstaller_filter_kind.is_none()).clicked() {
-                state.uninstaller_filter_kind = None;
+        if filter_chip(ui, "All", state.uninstaller_filter_kind.is_none()).clicked() {
+            state.uninstaller_filter_kind = None;
+        }
+        for (k, short) in [
+            (InstalledAppKind::Win32x64, "x64"),
+            (InstalledAppKind::Win32x86, "x86"),
+            (InstalledAppKind::UserHkcu, "User"),
+            (InstalledAppKind::StoreUwp, "Store"),
+        ] {
+            if filter_chip(ui, short, state.uninstaller_filter_kind == Some(k)).clicked() {
+                state.uninstaller_filter_kind = Some(k);
             }
-            for k in [
-                InstalledAppKind::Win32x64,
-                InstalledAppKind::Win32x86,
-                InstalledAppKind::UserHkcu,
-                InstalledAppKind::StoreUwp,
-            ] {
-                if filter_pill(ui, k.label(), state.uninstaller_filter_kind == Some(k)).clicked() {
-                    state.uninstaller_filter_kind = Some(k);
-                }
-            }
+        }
 
-            ui.separator();
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            if icon_button(ui, NavIcon::Refresh, "Rescan Apps", false).clicked() {
+                actions.push(AppAction::ScanInstalledApps);
+            }
             if subtle_button(
                 ui,
                 if state.uninstaller_sort_by_size {
-                    "Sort: Size (Largest First)"
+                    "Sort: Size"
                 } else {
-                    "Sort: Name (A-Z)"
+                    "Sort: A–Z"
                 },
             )
             .clicked()
@@ -172,18 +163,12 @@ pub fn render(ui: &mut egui::Ui, state: &mut UiState, actions: &mut Vec<AppActio
                 state.uninstaller_sort_by_size = !state.uninstaller_sort_by_size;
                 sort_toggled = true;
             }
-
-            let total_size: u64 = state.installed_apps.iter().map(|a| a.estimated_size_bytes).sum();
-            ui.label(
-                RichText::new(format!(
-                    "{} programs ({})",
-                    state.installed_apps.len(),
-                    format_bytes(total_size)
-                ))
-                .size(12.0)
-                .monospace()
-                .color(theme::TEXT_SECONDARY),
-            );
+            ui.horizontal(|ui| {
+                ui.label(RichText::new("UWP").size(11.5).color(theme::TEXT_MUTED));
+                if toggle_switch(ui, &mut state.uninstaller_include_uwp).changed() {
+                    actions.push(AppAction::ScanInstalledApps);
+                }
+            });
         });
     });
 
@@ -207,18 +192,18 @@ pub fn render(ui: &mut egui::Ui, state: &mut UiState, actions: &mut Vec<AppActio
         card_frame().show(ui, |ui| {
             ui.label(
                 RichText::new(if state.scanning_apps {
-                    "Scanning registry hives and installed programs..."
+                    "Indexing installed applications..."
                 } else {
-                    "Click 'Refresh Installed Programs' to load all Win32 & Store applications."
+                    "No applications indexed yet."
                 })
-                .size(13.0)
+                .size(12.8)
                 .color(theme::TEXT_SECONDARY),
             );
         });
         return;
     }
 
-    // Zero-clone index filter + virtualized row rendering (`show_rows`) for instant 240 FPS scrolling
+    // ==================== VIRTUALIZED SLEEK ROW LIST ====================
     let q = state.uninstaller_search.trim().to_ascii_lowercase();
     let kind_filter = state.uninstaller_filter_kind;
 
@@ -230,8 +215,7 @@ pub fn render(ui: &mut egui::Ui, state: &mut UiState, actions: &mut Vec<AppActio
             let kind_ok = kind_filter.map(|k| app.kind == k).unwrap_or(true);
             let txt_ok = q.is_empty()
                 || app.display_name.to_ascii_lowercase().contains(&q)
-                || app.publisher.to_ascii_lowercase().contains(&q)
-                || app.display_version.to_ascii_lowercase().contains(&q);
+                || app.publisher.to_ascii_lowercase().contains(&q);
             if kind_ok && txt_ok {
                 Some(idx)
             } else {
@@ -240,7 +224,7 @@ pub fn render(ui: &mut egui::Ui, state: &mut UiState, actions: &mut Vec<AppActio
         })
         .collect();
 
-    let row_height = 68.0;
+    let row_height = 60.0;
     egui::ScrollArea::vertical()
         .id_salt("geek_virtual_table")
         .auto_shrink([false, false])
@@ -248,81 +232,107 @@ pub fn render(ui: &mut egui::Ui, state: &mut UiState, actions: &mut Vec<AppActio
             for row_i in row_range {
                 let idx = matching_indices[row_i];
                 let app = &state.installed_apps[idx];
+
                 card_frame().show(ui, |ui| {
                     ui.horizontal(|ui| {
+                        // Left: Name + clean Publisher/Version subtitle
                         ui.vertical(|ui| {
-                            ui.horizontal_wrapped(|ui| {
-                                ui.label(
-                                    RichText::new(&app.display_name)
-                                        .size(14.0)
-                                        .strong()
-                                        .color(theme::TEXT_PRIMARY),
+                            ui.spacing_mut().item_spacing.y = 2.0;
+                            ui.horizontal(|ui| {
+                                ui.add(
+                                    egui::Label::new(
+                                        RichText::new(&app.display_name)
+                                            .size(13.8)
+                                            .strong()
+                                            .color(theme::TEXT_PRIMARY),
+                                    )
+                                    .truncate(),
                                 );
                                 if !app.display_version.is_empty() {
-                                    status_badge(
-                                        ui,
-                                        &format!("v{}", app.display_version),
-                                        theme::ACCENT_COBALT,
-                                        theme::BG_ELEVATED,
-                                    );
-                                }
-                                status_badge(
-                                    ui,
-                                    app.kind.label(),
-                                    theme::TEXT_SECONDARY,
-                                    theme::BG_ELEVATED,
-                                );
-                                if app.estimated_size_bytes > 0 {
-                                    status_badge(
-                                        ui,
-                                        &format_bytes(app.estimated_size_bytes),
-                                        theme::ACCENT_GOLD,
-                                        theme::BG_ELEVATED,
+                                    ui.label(
+                                        RichText::new(format!("v{}", app.display_version))
+                                            .size(11.2)
+                                            .monospace()
+                                            .color(theme::TEXT_MUTED),
                                     );
                                 }
                             });
                             ui.label(
-                                RichText::new(format!(
-                                    "Publisher: {}   |   Installed: {}   |   Location: {}",
-                                    if app.publisher.is_empty() {
-                                        "Unknown"
-                                    } else {
-                                        &app.publisher
-                                    },
-                                    if app.install_date.is_empty() {
-                                        "N/A"
-                                    } else {
-                                        &app.install_date
-                                    },
-                                    app.install_location.as_deref().unwrap_or("Registry / System"),
-                                ))
+                                RichText::new(if app.publisher.is_empty() {
+                                    app.kind.label()
+                                } else {
+                                    &app.publisher
+                                })
                                 .size(11.5)
                                 .color(theme::TEXT_SECONDARY),
                             );
                         });
 
+                        // Right: Size + Clean Uninstall + Compact "•••" Context Menu
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            if danger_button(ui, "Force Removal").clicked() {
-                                actions.push(AppAction::ScanAppLeftovers(app.id.clone()));
-                            }
-                            if emerald_button(ui, "Uninstall").clicked() {
+                            ui.menu_button(
+                                RichText::new("•••").size(13.0).strong().color(theme::TEXT_SECONDARY),
+                                |ui| {
+                                    ui.set_min_width(155.0);
+                                    if ui
+                                        .button(
+                                            RichText::new("Force Remove & Traces")
+                                                .color(theme::ACCENT_ROSE),
+                                        )
+                                        .clicked()
+                                    {
+                                        actions.push(AppAction::ScanAppLeftovers(app.id.clone()));
+                                        ui.close_menu();
+                                    }
+                                    if ui.button("Scan Leftovers").clicked() {
+                                        actions.push(AppAction::ScanAppLeftovers(app.id.clone()));
+                                        ui.close_menu();
+                                    }
+                                    if let Some(ref loc) = app.install_location {
+                                        if ui.button("Open Install Folder").clicked() {
+                                            actions.push(AppAction::OpenFolder(loc.clone()));
+                                            ui.close_menu();
+                                        }
+                                    }
+                                    if let Some(hive) = app.registry_hive {
+                                        if ui.button("Open Registry Key").clicked() {
+                                            actions.push(AppAction::OpenRegeditKey {
+                                                hive,
+                                                subkey: app.registry_subkey.clone(),
+                                            });
+                                            ui.close_menu();
+                                        }
+                                    }
+                                },
+                            );
+
+                            if ui
+                                .add(
+                                    egui::Button::new(
+                                        RichText::new("Uninstall")
+                                            .size(12.2)
+                                            .strong()
+                                            .color(theme::ACCENT_CYAN),
+                                    )
+                                    .fill(theme::ACCENT_CYAN_DIM)
+                                    .stroke(egui::Stroke::new(
+                                        1.0_f32,
+                                        theme::ACCENT_CYAN.linear_multiply(0.5),
+                                    ))
+                                    .min_size(Vec2::new(82.0, 28.0)),
+                                )
+                                .clicked()
+                            {
                                 actions.push(AppAction::StandardUninstallApp(app.id.clone()));
                             }
-                            if subtle_button(ui, "Scan Traces").clicked() {
-                                actions.push(AppAction::ScanAppLeftovers(app.id.clone()));
-                            }
-                            if let Some(hive) = app.registry_hive {
-                                if subtle_button(ui, "Regedit").clicked() {
-                                    actions.push(AppAction::OpenRegeditKey {
-                                        hive,
-                                        subkey: app.registry_subkey.clone(),
-                                    });
-                                }
-                            }
-                            if let Some(ref loc) = app.install_location {
-                                if subtle_button(ui, "Folder").clicked() {
-                                    actions.push(AppAction::OpenFolder(loc.clone()));
-                                }
+
+                            if app.estimated_size_bytes > 0 {
+                                ui.label(
+                                    RichText::new(format_bytes(app.estimated_size_bytes))
+                                        .size(12.0)
+                                        .monospace()
+                                        .color(theme::TEXT_SECONDARY),
+                                );
                             }
                         });
                     });
@@ -330,18 +340,4 @@ pub fn render(ui: &mut egui::Ui, state: &mut UiState, actions: &mut Vec<AppActio
                 ui.add_space(4.0);
             }
         });
-}
-
-fn filter_pill(ui: &mut egui::Ui, label: &str, active: bool) -> egui::Response {
-    let (fill, fg, stroke) = if active {
-        (theme::ACCENT_COBALT_DIM, theme::ACCENT_COBALT, theme::ACCENT_COBALT)
-    } else {
-        (theme::BG_ELEVATED, theme::TEXT_SECONDARY, theme::BORDER_SUBTLE)
-    };
-    ui.add(
-        egui::Button::new(RichText::new(label).size(12.0).color(fg))
-            .fill(fill)
-            .stroke(egui::Stroke::new(1.0_f32, stroke))
-            .corner_radius(egui::CornerRadius::same(12)),
-    )
 }

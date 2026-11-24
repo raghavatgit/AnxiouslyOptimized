@@ -1,120 +1,133 @@
 use crate::engine::tweaks::preset_ids;
 use crate::models::PresetId;
 use crate::ui::components::{
-    card_frame, emerald_button, primary_button, section_header, status_badge, subtle_button,
+    bento_frame, dot_pill, emerald_button, primary_button, progress_bar, section_header,
+    status_badge, subtle_button,
 };
 use crate::ui::{theme, AppAction, TabId, UiState};
-use egui::RichText;
+use egui::{RichText, Vec2};
 
 pub fn render(ui: &mut egui::Ui, state: &UiState, actions: &mut Vec<AppAction>) {
-    section_header(
-        ui,
-        "Quick Boost & Extreme Windows 11 Presets",
-        "Curated, OS-filtered optimization bundles backed by atomic undo journals.",
-    );
+    ui.horizontal(|ui| {
+        section_header(ui, "Boost Profiles", "One-click atomic optimization bundles.");
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            dot_pill(
+                ui,
+                if state.settings.auto_restore_point_before_preset {
+                    "Auto Restore Point"
+                } else {
+                    "Restore Point Off"
+                },
+                state.settings.auto_restore_point_before_preset,
+            );
+            if subtle_button(ui, "Rollbacks").clicked() {
+                actions.push(AppAction::SwitchTab(TabId::Safety));
+            }
+        });
+    });
 
     let presets = [
         (
             PresetId::EverydayBoost,
-            "Everyday Responsiveness",
-            "Balanced UI responsiveness, clean Windows 10/11 clutter, privacy hygiene, and NTFS last-access speedups without disabling balanced thermals.",
+            "Everyday",
+            "Snappy UI, zero telemetry clutter & fast NTFS.",
+            &["Snappy UI", "Privacy", "NTFS"],
             theme::ACCENT_COBALT,
         ),
         (
             PresetId::GamingRig,
-            "Gaming Rig Optimization",
-            "Enables Game Mode, Hardware-Accelerated GPU Scheduling, 1:1 Raw Mouse Input, Performance Power Plan, disables Core Parking & GameDVR.",
+            "Gaming",
+            "HAGS, 1:1 raw mouse, unparked cores & GameDVR off.",
+            &["HAGS", "Raw Input", "No GameDVR"],
             theme::ACCENT_EMERALD,
         ),
         (
             PresetId::CompetitiveLowLatency,
-            "Competitive Low-Latency",
-            "Full esports profile: Gaming Rig stack PLUS PCI GPU MSI-mode interrupts, MMCSS network un-throttling, Win32PrioritySeparation=0x26 & TCPNoDelay.",
+            "Competitive",
+            "PCI MSI interrupts, Win32 quantum 0x26 & TCP NoDelay.",
+            &["GPU MSI", "0x26 Quantum", "Zero Throttle"],
             theme::ACCENT_GOLD,
         ),
         (
             PresetId::ExtremeWin11,
-            "Extreme Windows 11 & eSports",
-            "Maximum Windows 11 overhaul: disables Copilot/Recall, Widgets, VBS/HVCI, background UWP apps, power throttling, enables Windowed Flip-Model, Compact Explorer & SvcHost consolidation.",
-            theme::ACCENT_ROSE,
+            "Extreme Win11",
+            "Disables VBS/HVCI, Recall, Widgets & enables Flip-Model VRR.",
+            &["No VBS", "Flip-Model", "SvcHost Merge"],
+            theme::ACCENT_CYAN,
         ),
     ];
 
-    ui.columns(2, |cols| {
-        for (i, (id, title, desc, accent)) in presets.into_iter().enumerate() {
-            let ui = &mut cols[i % 2];
+    let wide = ui.available_width() >= 760.0;
+    let cols_count = if wide { 2 } else { 1 };
+
+    ui.columns(cols_count, |cols| {
+        for (i, (id, title, tagline, pills, accent)) in presets.into_iter().enumerate() {
+            let col_ui = &mut cols[i % cols_count];
             let ids = preset_ids(id);
-            let matching_tweaks: Vec<_> = state
+            let matching: Vec<_> = state
                 .tweaks
                 .iter()
                 .filter(|t| ids.contains(&t.id.as_str()))
                 .collect();
-            let applied = matching_tweaks.iter().filter(|t| t.is_applied).count();
-            let total = matching_tweaks.len();
+            let applied = matching.iter().filter(|t| t.is_applied).count();
+            let total = matching.len().max(1);
+            let frac = applied as f32 / total as f32;
+            let all_active = applied == matching.len() && !matching.is_empty();
 
-            card_frame().show(ui, |ui| {
+            bento_frame(if all_active { Some(accent) } else { None }).show(col_ui, |ui| {
                 ui.horizontal(|ui| {
-                    ui.label(RichText::new(title).size(15.5).strong().color(accent));
+                    ui.label(RichText::new(title).size(18.0).strong().color(theme::TEXT_PRIMARY));
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         status_badge(
                             ui,
-                            &format!("{applied} / {total} Active"),
-                            if applied == total && total > 0 {
-                                theme::ACCENT_EMERALD
-                            } else {
-                                theme::TEXT_SECONDARY
-                            },
-                            theme::BG_ELEVATED,
+                            &format!("{applied}/{total}"),
+                            if all_active { theme::ACCENT_EMERALD } else { accent },
+                            theme::BG_VOID,
                         );
                     });
                 });
-                ui.add_space(4.0);
-                ui.label(RichText::new(desc).size(12.5).color(theme::TEXT_SECONDARY));
+
+                ui.add_space(2.0);
+                ui.label(RichText::new(tagline).size(12.2).color(theme::TEXT_SECONDARY));
                 ui.add_space(8.0);
-                let btn = match id {
-                    PresetId::EverydayBoost => primary_button(ui, "Apply Everyday Boost"),
-                    PresetId::GamingRig => emerald_button(ui, "Apply Gaming Rig"),
-                    PresetId::CompetitiveLowLatency => primary_button(ui, "Apply Competitive Profile"),
-                    PresetId::ExtremeWin11 => emerald_button(ui, "Apply Extreme Win11 & eSports"),
+
+                ui.horizontal_wrapped(|ui| {
+                    for p in pills {
+                        status_badge(ui, p, theme::TEXT_SECONDARY, theme::BG_VOID);
+                    }
+                });
+
+                ui.add_space(10.0);
+                progress_bar(ui, frac, "", accent);
+                ui.add_space(10.0);
+
+                let btn_label = if all_active {
+                    format!("Re-Apply {title}")
+                } else {
+                    format!("Activate {title}")
+                };
+                let btn = if matches!(id, PresetId::ExtremeWin11) {
+                    primary_button(ui, &btn_label)
+                } else if matches!(id, PresetId::GamingRig) {
+                    emerald_button(ui, &btn_label)
+                } else {
+                    ui.add(
+                        egui::Button::new(
+                            RichText::new(&btn_label)
+                                .size(12.8)
+                                .strong()
+                                .color(theme::TEXT_PRIMARY),
+                        )
+                        .fill(theme::BG_ELEVATED)
+                        .stroke(egui::Stroke::new(1.0_f32, accent.linear_multiply(0.65)))
+                        .min_size(Vec2::new(140.0, 32.0)),
+                    )
                 };
                 if btn.clicked() {
                     actions.push(AppAction::ApplyPreset(id));
                 }
             });
-            ui.add_space(8.0);
+            col_ui.add_space(10.0);
         }
-    });
-
-    ui.add_space(6.0);
-
-    card_frame().show(ui, |ui| {
-        ui.horizontal_wrapped(|ui| {
-            ui.vertical(|ui| {
-                ui.label(RichText::new("Direct Quick Actions").size(14.0).strong().color(theme::TEXT_PRIMARY));
-                ui.label(
-                    RichText::new(format!(
-                        "Auto Restore Point before presets is currently: {}",
-                        if state.settings.auto_restore_point_before_preset {
-                            "ENABLED (recommended)"
-                        } else {
-                            "DISABLED"
-                        }
-                    ))
-                    .size(12.0)
-                    .color(theme::TEXT_SECONDARY),
-                );
-            });
-            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                if emerald_button(ui, "Mem Reduct Clean Now").clicked() {
-                    actions.push(AppAction::RunMemReductClean);
-                }
-                if subtle_button(ui, "Open Geek Uninstaller").clicked() {
-                    actions.push(AppAction::SwitchTab(TabId::Uninstaller));
-                }
-                if subtle_button(ui, "Inspect Safety Journals").clicked() {
-                    actions.push(AppAction::SwitchTab(TabId::Safety));
-                }
-            });
-        });
     });
 }

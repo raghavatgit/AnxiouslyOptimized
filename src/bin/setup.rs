@@ -1,6 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use eframe::egui::{self, Color32, CornerRadius, Margin, RichText, Stroke, Vec2};
+use eframe::egui::{self, Color32, CornerRadius, Margin, Pos2, RichText, Sense, Stroke, StrokeKind, Vec2};
 use std::os::windows::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -13,6 +13,17 @@ const PAYLOAD_EXE: &[u8] = include_bytes!("../../dist/OptimizerByRaghav.exe");
 const UNINSTALL_REG_PATH: &str =
     r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\OptimizerByRaghav";
 const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+
+const BG_VOID: Color32 = Color32::from_rgb(6, 8, 13);
+const BG_CANVAS: Color32 = Color32::from_rgb(9, 12, 18);
+const BG_SURFACE: Color32 = Color32::from_rgb(14, 19, 29);
+const BORDER_HAIRLINE: Color32 = Color32::from_rgb(28, 38, 54);
+const TEXT_PRIMARY: Color32 = Color32::from_rgb(244, 247, 252);
+const TEXT_SECONDARY: Color32 = Color32::from_rgb(154, 168, 190);
+const TEXT_MUTED: Color32 = Color32::from_rgb(96, 111, 135);
+const ACCENT_CYAN: Color32 = Color32::from_rgb(56, 189, 248);
+const ACCENT_EMERALD: Color32 = Color32::from_rgb(16, 185, 129);
+const ACCENT_ROSE: Color32 = Color32::from_rgb(244, 63, 94);
 
 fn default_install_dir() -> PathBuf {
     let pf = std::env::var("ProgramFiles").unwrap_or_else(|_| r"C:\Program Files".to_string());
@@ -32,8 +43,12 @@ fn perform_install(
     desktop_shortcut: bool,
     start_menu_shortcut: bool,
 ) -> Result<PathBuf, String> {
-    std::fs::create_dir_all(install_dir)
-        .map_err(|e| format!("Failed creating {}: {e} (Run Setup as Administrator)", install_dir.display()))?;
+    std::fs::create_dir_all(install_dir).map_err(|e| {
+        format!(
+            "Failed creating {}: {e} (Run Setup as Administrator)",
+            install_dir.display()
+        )
+    })?;
 
     let target_exe = install_dir.join("OptimizerByRaghav.exe");
     if target_exe.exists() && std::fs::write(&target_exe, PAYLOAD_EXE).is_err() {
@@ -147,7 +162,37 @@ fn perform_uninstall() -> Result<String, String> {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
-    Ok("Uninstalled Optimizer by Raghav cleanly from Program Files, Shortcuts & Installed Apps.".to_string())
+    Ok("Uninstalled cleanly.".to_string())
+}
+
+fn pill_toggle(ui: &mut egui::Ui, on: &mut bool) {
+    let desired = Vec2::new(36.0, 20.0);
+    let (rect, mut resp) = ui.allocate_exact_size(desired, Sense::click());
+    if resp.clicked() {
+        *on = !*on;
+        resp.mark_changed();
+    }
+    let t = ui.ctx().animate_bool_responsive(resp.id, *on);
+    let p = ui.painter();
+    let bg = Color32::from_rgb(
+        (BG_VOID.r() as f32 + (ACCENT_CYAN.r() as f32 - BG_VOID.r() as f32) * t) as u8,
+        (BG_VOID.g() as f32 + (ACCENT_CYAN.g() as f32 - BG_VOID.g() as f32) * t) as u8,
+        (BG_VOID.b() as f32 + (ACCENT_CYAN.b() as f32 - BG_VOID.b() as f32) * t) as u8,
+    );
+    p.rect_filled(rect, CornerRadius::same(10), bg);
+    p.rect_stroke(
+        rect,
+        CornerRadius::same(10),
+        Stroke::new(1.0_f32, if *on { ACCENT_CYAN } else { BORDER_HAIRLINE }),
+        StrokeKind::Inside,
+    );
+    let r = rect.height() * 0.5 - 3.0;
+    let cx = egui::lerp((rect.left() + 3.0 + r)..=(rect.right() - 3.0 - r), t);
+    p.circle_filled(
+        Pos2::new(cx, rect.center().y),
+        r,
+        if *on { BG_VOID } else { TEXT_SECONDARY },
+    );
 }
 
 struct SetupWizardApp {
@@ -163,8 +208,10 @@ struct SetupWizardApp {
 impl SetupWizardApp {
     fn new(cc: &eframe::CreationContext<'_>, logo_rgba: Option<(Vec<u8>, u32, u32)>) -> Self {
         let mut visuals = egui::Visuals::dark();
-        visuals.panel_fill = Color32::from_rgb(10, 14, 22);
-        visuals.window_fill = Color32::from_rgb(18, 24, 36);
+        visuals.panel_fill = BG_CANVAS;
+        visuals.window_fill = BG_SURFACE;
+        visuals.extreme_bg_color = BG_VOID;
+        visuals.override_text_color = Some(TEXT_PRIMARY);
         cc.egui_ctx.set_visuals(visuals);
 
         let logo_tex = logo_rgba.map(|(rgba, w, h)| {
@@ -187,113 +234,127 @@ impl SetupWizardApp {
 
 impl eframe::App for SetupWizardApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        // Minimalist Borderless Drag Bar
+        egui::TopBottomPanel::top("setup_bar")
+            .exact_height(36.0)
+            .frame(
+                egui::Frame::new()
+                    .fill(BG_VOID)
+                    .stroke(Stroke::new(1.0_f32, BORDER_HAIRLINE))
+                    .inner_margin(Margin::symmetric(14, 4)),
+            )
+            .show(ctx, |ui| {
+                let rect = ui.max_rect();
+                ui.horizontal_centered(|ui| {
+                    ui.label(
+                        RichText::new(format!("SETUP  •  v{APP_VERSION}"))
+                            .size(10.5)
+                            .strong()
+                            .color(TEXT_MUTED),
+                    );
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        if ui
+                            .add(
+                                egui::Button::new(RichText::new("✕").size(12.5).color(TEXT_SECONDARY))
+                                    .frame(false),
+                            )
+                            .clicked()
+                        {
+                            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+                        }
+                    });
+                });
+                let drag = ui.interact(rect, egui::Id::new("setup_drag"), Sense::drag());
+                if drag.drag_started_by(egui::PointerButton::Primary) {
+                    ctx.send_viewport_cmd(egui::ViewportCommand::StartDrag);
+                }
+            });
+
         egui::CentralPanel::default()
             .frame(
                 egui::Frame::new()
-                    .fill(Color32::from_rgb(10, 14, 22))
-                    .inner_margin(Margin::same(22)),
+                    .fill(BG_CANVAS)
+                    .inner_margin(Margin::symmetric(24, 20)),
             )
             .show(ctx, |ui| {
-                // Header
                 ui.horizontal(|ui| {
                     if let Some(tex) = &self.logo_tex {
                         ui.add(
                             egui::Image::new(tex)
-                                .fit_to_exact_size(egui::vec2(52.0, 52.0))
+                                .fit_to_exact_size(egui::vec2(46.0, 46.0))
                                 .corner_radius(CornerRadius::same(10)),
                         );
-                        ui.add_space(8.0);
+                        ui.add_space(6.0);
                     }
                     ui.vertical(|ui| {
-                        ui.spacing_mut().item_spacing.y = 1.0;
-                        ui.horizontal(|ui| {
-                            ui.label(
-                                RichText::new("Optimizer")
-                                    .size(25.0)
-                                    .strong()
-                                    .color(Color32::from_rgb(241, 245, 249)),
-                            );
-                            ui.label(
-                                RichText::new(format!("v{APP_VERSION} Setup"))
-                                    .size(13.0)
-                                    .strong()
-                                    .color(Color32::from_rgb(59, 130, 246)),
-                            );
-                        });
-                        ui.label(
-                            RichText::new("by Raghav")
-                                .size(12.5)
-                                .color(Color32::from_rgb(245, 158, 11)),
-                        );
+                        ui.spacing_mut().item_spacing.y = 0.0;
+                        ui.label(RichText::new("Optimizer").size(24.0).strong().color(TEXT_PRIMARY));
+                        ui.label(RichText::new("by Raghav").size(11.5).color(ACCENT_CYAN));
                     });
                 });
 
-                ui.add_space(12.0);
-                ui.separator();
-                ui.add_space(10.0);
+                ui.add_space(16.0);
 
                 egui::Frame::new()
-                    .fill(Color32::from_rgb(18, 25, 38))
-                    .stroke(Stroke::new(1.0_f32, Color32::from_rgb(39, 51, 74)))
-                    .corner_radius(CornerRadius::same(8))
-                    .inner_margin(Margin::same(14))
+                    .fill(BG_SURFACE)
+                    .stroke(Stroke::new(1.0_f32, BORDER_HAIRLINE))
+                    .corner_radius(CornerRadius::same(12))
+                    .inner_margin(Margin::same(16))
                     .show(ui, |ui| {
-                        ui.label(
-                            RichText::new("Installation Destination")
-                                .size(12.5)
-                                .strong()
-                                .color(Color32::from_rgb(163, 177, 198)),
-                        );
+                        ui.label(RichText::new("LOCATION").size(10.0).strong().color(TEXT_MUTED));
                         ui.add_space(4.0);
                         ui.add_sized(
                             [ui.available_width(), 28.0],
                             egui::TextEdit::singleline(&mut self.install_dir),
                         );
 
-                        ui.add_space(10.0);
-                        ui.checkbox(
-                            &mut self.desktop_shortcut,
-                            "Create Desktop Shortcut (Optimizer by Raghav.lnk)",
-                        );
-                        ui.checkbox(
-                            &mut self.start_menu_shortcut,
-                            "Create Windows Start Menu Shortcut & Search Entry",
-                        );
-                        ui.checkbox(
-                            &mut self.launch_after_install,
-                            "Launch Optimizer by Raghav immediately after installation",
-                        );
+                        ui.add_space(12.0);
+                        for (lbl, flag) in [
+                            ("Desktop shortcut", &mut self.desktop_shortcut),
+                            ("Start Menu shortcut", &mut self.start_menu_shortcut),
+                            ("Launch when ready", &mut self.launch_after_install),
+                        ] {
+                            ui.horizontal(|ui| {
+                                ui.label(RichText::new(lbl).size(12.8).color(TEXT_PRIMARY));
+                                ui.with_layout(
+                                    egui::Layout::right_to_left(egui::Align::Center),
+                                    |ui| {
+                                        pill_toggle(ui, flag);
+                                    },
+                                );
+                            });
+                            ui.add_space(2.0);
+                        }
                     });
 
-                ui.add_space(12.0);
+                ui.add_space(14.0);
 
                 if let Some((ok, msg)) = &self.status_msg {
-                    let c = if *ok {
-                        Color32::from_rgb(16, 185, 129)
-                    } else {
-                        Color32::from_rgb(244, 63, 94)
-                    };
-                    ui.label(RichText::new(msg).size(12.5).strong().color(c));
-                    ui.add_space(8.0);
+                    ui.label(
+                        RichText::new(msg)
+                            .size(12.0)
+                            .color(if *ok { ACCENT_EMERALD } else { ACCENT_ROSE }),
+                    );
+                    ui.add_space(6.0);
                 }
 
                 ui.horizontal(|ui| {
-                    let install_lbl = if self.already_installed {
-                        format!("Upgrade / Reinstall v{APP_VERSION}")
+                    let lbl = if self.already_installed {
+                        format!("Update v{APP_VERSION}")
                     } else {
-                        format!("Install Optimizer by Raghav v{APP_VERSION}")
+                        format!("Install v{APP_VERSION}")
                     };
-                    let install_btn = egui::Button::new(
-                        RichText::new(install_lbl)
-                            .size(14.0)
-                            .strong()
-                            .color(Color32::from_rgb(6, 24, 18)),
+                    let btn = egui::Button::new(
+                        RichText::new(lbl).size(13.5).strong().color(BG_VOID),
                     )
-                    .min_size(Vec2::new(250.0, 38.0))
-                    .fill(Color32::from_rgb(16, 185, 129))
-                    .corner_radius(CornerRadius::same(7));
+                    .min_size(Vec2::new(
+                        if self.already_installed { 320.0 } else { ui.available_width() },
+                        38.0,
+                    ))
+                    .fill(ACCENT_CYAN)
+                    .corner_radius(CornerRadius::same(9));
 
-                    if ui.add(install_btn).clicked() {
+                    if ui.add(btn).clicked() {
                         match perform_install(
                             Path::new(&self.install_dir),
                             self.desktop_shortcut,
@@ -301,34 +362,26 @@ impl eframe::App for SetupWizardApp {
                         ) {
                             Ok(exe_path) => {
                                 self.already_installed = true;
-                                self.status_msg = Some((
-                                    true,
-                                    format!("Installed cleanly to {}", exe_path.display()),
-                                ));
+                                self.status_msg = Some((true, "Installed cleanly.".into()));
                                 if self.launch_after_install {
                                     let _ = Command::new(&exe_path).spawn();
                                     ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                                 }
                             }
-                            Err(e) => {
-                                self.status_msg = Some((false, e));
-                            }
+                            Err(e) => self.status_msg = Some((false, e)),
                         }
                     }
 
                     if self.already_installed {
-                        let uninst_btn = egui::Button::new(
-                            RichText::new("Uninstall")
-                                .size(13.0)
-                                .strong()
-                                .color(Color32::from_rgb(244, 63, 94)),
+                        let uninst = egui::Button::new(
+                            RichText::new("Uninstall").size(12.5).strong().color(ACCENT_ROSE),
                         )
                         .min_size(Vec2::new(110.0, 38.0))
-                        .fill(Color32::from_rgb(70, 20, 32))
-                        .stroke(Stroke::new(1.0_f32, Color32::from_rgb(244, 63, 94)))
-                        .corner_radius(CornerRadius::same(7));
+                        .fill(Color32::from_rgb(52, 16, 26))
+                        .stroke(Stroke::new(1.0_f32, ACCENT_ROSE.linear_multiply(0.65)))
+                        .corner_radius(CornerRadius::same(9));
 
-                        if ui.add(uninst_btn).clicked() {
+                        if ui.add(uninst).clicked() {
                             match perform_uninstall() {
                                 Ok(msg) => {
                                     self.already_installed = false;
@@ -365,8 +418,9 @@ fn main() {
 
     let icon_rgba = load_icon();
     let mut viewport = egui::ViewportBuilder::default()
-        .with_title(format!("Optimizer by Raghav v{APP_VERSION} — Setup"))
-        .with_inner_size([520.0, 370.0])
+        .with_title(format!("Optimizer by Raghav v{APP_VERSION} Setup"))
+        .with_decorations(false)
+        .with_inner_size([490.0, 360.0])
         .with_resizable(false);
 
     if let Some((ref rgba, w, h)) = icon_rgba {

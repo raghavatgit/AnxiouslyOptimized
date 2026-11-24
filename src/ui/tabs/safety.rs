@@ -1,65 +1,59 @@
 use crate::engine::format_bytes;
 use crate::ui::components::{
-    card_frame, danger_button, emerald_button, kv_row, primary_button, section_header,
-    status_badge, subtle_button,
+    bento_frame, card_frame, danger_button, dot_pill, emerald_button, icon_button, section_header,
+    status_badge, subtle_button, NavIcon,
 };
 use crate::ui::{theme, AppAction, UiState};
 use egui::RichText;
 
 pub fn render(ui: &mut egui::Ui, state: &mut UiState, actions: &mut Vec<AppAction>) {
     ui.horizontal(|ui| {
-        section_header(
-            ui,
-            "Safety & Rollback Center",
-            "Typed LIFO transaction rollback journals, on-demand Emergency .bat generator, and Volume Shadow Copy restore points.",
-        );
+        section_header(ui, "Safety & Rollback", "Atomic undo timeline & System Restore.");
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-            if primary_button(ui, "Refresh Safety Data").clicked() {
+            if icon_button(ui, NavIcon::Refresh, "Refresh Safety", false).clicked() {
                 actions.push(AppAction::RefreshSafety);
+            }
+            if subtle_button(ui, "System Restore UI").clicked() {
+                actions.push(AppAction::OpenSystemRestoreUi);
             }
         });
     });
 
-    // VSS & System Restore Card
-    card_frame().show(ui, |ui| {
-        let v = &state.vss_health;
+    // ==================== SYSTEM RESTORE CHECKPOINT CARD ====================
+    let v = &state.vss_health;
+    let vss_ok = v.service_exists && !v.is_disabled && v.sufficient_space && v.restore_enabled != Some(false);
+
+    bento_frame(None).show(ui, |ui| {
         ui.horizontal_wrapped(|ui| {
             ui.label(
-                RichText::new("Windows System Protection & Restore Points")
+                RichText::new("Restore Checkpoint")
                     .size(15.0)
                     .strong()
                     .color(theme::TEXT_PRIMARY),
             );
-            if v.service_exists && !v.is_disabled && v.sufficient_space && v.restore_enabled != Some(false) {
-                status_badge(ui, "VSS HEALTHY", theme::ACCENT_EMERALD, theme::ACCENT_EMERALD_DIM);
-            } else {
-                status_badge(ui, "VSS ATTENTION REQUIRED", theme::ACCENT_AMBER, theme::ACCENT_AMBER_DIM);
-            }
-            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                if subtle_button(ui, "Open Windows Restore UI (rstrui.exe)").clicked() {
-                    actions.push(AppAction::OpenSystemRestoreUi);
-                }
-            });
+            dot_pill(ui, if vss_ok { "VSS Ready" } else { "VSS Disabled" }, vss_ok);
+            ui.label(
+                RichText::new(format!(
+                    "{} free on {}",
+                    format_bytes(v.system_drive_free_bytes),
+                    v.system_drive
+                ))
+                .size(11.5)
+                .monospace()
+                .color(theme::TEXT_MUTED),
+            );
         });
-        ui.add_space(4.0);
-        kv_row(ui, "VSS Status", &v.summary, false);
-        kv_row(
-            ui,
-            "System Drive Free",
-            &format!("{} free on {}", format_bytes(v.system_drive_free_bytes), v.system_drive),
-            true,
-        );
 
-        ui.add_space(6.0);
+        ui.add_space(8.0);
         ui.horizontal_wrapped(|ui| {
             ui.add_sized(
-                [300.0, 28.0],
+                [260.0, 30.0],
                 egui::TextEdit::singleline(&mut state.restore_desc_input)
-                    .hint_text("Restore point description..."),
+                    .hint_text("Checkpoint label..."),
             );
-            if emerald_button(ui, "Create Restore Point Now").clicked() {
+            if emerald_button(ui, "Create Checkpoint").clicked() {
                 let desc = if state.restore_desc_input.trim().is_empty() {
-                    "Optimizer by Raghav Manual Checkpoint".to_string()
+                    "Optimizer Checkpoint".to_string()
                 } else {
                     state.restore_desc_input.trim().to_string()
                 };
@@ -68,46 +62,43 @@ pub fn render(ui: &mut egui::Ui, state: &mut UiState, actions: &mut Vec<AppActio
         });
 
         if !state.restore_points.is_empty() {
-            ui.add_space(6.0);
-            egui::Grid::new("rp_grid").striped(true).num_columns(4).show(ui, |ui| {
-                for h in ["Seq #", "Created At", "Type", "Description"] {
-                    ui.label(RichText::new(h).size(11.5).strong().color(theme::TEXT_MUTED));
-                }
-                ui.end_row();
-                for rp in state.restore_points.iter().take(8) {
-                    ui.label(RichText::new(rp.sequence_number.to_string()).monospace().size(12.0));
-                    ui.label(RichText::new(&rp.created_at).monospace().size(12.0));
-                    ui.label(RichText::new(&rp.restore_type).size(12.0));
-                    ui.label(RichText::new(&rp.description).size(12.0));
-                    ui.end_row();
-                }
-            });
+            ui.add_space(8.0);
+            for rp in state.restore_points.iter().take(4) {
+                ui.horizontal(|ui| {
+                    status_badge(
+                        ui,
+                        &format!("#{}", rp.sequence_number),
+                        theme::ACCENT_CYAN,
+                        theme::BG_VOID,
+                    );
+                    ui.label(
+                        RichText::new(&rp.created_at)
+                            .size(11.5)
+                            .monospace()
+                            .color(theme::TEXT_MUTED),
+                    );
+                    ui.label(RichText::new(&rp.description).size(12.2).color(theme::TEXT_PRIMARY));
+                });
+            }
         }
     });
 
-    ui.add_space(10.0);
+    ui.add_space(12.0);
 
-    // Transaction Journals
-    ui.horizontal(|ui| {
-        ui.label(
-            RichText::new(format!("Transaction Undo Journals ({})", state.journals.len()))
-                .size(15.5)
-                .strong()
-                .color(theme::TEXT_PRIMARY),
-        );
-        ui.label(
-            RichText::new("  — Emergency .bat files are exported to Desktop ONLY when requested.")
-                .size(12.0)
-                .color(theme::TEXT_SECONDARY),
-        );
-    });
-    ui.add_space(4.0);
+    // ==================== UNDO TIMELINE ====================
+    ui.label(
+        RichText::new(format!("UNDO TIMELINE ({})", state.journals.len()))
+            .size(10.5)
+            .strong()
+            .color(theme::TEXT_MUTED),
+    );
+    ui.add_space(6.0);
 
     if state.journals.is_empty() {
         card_frame().show(ui, |ui| {
             ui.label(
-                RichText::new("No transaction journals recorded yet. Every tweak, preset, DNS apply, and config patch creates one automatically.")
-                    .size(13.0)
+                RichText::new("No changes recorded yet — every tweak & preset automatically saves an undo point here.")
+                    .size(12.2)
                     .color(theme::TEXT_SECONDARY),
             );
         });
@@ -116,48 +107,58 @@ pub fn render(ui: &mut egui::Ui, state: &mut UiState, actions: &mut Vec<AppActio
 
     for j in &state.journals {
         card_frame().show(ui, |ui| {
-            ui.horizontal_wrapped(|ui| {
+            ui.horizontal(|ui| {
                 ui.vertical(|ui| {
-                    ui.horizontal_wrapped(|ui| {
-                        ui.label(RichText::new(&j.title).size(14.0).strong().color(theme::TEXT_PRIMARY));
-                        if j.rolled_back {
-                            status_badge(ui, "ROLLED BACK", theme::TEXT_MUTED, theme::BG_ELEVATED);
-                        } else {
-                            status_badge(ui, "ACTIVE", theme::ACCENT_EMERALD, theme::ACCENT_EMERALD_DIM);
-                        }
+                    ui.spacing_mut().item_spacing.y = 2.0;
+                    ui.horizontal(|ui| {
+                        ui.label(
+                            RichText::new(&j.title)
+                                .size(13.8)
+                                .strong()
+                                .color(theme::TEXT_PRIMARY),
+                        );
                         status_badge(
                             ui,
-                            &format!("{} step(s)", j.steps.len()),
-                            theme::ACCENT_COBALT,
-                            theme::BG_ELEVATED,
+                            &format!("{} steps", j.steps.len()),
+                            if j.rolled_back {
+                                theme::TEXT_MUTED
+                            } else {
+                                theme::ACCENT_EMERALD
+                            },
+                            theme::BG_VOID,
                         );
                     });
                     ui.label(
-                        RichText::new(format!("{}  |  {}", j.journal_id, j.timestamp_iso))
-                            .size(11.5)
+                        RichText::new(&j.timestamp_iso)
+                            .size(11.2)
                             .monospace()
-                            .color(theme::TEXT_SECONDARY),
+                            .color(theme::TEXT_MUTED),
                     );
-                    if let Some(err) = &j.last_error {
-                        ui.label(RichText::new(err).size(11.5).color(theme::ACCENT_ROSE));
-                    }
                 });
 
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    if subtle_button(ui, "Delete").clicked() {
-                        actions.push(AppAction::DeleteJournal(j.journal_id.clone()));
-                    }
-                    if subtle_button(ui, "Export Emergency .bat").clicked() {
-                        actions.push(AppAction::ExportJournalBat(j.journal_id.clone()));
-                    }
-                    if !j.rolled_back {
-                        if danger_button(ui, "Rollback Now").clicked() {
-                            actions.push(AppAction::RollbackJournal(j.journal_id.clone()));
+                    ui.menu_button(RichText::new("•••").strong(), |ui| {
+                        if ui.button("Export Emergency .bat").clicked() {
+                            actions.push(AppAction::ExportJournalBat(j.journal_id.clone()));
+                            ui.close_menu();
                         }
+                        if ui
+                            .button(RichText::new("Delete Entry").color(theme::ACCENT_ROSE))
+                            .clicked()
+                        {
+                            actions.push(AppAction::DeleteJournal(j.journal_id.clone()));
+                            ui.close_menu();
+                        }
+                    });
+
+                    if j.rolled_back {
+                        status_badge(ui, "Reverted", theme::TEXT_MUTED, theme::BG_VOID);
+                    } else if danger_button(ui, "Undo").clicked() {
+                        actions.push(AppAction::RollbackJournal(j.journal_id.clone()));
                     }
                 });
             });
         });
-        ui.add_space(4.0);
+        ui.add_space(5.0);
     }
 }

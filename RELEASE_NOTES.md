@@ -1,5 +1,20 @@
 # Release Notes — Optimizer by Raghav
 
+## v2.2.0 — Futuristic Minimalist UI/UX Overhaul, Borderless Shell, Radial Gauges & Command Palette
+
+### Highlights
+- **Frameless Borderless Shell & `Ctrl+K` Command Palette**:
+  - Replaced native OS window chrome with a custom borderless obsidian header featuring window drag, double-click maximize, edge/corner resize handles, custom window controls, a live `⚡ RAM %` purge pill, and an instant `Ctrl+K` **Command Palette** to search tweaks, jump to pages, or trigger presets.
+- **Minimalist, Decluttered & Scalable Interface**:
+  - **Radial 270° Arc Telemetry Gauges**: Live glowing radial rings for CPU load, physical memory, commit charge, cache, and active optimization score on the **Home** and **Clean** workspaces.
+  - **Custom Vector Iconography & Windows Variable Fonts**: Geometric vector icon system (`NavIcon`) + automatic Windows `Segoe UI Variable` / `Cascadia Mono` font loading (zero binary bloat, razor-sharp at all DPIs).
+  - **Collapsible Adaptive Navigation Rail & Smooth UI Scaling**: Auto-collapses to a `62px` icon rail on compact viewports (or manually via the top-left toggle) and supports live UI zoom (`90%`, `100%`, `110%`, `125%` or `Ctrl +` / `Ctrl -`).
+  - **Animated Pill Toggle Switches & Segmented Workspaces**: Replaced square checkboxes and verbose descriptions with instant pill switches (`action_switch` / `toggle_switch`), unified **Applications** (`Installed | OS Debloat`) with a clean `•••` overflow menu, and organized **Clean** (`Memory | Storage | Repair`) and **Gaming** (`Game Mode | VALORANT | Emulators`) into zero-clutter segmented views.
+- **Borderless Setup Wizard (`OptimizerByRaghav-Setup.exe`)**:
+  - Redesigned the standalone installer to match the new frameless obsidian & electric-cyan aesthetic with pill toggles and one-click upgrade/uninstall.
+
+---
+
 ## v2.1.0 — Native Windows Setup Installer, GitHub Update Checker, 240 FPS UI/UX & Emulator Engine Hardening
 
 ### Highlights

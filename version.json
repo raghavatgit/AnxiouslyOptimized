@@ -1,9 +1,9 @@
 {
-  "version": "2.1.0",
-  "tag": "v2.1.0",
-  "released_at": "2026-11-20",
+  "version": "2.2.0",
+  "tag": "v2.2.0",
+  "released_at": "2026-11-24",
   "release_url": "https://github.com/raghavatgit/AnxiouslyOptimized/releases/latest",
   "setup_download_url": "https://raw.githubusercontent.com/raghavatgit/AnxiouslyOptimized/main/dist/OptimizerByRaghav-Setup.exe",
   "portable_download_url": "https://raw.githubusercontent.com/raghavatgit/AnxiouslyOptimized/main/dist/OptimizerByRaghav.exe",
-  "notes": "Optimizer by Raghav v2.1.0: Native Windows Setup Installer (OptimizerByRaghav-Setup.exe), built-in GitHub Update Checker, 6-region Mem Reduct engine, Geek.exe Uninstaller with virtualized 240FPS list & Force Removal, Extreme Windows 11 & Emulator optimizations, and swifter UI/UX."
+  "notes": "Optimizer by Raghav v2.2.0: Complete Futuristic & Minimalist UI/UX Redesign — frameless borderless obsidian window, radial 270° telemetry arc gauges, Ctrl+K Command Palette, collapsible vector icon rail, smooth UI scaling (90%–125%), iOS-style pill switches, unified Applications & Segmented Gaming/Clean workspaces, and borderless Setup Wizard."
 }
